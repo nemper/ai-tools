@@ -1,0 +1,9 @@
+langchain==0.0.281
+numpy==1.23.5
+openai==0.27.9
+pandas==2.0.3
+PyYAML==6.0
+streamlit==1.26.0
+streamlit_authenticator==0.2.2
+tiktoken==0.3.3
+git+https://github.com/djordjethai/myfunc.git

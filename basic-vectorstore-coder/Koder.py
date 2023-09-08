@@ -47,10 +47,17 @@ def main():
     name_space = "koder"
     vectorstore = Pinecone(index, embeddings,
                            text_field, name_space)
-
+    with st.sidebar:
+        st.image(
+                "https://test.georgemposi.com/wp-content/uploads/2023/05/positive-logo-red.jpg", width=150)
     # Get user input
     st.subheader("Koristeci LangChain i Streamlit...")
-
+    with st.expander("Procitajte uputstvo:"):
+        st.caption("Prethodni korak bio je kreiranje pitanja. To smo radili pomocu besplatnog CHATGPT modela. Iz svake oblasti (ili iz dokumenta) zamolimo CHATGPT da kreira relevantna pitanja. Na pitanja mozemo da odgovorimo sami ili se odgovori mogu izvuci iz dokumenta.")
+        st.caption("Ukoliko zelite da vam model kreira odgovore, odaberite ulazni fajl sa pitanjma iz prethodnog koraka. Opciono, ako je za odgovore potreban izvor, odaberite i fajl sa izvorom. Unesite sistemsku poruku (opis ponasanja modela) i naziv FT modela. Kliknite na Submit i sacekajte da se obrada zavrsi. Fajl sa odgovorima cete kasnije korisiti za kreiranje FT modela.")
+        st.caption(
+            "Pre prelaska na sledecu fazu OBAVEZNO pregledajte izlazni dokument sa odgovorima i korigujte ga po potrebi. ")
+    st.divider()
     # Initialize ChatOpenAI and RetrievalQA
 
     izlaz = ""
@@ -72,10 +79,11 @@ def main():
                 label="Detaljno opisite sta zelite da uradim (kod, objasnjenje ili sl): ",
                 key="1",
                 value=st.session_state["task"],
+                help = "Npr. Napravi kod koji ce da ispise Hello World!"
             )
             + "."
         )
-        submit_button = st.form_submit_button(label="Submit")
+        submit_button = st.form_submit_button(label="Submit", help="Kliknite ovde da pokrenete")
 
         # If the submit button is clicked, clear the session state and run the query
         if submit_button:
@@ -86,9 +94,9 @@ def main():
 
     if izlaz != "":
         st.download_button("Download as .txt",
-                           izlaz, file_name="koder.txt")
+                           izlaz, file_name="koder.txt", help="Kliknite ovde da preuzmete fajl")
 
 
-name, authentication_status, username = positive_login(main, "27.08.23")
+name, authentication_status, username = positive_login(main, "08.09.23")
 
 
