@@ -81,7 +81,7 @@ msal==1.23.0
 msal-extensions==1.0.0
 multidict==6.0.4
 multitasking==0.0.11
-myfunc @ git+https://github.com/djordjethai/myfunc.git@69ddfceaa76f57228d7257062fffd29583b6f247
+myfunc @ git+https://github.com/djordjethai/myfunc.git
 mypy-extensions==1.0.0
 nest-asyncio==1.5.7
 nltk==3.8.1
