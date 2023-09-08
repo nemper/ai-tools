@@ -116,7 +116,6 @@ pyee==8.2.2
 Pygments==2.16.1
 PyJWT==2.8.0
 Pympler==1.0.1
-pymsalruntime==0.13.12
 pyparsing==3.1.1
 pyppeteer==1.0.2
 pyquery==2.0.0
