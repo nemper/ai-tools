@@ -8,7 +8,9 @@ from langchain.chains import RetrievalQA
 import pinecone
 import streamlit as st
 import os
-from mojafunkcija import st_style, positive_login, init_cond_llm
+from myfunc.mojafunkcija import st_style, positive_login, init_cond_llm
+
+
 
 # these are the environment variables that need to be set for LangSmith to work
 # os.environ["LANGCHAIN_PROJECT"] = "Koder"
