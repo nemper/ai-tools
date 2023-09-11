@@ -50,9 +50,9 @@ To use this program effectively, follow these steps:
 
 ## Script Details
 
-- **Author**: [Author's Name]
-- **Date**: [Date]
-- **License**: [License Information]
+- **Author**: Positive
+- **Date**: 11.09.23
+- **License**: MIT
 
 Please note that this program relies on Pinecone for text retrieval and OpenAI for text generation. Proper setup and configuration of Pinecone and OpenAI credentials are essential for the program to function correctly.
 
