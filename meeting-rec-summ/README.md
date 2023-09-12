@@ -1,7 +1,3 @@
-Certainly! Here's a description of the provided code for your README.md file:
-
----
-
 # Text Summarization Tool
 
 This code is designed for summarizing text documents efficiently. It utilizes various libraries and APIs to extract key information from large texts and generate concise summaries.
@@ -58,6 +54,3 @@ To use this code for text summarization, follow these steps:
 
 Please note that this code relies on LangSmith and OpenAI APIs for text summarization and transcription. Proper setup and configuration of environment variables are essential for the code to function correctly.
 
----
-
-You can include this description at the beginning of your script or in the README to provide users with an understanding of the purpose and usage of your "Text Summarization Tool" code.
