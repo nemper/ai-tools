@@ -1,0 +1,15 @@
+*.txt
+!requirements.txt
+!propmt_pam.txt
+!propmt_summarizer.txt
+*.json
+*.exe
+*.mp3
+*.pdf
+*.docx
+.vsidx
+.wsuo
+*.csv
+*.xlsx
+slnx.sqlite
+*.JSONL
