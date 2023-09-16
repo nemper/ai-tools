@@ -1,56 +1,99 @@
-# Text Summarization Tool
+# Code Summarization Repository
 
-This code is designed for summarizing text documents efficiently. It utilizes various libraries and APIs to extract key information from large texts and generate concise summaries.
-
-## Overview
-
-The primary purpose of this code is to assist users in summarizing lengthy text documents, including PDFs, DOCX files, and plain text. It employs a combination of text processing techniques and utilizes OpenAI's GPT models for content summarization.
-
-## Key Features
-
-Here are some of the key features and functionalities offered by this code:
-
-- **Text Summarization**: Users can upload text documents in various formats (PDF, DOCX, TXT), and the code will automatically summarize their content, providing a condensed version of the original text.
-
-- **Customization**: Users can customize the summarization process by specifying prompts for both the initial and final summaries, allowing for fine-tuning the summarization output.
-
-- **Language Support**: The code supports multiple languages, and users can choose the language for transcribing audio files.
-
-- **Feedback and Evaluation**: Users can provide feedback and evaluate the summarization results, helping to improve the summarization quality over time.
+This repository contains a Streamlit application that facilitates code summarization by utilizing OpenAI's language models. The application aids users in summarizing code and generating human-readable explanations for it. Below are explanations for the main functions and features of the application:
 
 ## Getting Started
 
-To use this code for text summarization, follow these steps:
+To start using this code summarization application, follow these steps:
 
-1. Ensure you have the required environment variables set up for LangSmith, including the project, tracing, and endpoint settings.
+1. **Clone the Repository:** Clone this repository to your local machine using the following command:
 
-2. Clone or download the code to your local machine.
+   ```bash
+   git clone https://github.com/yourusername/your-repo.git
+   ```
 
-3. Customize the summarization prompts by editing the "prompt_summarizer.txt" and "prompt_pam.txt" files to match your specific requirements.
+2. **Navigate to the Directory:** Access the repository directory by running:
 
-4. Run the code using Streamlit to initiate the summarization process.
+   ```bash
+   cd your-repo
+   ```
 
-5. Upload the text document you want to summarize, select the language (if transcribing audio), and customize the summarization prompts.
+3. **Install Dependencies:** Install the necessary dependencies by executing:
 
-6. Review and download the generated summary in various formats, including TXT, PDF, and DOCX.
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-## Usage Guidelines
+4. **Set Environment Variables:** Configure the required environment variables as follows:
 
-- **Text Input**: Upload the text document you wish to summarize. The code accepts files in formats such as PDF, DOCX, and plain text (TXT).
+   - `OPENAI_API_KEY`: This variable should store your OpenAI API key.
 
-- **Language Selection**: Choose the language for transcribing audio files if needed.
+5. **Run the Application:** Launch the Streamlit application by running the following command:
 
-- **Summarization Prompts**: Customize the initial and final summarization prompts to tailor the summary output to your specific requirements.
+   ```bash
+   streamlit run your_app.py
+   ```
 
-- **Feedback and Evaluation**: Provide feedback on the summarization results, helping to enhance the summarization process.
+## Usage
 
-- **Download Options**: Download the generated summary in different formats, including plain text, PDF, and DOCX.
+Once you've set up the application and launched it locally, you can use it to summarize code and generate explanations. Here's a breakdown of how to utilize the application:
 
-## Script Details
+### 1. Code Upload
 
-- **Author**: Positive
-- **Date**: 12.09.23
-- **License**: MIT
+- **Upload a Code File**: Begin by uploading a code file in one of the supported formats: `.txt`, `.pdf`, or `.docx`.
 
-Please note that this code relies on LangSmith and OpenAI APIs for text summarization and transcription. Proper setup and configuration of environment variables are essential for the code to function correctly.
+### 2. Model Selection
 
+- **Choose a Language Model**: Select your preferred language model from the available options, which include GPT-4 8K and GPT-3.5 Turbo 16K.
+
+### 3. Custom Prompts
+
+- **Optional Prompt Upload**: If desired, you can upload a starting prompt and a final prompt for the summarization process. These prompts can be customized to provide specific instructions to the summarization model.
+
+### 4. Summarization
+
+- **Initiate Summarization**: Click the "Submit" button to initiate the summarization process. The application will automatically split the code into smaller chunks if necessary and summarize each segment based on your provided prompts.
+
+### 5. Download Summaries
+
+- **Download Generated Summaries**: Once the summarization is complete, you can download the generated summary as a text file, PDF, or DOCX file for your convenience.
+
+### 6. User Feedback
+
+- **Provide Feedback**: The application also allows you to provide feedback on the summarization results through the feedback interface.
+
+## Features and Functions
+
+Here's a more detailed explanation of the key functions and features of the application:
+
+### Code Summarization
+
+- The application's primary function is to summarize code and produce comprehensible explanations.
+
+- Users can choose between two language models: GPT-4 8K and GPT-3.5 Turbo 16K.
+
+- Large code files are automatically segmented into smaller chunks for efficient processing.
+
+- Custom prompts can be tailored to guide the summarization process according to specific requirements.
+
+- Users have the option to download the generated summaries in various formats.
+
+### Additional Functions
+
+In addition to code summarization, the application includes two additional functions:
+
+1. **Fix Names**: This function allows users to correct misspelled names in a transcript. Users can upload a text file for correction and provide the corrected names.
+
+2. **Transcript**: Users can convert an MP3 audio file to text by selecting the desired language. The resulting transcript can be downloaded for further use.
+
+## Further Information
+
+- This application relies on OpenAI's language models, so ensure you have a valid API key set up.
+
+- Users can fine-tune the code summarization process by adjusting the prompts and instructions according to their needs.
+
+- The application's versatility extends beyond code summarization, making it a valuable tool for various text-related tasks.
+
+- For any issues or suggestions for improvement, users are encouraged to contribute to the repository or report any problems encountered.
+
+Experience the convenience of code summarization with this application and explore its other useful features!

@@ -14,6 +14,12 @@ from html2docx import html2docx
 import markdown
 import openai
 import pdfkit
+from langchain import PromptTemplate
+from langchain.prompts.chat import (
+    ChatPromptTemplate,
+    SystemMessagePromptTemplate,
+    HumanMessagePromptTemplate,
+)
 from myfunc.mojafunkcija import (
     st_style,
     positive_login,
@@ -21,6 +27,7 @@ from myfunc.mojafunkcija import (
     init_cond_llm,
     greska,
     show_logo,
+    def_chunk,
 )
 
 # XXX
@@ -73,7 +80,7 @@ def main():
 
     uploaded_file = st.file_uploader(
         "Izaberite tekst za sumarizaciju",
-        key="upload_file",
+        key="upload_file_sumarizacija",
         type=["txt", "pdf", "docx"],
         help="Odabir dokumenta",
     )
@@ -337,6 +344,77 @@ def main():
         # XXX
 
 
+def fix_names():
+    with st.sidebar:
+        openai_api_key = os.environ.get("OPENAI_API_KEY")
+        model, temp = init_cond_llm()
+        chat = ChatOpenAI(model=model, temperature=temp)
+        template = (
+            "You are a helpful assistant that fixes misspelled names in transcript."
+        )
+        system_message_prompt = SystemMessagePromptTemplate.from_template(template)
+        result_string = ""
+        prompt = PromptTemplate(
+            template="Please only fix the names of the people mentioned that are misspelled in this text: ### {text} ### The correct names are {ucesnici}. Do not write any comment, just the original text with corrected names. If there are no corrections to be made, just write the original text again ",
+            input_variables=["ucesnici", "text"],
+        )
+        human_message_prompt = HumanMessagePromptTemplate(prompt=prompt)
+
+        chat_prompt = ChatPromptTemplate.from_messages(
+            [system_message_prompt, human_message_prompt]
+        )
+
+        dokum = st.file_uploader(
+            "Izaberite .txt",
+            key="upload_file_fix_names",
+            type=["txt"],
+            help="Izaberite .txt fajl koji zelite da obradite",
+        )
+
+        if dokum:
+            loader = UnstructuredFileLoader(dokum.name, encoding="utf-8")
+
+            data = loader.load()
+            chunk_size, chunk_overlap = def_chunk()
+            # Split the document into smaller parts
+            text_splitter = RecursiveCharacterTextSplitter(
+                chunk_size=chunk_size,
+                chunk_overlap=chunk_overlap,
+            )
+            texts = text_splitter.split_documents(data)
+            new_text = []
+            for txt in texts:
+                new_text.append(txt.page_content)
+            with st.form(key="imena"):
+                ucesnici = st.text_input(
+                    "Unesi imena ucesnika: ",
+                    help="Imena ucesnika odvojiti zarezom i razmakom",
+                )
+                submit = st.form_submit_button(
+                    label="Submit", help="Submit dugme pokrece izvrsenje programa"
+                )
+                if submit:
+                    with st.spinner("Obrada teksta u toku..."):
+                        # Get a chat completion from the formatted messages
+                        for text in new_text:
+                            result = chat(
+                                chat_prompt.format_prompt(
+                                    ucesnici=ucesnici,
+                                    text=text,
+                                ).to_messages()
+                            )
+                            result_string += result.content
+                            result_string = result_string.replace("\n", " ")
+
+                        with st.expander("Obradjen tekst"):
+                            st.write(result_string)
+                        with open(f"out_{dokum.name}", "w", encoding="utf-8") as file:
+                            file.write(result_string)
+                        st.success(
+                            f"Texts saved to out_{dokum.name} and are now ready for Embeddings"
+                        )
+
+
 def transkript():
     # Read OpenAI API key from env
 
@@ -399,4 +477,14 @@ def transkript():
 
 
 name, authentication_status, username = positive_login(main, "12.09.23.")
-transkript()
+with st.sidebar:
+    izbor_app = st.selectbox(
+        "Izaberite pomocnu akciju",
+        ("Transkript", "Fix names"),
+        help="Odabir akcije za pripremu zapisnika",
+    )
+    if izbor_app == "Transkript":
+        transkript()
+
+    elif izbor_app == "Fix names":
+        fix_names()
