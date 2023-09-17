@@ -20,6 +20,7 @@ from myfunc.mojafunkcija import st_style, positive_login, init_cond_llm, show_lo
 
 st.set_page_config(page_title="Koder", page_icon="🖥️", layout="wide")
 st_style()
+model, temp = init_cond_llm()
 
 
 def main():
@@ -60,7 +61,7 @@ def main():
     # Initialize ChatOpenAI and RetrievalQA
 
     st.session_state["izlaz"] = ""
-    model, temp = init_cond_llm()
+
     llm = ChatOpenAI(openai_api_key=OPENAI_API_KEY, model_name=model, temperature=temp)
     qa = RetrievalQA.from_chain_type(
         llm=llm, chain_type="stuff", retriever=vectorstore.as_retriever(), verbose=False
