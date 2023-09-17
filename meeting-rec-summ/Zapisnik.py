@@ -56,6 +56,7 @@ show_logo()
 
 
 def main():
+    side_zapisnik()
     # Read OpenAI API key from env
     openai.api_key = os.environ.get("OPENAI_API_KEY")
     # initial prompt
@@ -476,17 +477,19 @@ def transkript():
                 )
 
 
-with st.sidebar:
-    izbor_app = st.selectbox(
-        "Izaberite pomocnu akciju",
-        ("Transkript", "Fix names"),
-        help="Odabir akcije za pripremu zapisnika",
-    )
-    if izbor_app == "Transkript":
-        transkript()
+def side_zapisnik():
+    with st.sidebar:
+        izbor_app = st.selectbox(
+            "Izaberite pomocnu akciju",
+            ("Transkript", "Fix names"),
+            help="Odabir akcije za pripremu zapisnika",
+        )
+        if izbor_app == "Transkript":
+            transkript()
 
-    elif izbor_app == "Fix names":
-        fix_names()
+        elif izbor_app == "Fix names":
+            fix_names()
+
 
 # Deployment on Stremalit Login functionality
 deployment_environment = os.environ.get("DEPLOYMENT_ENVIRONMENT")
