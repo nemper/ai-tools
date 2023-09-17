@@ -1,7 +1,7 @@
 *.txt
 !requirements.txt
-!propmt_pam.txt
-!propmt_summarizer.txt
+!prompt_pam.txt
+!prompt_summarizer.txt
 *.json
 *.exe
 *.mp3
