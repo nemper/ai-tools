@@ -490,3 +490,6 @@ with st.sidebar:
 
     elif izbor_app == "Fix names":
         fix_names()
+
+if __name__ == "__main__":
+    main()
