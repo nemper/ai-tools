@@ -18,7 +18,7 @@ from myfunc.mojafunkcija import st_style, positive_login, open_file
 from langchain.utilities.google_search import GoogleSearchAPIWrapper
 
 
-st.set_page_config(page_title="Pisi u stilu", page_icon="✍🏼", layout="wide")
+st.set_page_config(page_title="Pisi u stilu", page_icon="😎", layout="wide")
 # these are the environment variables that need to be set for LangSmith to work
 os.environ["LANGCHAIN_PROJECT"] = "Stil"
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
