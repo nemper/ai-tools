@@ -1,6 +1,3 @@
-# program za pisanje u stilu neke osobe, uzima stil i temu iz Pinecone indexa
-
-# uvoze se biblioteke
 import os
 import streamlit as st
 import pinecone
@@ -20,6 +17,8 @@ import pdfkit
 from myfunc.mojafunkcija import st_style, positive_login, open_file
 from langchain.utilities.google_search import GoogleSearchAPIWrapper
 
+
+st.set_page_config(page_title="Pisi u stilu", page_icon="✍🏼", layout="wide")
 # these are the environment variables that need to be set for LangSmith to work
 os.environ["LANGCHAIN_PROJECT"] = "Stil"
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
@@ -28,7 +27,7 @@ os.environ.get("LANGCHAIN_API_KEY")
 
 
 # Zaglavlje stranice
-st.set_page_config(page_title="Pisi u stilu", page_icon="✍🏼", layout="wide")
+
 
 # glavna funkcija
 
