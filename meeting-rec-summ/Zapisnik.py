@@ -82,7 +82,7 @@ def main():
     uploaded_file = st.file_uploader(
         "Izaberite tekst za sumarizaciju",
         key="upload_file_sumarizacija",
-        type=["txt", "pdf", "docx"],
+        type=["txt", "docx"],
         help="Odabir dokumenta",
     )
 
@@ -100,7 +100,7 @@ def main():
         "quiet": "",
     }
 
-    pdf_data = pdfkit.from_string(html, False, options=options)
+    # pdf_data = pdfkit.from_string(html, False, options=options)
 
     # summarize chosen file
     if uploaded_file is not None:
