@@ -48,7 +48,7 @@ os.environ["LANGCHAIN_PROJECT"] = "Zapisnik"
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.langchain.plus"
 os.environ.get("LANGCHAIN_API_KEY")
-deployment_environment = os.environ.get("DEPLOYMENT_ENVIRONMENT")
+
 
 st.set_page_config(page_title="Zapisnik", page_icon="📜", layout="wide")
 st_style()
@@ -476,9 +476,6 @@ def transkript():
                 )
 
 
-if deployment_environment == "Streamlit":
-    name, authentication_status, username = positive_login(main, "12.09.23.")
-
 with st.sidebar:
     izbor_app = st.selectbox(
         "Izaberite pomocnu akciju",
@@ -491,5 +488,11 @@ with st.sidebar:
     elif izbor_app == "Fix names":
         fix_names()
 
-if __name__ == "__main__":
-    main()
+# Deployment on Stremalit Login functionality
+deployment_environment = os.environ.get("DEPLOYMENT_ENVIRONMENT")
+
+if deployment_environment == "Streamlit":
+    name, authentication_status, username = positive_login(main, "16.09.23.")
+else:
+    if __name__ == "__main__":
+        main()
