@@ -1,6 +1,7 @@
 *.txt
 !requirements.txt
 !prompt_FT.txt
+!packages.txt
 *.json
 *.exe
 *.mp3
