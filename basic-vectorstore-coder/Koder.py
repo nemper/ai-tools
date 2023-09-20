@@ -45,18 +45,15 @@ def main():
     vectorstore = Pinecone(index, embeddings, text_field, name_space)
     show_logo()
     # Get user input
-    st.subheader("Koristeci LangChain i Streamlit...")
-    with st.expander("Procitajte uputstvo:"):
-        st.caption(
-            "Prethodni korak bio je kreiranje pitanja. To smo radili pomocu besplatnog CHATGPT modela. Iz svake oblasti (ili iz dokumenta) zamolimo CHATGPT da kreira relevantna pitanja. Na pitanja mozemo da odgovorimo sami ili se odgovori mogu izvuci iz dokumenta."
-        )
-        st.caption(
-            "Ukoliko zelite da vam model kreira odgovore, odaberite ulazni fajl sa pitanjma iz prethodnog koraka. Opciono, ako je za odgovore potreban izvor, odaberite i fajl sa izvorom. Unesite sistemsku poruku (opis ponasanja modela) i naziv FT modela. Kliknite na Submit i sacekajte da se obrada zavrsi. Fajl sa odgovorima cete kasnije korisiti za kreiranje FT modela."
-        )
-        st.caption(
-            "Pre prelaska na sledecu fazu OBAVEZNO pregledajte izlazni dokument sa odgovorima i korigujte ga po potrebi. "
-        )
-    st.divider()
+    st.subheader("Koristeći LangChain i Streamlit...")
+    with st.expander("Pročitajte uputstvo:"):
+        st.caption("""
+                   Prethodni korak bio je kreiranje pitanja. To smo radili pomocu besplatnog CHATGPT modela. Iz svake oblasti (ili iz dokumenta) zamolimo CHATGPT da kreira relevantna pitanja. Na pitanja mozemo da odgovorimo sami ili se odgovori mogu izvuci iz dokumenta.\n
+                   Ukoliko zelite da vam model kreira odgovore, odaberite ulazni fajl sa pitanjma iz prethodnog koraka. Opciono, ako je za odgovore potreban izvor, odaberite i fajl sa izvorom. Unesite sistemsku poruku (opis ponasanja modela) i naziv FT modela. Kliknite na Submit i sacekajte da se obrada zavrsi. Fajl sa odgovorima cete kasnije korisiti za kreiranje FT modela.\n
+                   Pre prelaska na sledecu fazu OBAVEZNO pregledajte izlazni dokument sa odgovorima i korigujte ga po potrebi.
+                   """)
+        st.divider()
+
     # Initialize ChatOpenAI and RetrievalQA
 
     st.session_state["izlaz"] = ""
@@ -75,21 +72,21 @@ def main():
         query = (
             "Using langchain and streamlite, "
             + st.text_area(
-                label="Detaljno opisite sta zelite da uradim (kod, objasnjenje ili sl): ",
+                label="Detaljno opišite šta želite da uradim (kod, objašnjenje ili sl): ",
                 key="1",
                 value=st.session_state["task"],
-                help="Npr. Napravi kod koji ce da ispise Hello World!",
+                help="Npr. Napravi kod koji će da ispiše Hello World!",
             )
             + "."
         )
         submit_button = st.form_submit_button(
-            label="Submit", help="Kliknite ovde da pokrenete"
+            label="Submit", help="Kliknite ovde da pokrenete izvršavanje"
         )
 
         # If the submit button is clicked, clear the session state and run the query
         if submit_button:
             st.session_state["task"] = ""
-            with st.spinner("Sacekajte trenutak..."):
+            with st.spinner("Sačekajte trenutak..."):
                 st.session_state["izlaz"] = qa.run(query)
                 st.write(st.session_state["izlaz"])
 
