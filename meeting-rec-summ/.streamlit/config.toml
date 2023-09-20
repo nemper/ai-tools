@@ -5,6 +5,9 @@ secondaryBackgroundColor="#1e3781"
 textColor="#ffffff"
 font="sans serif"
 
+[server]
+enableXsrfProtection = false
+
 [browser]
 gatherUsageStats = false
 

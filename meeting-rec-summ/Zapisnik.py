@@ -64,20 +64,16 @@ def main():
     prompt_string_pam = open_file("prompt_pam.txt")
     opis = "opis"
     st.subheader("Zapisnik")  # Setting the title for Streamlit application
-    with st.expander("Procitajte uputstvo:"):
+    with st.expander("Pročitajte uputstvo:"):
         st.caption(
-            "Po potrebi, sa leve strane,  mozete konvertovati svoj MP3 fajl u tekst za obradu."
+            "Po potrebi, sa leve strane, možete konvertovati svoj MP3 fajl u tekst za obradu."
         )
-
-        st.caption(
-            "U svrhe testiranja mozete birati GPT 4 8K ili GPT 3.5 Turbo 16k modele."
-        )
-        st.caption(
-            "Date su standardne instrukcije koji mozete promeniti po potrebi. Promprove mozete cuvati i uploadovati u .txt formatu"
-        )
-        st.caption(
-            "* dokumenti do velicine 4.000 karaktera ce biti tretirani kao jedan. Dozvoljeni formati su .txt, .docx i .pdf"
-        )
+        st.divider()
+        st.caption("""
+                   U svrhe testiranja možete birati GPT 4 (8K) ili GPT 3.5 Turbo (16k) modele.\n
+                   Date su standardne instrukcije koji mozete promeniti po potrebi. Promptove možete čuvati i uploado-vati u txt formatu.\n
+                   * dokumenti do velicine 5000 karaktera će biti tretirani kao jedan. Dozvoljeni formati su txt, docx i pdf.
+                   """)
 
     uploaded_file = st.file_uploader(
         "Izaberite tekst za sumarizaciju",
@@ -111,7 +107,7 @@ def main():
         )
 
         prva_file = st.file_uploader(
-            "Izaberite pocetni prompt koji mozete editovati ili pisite prompt od pocetka",
+            "Izaberite početni prompt koji možete editovati ili pišite prompt od početka",
             key="upload_prva",
             type="txt",
             help="Odabir dokumenta",
@@ -122,7 +118,7 @@ def main():
         else:
             prva = " "
         druga_file = st.file_uploader(
-            "Izaberite finalni prompt koji mozete editovati ili pisite prompt od pocetka",
+            "Izaberite finalni prompt koji možete editovati ili pišite prompt od početka",
             key="upload_druga",
             type="txt",
             help="Odabir dokumenta",
@@ -157,7 +153,7 @@ def main():
         )
         if chunkova == 1:
             st.info(
-                "Tekst je kratak i bice obradjen u celini koristeci samo drugi prompt"
+                "Tekst je kratak i biće obrađen u celini koristeći samo drugi prompt"
             )
 
         # XXX
@@ -171,19 +167,19 @@ def main():
         # XXX
         with st.form(key="my_form", clear_on_submit=False):
             opis = st.text_area(
-                "Unestite instrukcije za pocetnu sumarizaciju (kreiranje vise manjih delova teksta): ",
+                "Unesite instrukcije za početnu sumarizaciju (kreiranje više manjih delova teksta): ",
                 prva,
                 key="prompt_prva",
                 height=150,
-                help="Napisite prompt za pocetnu sumarizaciju",
+                help="Napišite prompt za početnu sumarizaciju",
             )
 
             opis_kraj = st.text_area(
-                "Unestite instrukcije za finalnu sumarizaciju (kreiranje finalne verzije teksta): ",
+                "Unesite instrukcije za finalnu sumarizaciju (kreiranje finalne verzije teksta): ",
                 druga,
                 key="prompt_druga",
                 height=150,
-                help="Napisite prompt za finalnu sumarizaciju",
+                help="Napišite prompt za finalnu sumarizaciju",
             )
 
             PROMPT = PromptTemplate(
@@ -195,7 +191,7 @@ def main():
             submit_button = st.form_submit_button(label="Submit")
 
             if submit_button:
-                with st.spinner("Sacekajte trenutak..."):
+                with st.spinner("Sačekajte trenutak..."):
                     chain = load_summarize_chain(
                         llm,
                         chain_type="map_reduce",
@@ -220,7 +216,7 @@ def main():
                         greska(e)
 
         if st.session_state.dld != "Zapisnik":
-            st.write("Downloadujte vase promptove")
+            st.write("Downloadujte vaše promptove")
             col4, col5 = st.columns(2)
             with col4:
                 st.download_button(
@@ -236,7 +232,7 @@ def main():
                     file_name="prompt2.txt",
                     help="Odabir dokumenta",
                 )
-            st.write("Downloadujte vas zapisnik")
+            st.write("Downloadujte vaš zapisnik")
             col1, col2, col3 = st.columns(3)
             with col1:
                 st.download_button(
@@ -262,7 +258,7 @@ def main():
                     help="Odabir dokumenta",
                 )
 
-            with st.expander("Summary", True):
+            with st.expander("Sažetak", True):
                 # Generate the summary by running the chain on the input documents and store it in an AIMessage object
                 st.write(st.session_state.dld)  # Displaying the summary
 
@@ -280,7 +276,7 @@ def main():
                 message_placeholder.markdown("Samo sekund!")
                 run_collector = RunCollectorCallbackHandler()
                 message_placeholder.markdown(
-                    "Samo jos ocenite od 1 do 5 dobijene rezultate."
+                    "Samo još ocenite od 1 do 5 dobijene rezultate."
                 )
 
                 memory = ConversationBufferMemory(
@@ -300,7 +296,7 @@ def main():
                 )["text"]
 
                 message_placeholder.markdown(
-                    "Samo jos ocenite od 1 do 5 dobijene rezultate."
+                    "Samo još ocenite od 1 do 5 dobijene rezultate."
                 )
                 run = run_collector.traced_runs[0]
                 run_collector.traced_runs = []
@@ -345,7 +341,7 @@ def main():
         # XXX
 
 
-def fix_names():
+def korekcija_imena():
     with st.sidebar:
         openai_api_key = os.environ.get("OPENAI_API_KEY")
         model, temp = init_cond_llm()
@@ -369,7 +365,7 @@ def fix_names():
             "Izaberite .txt",
             key="upload_file_fix_names",
             type=["txt"],
-            help="Izaberite .txt fajl koji zelite da obradite",
+            help="Izaberite .txt fajl koji želite da obradite",
         )
 
         if dokum:
@@ -388,11 +384,11 @@ def fix_names():
                 new_text.append(txt.page_content)
             with st.form(key="imena"):
                 ucesnici = st.text_input(
-                    "Unesi imena ucesnika: ",
-                    help="Imena ucesnika odvojiti zarezom i razmakom",
+                    "Unesite imena učesnika: ",
+                    help="Imena učesnika sastanka odvojiti zarezom i razmakom",
                 )
                 submit = st.form_submit_button(
-                    label="Submit", help="Submit dugme pokrece izvrsenje programa"
+                    label="Submit", help="Pokreće izvršenje programa"
                 )
                 if submit:
                     with st.spinner("Obrada teksta u toku..."):
@@ -407,12 +403,12 @@ def fix_names():
                             result_string += result.content
                             result_string = result_string.replace("\n", " ")
 
-                        with st.expander("Obradjen tekst"):
+                        with st.expander("Obrađen tekst"):
                             st.write(result_string)
                         with open(f"out_{dokum.name}", "w", encoding="utf-8") as file:
                             file.write(result_string)
                         st.success(
-                            f"Texts saved to out_{dokum.name} and are now ready for Embeddings"
+                            f"Tekst je sačuvan u out_{dokum.name} i može se dalje raditi Embeding"
                         )
 
 
@@ -420,9 +416,9 @@ def transkript():
     # Read OpenAI API key from env
 
     with st.sidebar:  # App start
-        st.info("Konvertuje MP3 u TXT")
+        st.info("Konvertujte MP3 u TXT")
         audio_file = st.file_uploader(
-            "Choose MP3 file MAX SIZE 25Mb",
+            "Max 25Mb",
             type="mp3",
             key="audio_",
             help="Odabir dokumenta",
@@ -458,7 +454,7 @@ def transkript():
                 submit_button = st.form_submit_button(label="Submit")
 
                 if submit_button:
-                    with st.spinner("Sacekajte trenutak..."):
+                    with st.spinner("Sačekajte trenutak..."):
                         transcript = openai.Audio.transcribe(
                             "whisper-1", audio_file, language=jezik
                         )
@@ -480,15 +476,14 @@ def transkript():
 def side_zapisnik():
     with st.sidebar:
         izbor_app = st.selectbox(
-            "Izaberite pomocnu akciju",
-            ("Transkript", "Fix names"),
+            "Izaberite pomoćnu akciju",
+            ("Transkript", "Korekcija imena"),
             help="Odabir akcije za pripremu zapisnika",
         )
         if izbor_app == "Transkript":
             transkript()
-
-        elif izbor_app == "Fix names":
-            fix_names()
+        elif izbor_app == "Korekcija imena":
+            korekcija_imena()
 
 
 # Deployment on Stremalit Login functionality
