@@ -33,7 +33,7 @@ os.environ.get("LANGCHAIN_API_KEY")
 
 
 def main():
-    # Retrieving GOOGLE API keys from env
+    # Retrieving GOOGLE API keys from enva
     GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
     GOOGLE_CSE_ID = os.environ.get("GOOGLE_CSE_ID")
     # Retrieving API keys from env
