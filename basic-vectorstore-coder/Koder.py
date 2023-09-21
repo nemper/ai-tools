@@ -12,11 +12,10 @@ from myfunc.mojafunkcija import st_style, positive_login, init_cond_llm, show_lo
 
 
 # these are the environment variables that need to be set for LangSmith to work
-# os.environ["LANGCHAIN_PROJECT"] = "Koder"
-# os.environ["LANGCHAIN_TRACING_V2"] = "true"
-# os.environ["LANGCHAIN_ENDPOINT"] = "https://api.langchain.plus"
-# os.environ.get("LANGCHAIN_API_KEY")
-
+os.environ["LANGCHAIN_PROJECT"] = "Koder"
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
+os.environ["LANGCHAIN_ENDPOINT"] = "https://api.langchain.plus"
+os.environ.get("LANGCHAIN_API_KEY")
 
 st.set_page_config(page_title="Koder", page_icon="🖥️", layout="wide")
 st_style()
