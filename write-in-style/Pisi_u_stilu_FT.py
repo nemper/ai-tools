@@ -78,7 +78,8 @@ def main():
     with st.expander("Pročitajte uputstvo 🧝"):
         st.caption("""
                    FT se odnosi na Fine-Tuning, tj. prilagođavanje aplikacije nekoj specifičnoj primeni (iliti specijalizacija)
-                   - u našem slučaju se aplikacija prilagođava nečijem stilu pisanja (npr. od Miljana).
+                   - u našem slučaju se aplikacija prilagođava nečijem stilu pisanja (npr. od Miljana).\n
+                   Promptove možete naći na Public-u - folder AI Dev.
                    """)
         st.image("https://test.georgemposi.com/wp-content/uploads/2023/09/PisiUStilu1.png")
         st.caption("""\n
