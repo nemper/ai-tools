@@ -17,6 +17,8 @@ os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.langchain.plus"
 os.environ.get("LANGCHAIN_API_KEY")
 
+version = "21.09.23."
+
 st.set_page_config(page_title="Koder", page_icon="🖥️", layout="wide")
 st_style()
 
@@ -44,6 +46,7 @@ def main():
     vectorstore = Pinecone(index, embeddings, text_field, name_space)
     show_logo()
     # Get user input
+    st.markdown(f"<p style='font-size: 10px; color: grey;'>{version}</p>", unsafe_allow_html=True)
     st.subheader("Koristeći LangChain i Streamlit...")
     with st.expander("Pročitajte uputstvo:"):
         st.caption("""
