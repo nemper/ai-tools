@@ -31,6 +31,7 @@ os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.langchain.plus"
 os.environ.get("LANGCHAIN_API_KEY")
 
+version = "21.09.23."
 
 st.set_page_config(
     page_title="Pisi u stilu",
@@ -72,6 +73,7 @@ def main():
         st.session_state.stil = ""
 
     # Izbor stila i teme
+    st.markdown(f"<p style='font-size: 10px; color: grey;'>{version}</p>", unsafe_allow_html=True)
     st.subheader("Pišite u stilu osoba koje imaju sopstvene Fine-Tunned modele 🏙️")
     with st.expander("Pročitajte uputstvo 🧝"):
         st.caption("""
@@ -122,7 +124,7 @@ def main():
         st.caption("Temperatura za stil treba de je što bliže 1.0")
         st.session_state.thold = st.slider(
             'Set relevance (0=any, 1=strict)', 0.0, 1.0, step=0.1, value=0.5)
-        st.caption("Relevance za temu određuje koji dokmenti će se korsititi iz indeksa. Ako je vrednost 0.0 onda se koriste svi dokumenti, a za 1.0 samo oni koji su najrelevantniji.")
+        st.caption("Relevantost za temu određuje koji dokmenti će se korsititi iz indeksa. Ako je vrednost 0.0 onda se koriste svi dokumenti, a za 1.0 samo oni koji su najrelevantniji.")
 
     # define model, vestorstore and retriever
     llm = ChatOpenAI(model_name=st.session_state.model, temperature=st.session_state.temp,
