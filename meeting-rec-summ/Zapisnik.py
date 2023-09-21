@@ -43,6 +43,8 @@ os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.langchain.plus"
 os.environ.get("LANGCHAIN_API_KEY")
 
+version = "21.09.23."
+
 st.set_page_config(
     page_title="Zapisnik",
     page_icon="👉",
@@ -57,6 +59,7 @@ def main():
     prompt_string = open_file("prompt_summarizer.txt")
     prompt_string_pam = open_file("prompt_pam.txt")
     opis = "opis"
+    st.markdown(f"<p style='font-size: 10px; color: grey;'>{version}</p>", unsafe_allow_html=True)
     st.subheader('Zapisnik ✍️')  # Setting the title for Streamlit application
     with st.expander("Pročitajte uputstvo 🧜"):
         st.caption("""
@@ -440,4 +443,3 @@ if deployment_environment == "Streamlit":
 else:
     if __name__ == "__main__":
         main()
-        st.markdown(f"## Version: 16.09.23")
