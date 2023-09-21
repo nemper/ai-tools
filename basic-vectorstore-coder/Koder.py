@@ -105,7 +105,7 @@ def main():
 deployment_environment = os.environ.get("DEPLOYMENT_ENVIRONMENT")
 
 if deployment_environment == "Streamlit":
-    name, authentication_status, username = positive_login(main, "16.09.23.")
+    name, authentication_status, username = positive_login(main, f"{version}")
 else:
     if __name__ == "__main__":
         main()
