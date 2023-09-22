@@ -53,6 +53,7 @@ st.set_page_config(
 st_style()
 
 def main():
+    side_zapisnik()
     # Read OpenAI API key from envtekst za
     openai.api_key = os.environ.get('OPENAI_API_KEY')
     # initial prompt
