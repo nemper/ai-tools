@@ -17,7 +17,6 @@ import os
 from html2docx import html2docx
 import markdown
 import openai
-import pdfkit
 from myfunc.mojafunkcija import (
     st_style,
     positive_login,
@@ -37,6 +36,11 @@ from langchain.callbacks.tracers.langchain import wait_for_all_tracers
 from vanilla_chain import get_llm_chain
 client = Client()
 
+from xhtml2pdf import pisa
+import PyPDF2
+import re
+import io
+
 # these are the environment variables that need to be set for LangSmith to work
 os.environ["LANGCHAIN_PROJECT"] = "Zapisnik"
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
@@ -53,6 +57,7 @@ st.set_page_config(
 st_style()
 
 def main():
+    side_zapisnik()
     # Read OpenAI API key from envtekst za
     openai.api_key = os.environ.get('OPENAI_API_KEY')
     # initial prompt
@@ -102,19 +107,44 @@ def main():
 
     if 'dld' not in st.session_state:
         st.session_state.dld = "Zapisnik"
-
+    
     # markdown to html
     html = markdown.markdown(st.session_state.dld)
     # html to docx
     buf = html2docx(html, title="Zapisnik")
-    # create pdf
-    options = {
-        'encoding': 'UTF-8',  # Set the encoding to UTF-8
-        'no-outline': None,
-        'quiet': ''
-    }
 
-    pdf_data = pdfkit.from_string(html, False, options=options)
+    # pdf_data = pdfkit.from_string(html, cover_first=False, options=options)
+
+    html1 = """
+    <html>
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                @font-face {
+                    font-family: Arial;
+                    src: url(path/to/arial.ttf); /* Replace with the actual path to your font file */
+                }
+                body {
+                    font-family: Arial, sans-serif;
+                }
+            </style>
+        </head>
+        <body>
+            <p>
+            """ + markdown.markdown(st.session_state.dld) + """
+            </p>
+        </body>
+    </html>
+    """
+
+    x = """
+    html_io = io.BytesIO(html.encode('UTF-8'))
+    pdf_data = io.BytesIO()
+    pisa.CreatePDF(html_io, pdf_data, encoding='UTF-8', embed_font=True)
+    pdf_data.seek(0)
+    pdf_data = pdf_data.getvalue()
+    st.write(pdf_data)
+    """
 
     # summarize chosen file
     if uploaded_file is not None:
@@ -137,23 +167,36 @@ def main():
         else:
             druga = " "
 
-        with open(uploaded_file.name, "wb") as file:
+        with io.open(uploaded_file.name, "wb") as file:
             file.write(uploaded_file.getbuffer())
 
         if ".pdf" in uploaded_file.name:
-            loader = UnstructuredPDFLoader(
-                uploaded_file.name, encoding="utf-8")
+            pdf_reader = PyPDF2.PdfReader(uploaded_file)
+            num_pages = len(pdf_reader.pages)
+            text_content = ""
+
+            for page in range(num_pages):
+                page_obj = pdf_reader.pages[page]
+                text_content += page_obj.extract_text()
+            text_content = text_content.replace('•', '')
+            text_content = re.sub(r'(?<=\b\w) (?=\w\b)', '', text_content)
+            with io.open('temp.txt', 'w', encoding='utf-8') as f:
+                f.write(text_content)
+            
+            loader = UnstructuredFileLoader('temp.txt', encoding="utf-8")
         else:
             # Creating a file loader object
             loader = UnstructuredFileLoader(
                 uploaded_file.name, encoding="utf-8")
 
-        result = loader.load()  # Loading text from the file
+
+        result = loader.load() 
         chunk_size = 5000
         chunk_overlap = 0
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size, chunk_overlap=chunk_overlap)  # Creating a text splitter object
         duzinafajla = len(result[0].page_content)
+
         # Splitting the loaded text into smaller chunks
         texts = text_splitter.split_documents(result)
         chunkova = len(texts)
@@ -163,7 +206,9 @@ def main():
             st.info(
                 "Tekst je kratak i biće obradjen u celini koristeći samo drugi prompt")
 
-        out_elements = ["Zapisnik -", "m=" + model.rsplit('-', 1)[-1], "t=" + str(temp), 
+        out_elements = ["Zapisnik -", 
+                        "m=" + model.rsplit('-', 1)[-1], 
+                        "t=" + str(temp), 
                         "chunk s_o=" + str(chunk_size/1000) + "k_" + str(chunk_overlap)]
         out_name = ' '.join(out_elements)
 
@@ -195,8 +240,7 @@ def main():
                         st.session_state.dld = suma.content
                         html = markdown.markdown(st.session_state.dld)
                         buf = html2docx(html, title="Zapisnik")
-                        pdf_data = pdfkit.from_string(
-                            html, False, options=options)
+                        pdf_data = pisa.CreatePDF(src=html, encoding='utf-8')
                     except Exception as e:
                         greska(e)
 
@@ -211,21 +255,22 @@ def main():
                 st.download_button("Download prompt 2 as .txt",
                                    opis_kraj, file_name="prompt2.txt")
             st.write("Download-ujte vas zapisnik")
-            col1, col2, col3 = st.columns(3)
+            col1, col2 = st.columns(2)
             with col1:
                 st.download_button("Download Zapisnik as .txt",
                                    st.session_state.dld, file_name=out_name + ".txt")
             with col2:
-                st.download_button(label="Download Zapisnik as .pdf",
-                                   data=pdf_data,
-                                   file_name=out_name + ".pdf",
-                                   mime='application/octet-stream')
-            with col3:
                 st.download_button(label="Download Zapisnik as .docx",
                                    data=buf.getvalue(),
                                    file_name=out_name + ".docx",
                                    mime="docx")
-
+            x = """ izmeni i poziv st.columns iznad
+            with col3:
+                st.download_button(label="Download Zapisnik as .pdf",
+                                   data=pdf_data,
+                                   file_name=out_name + ".pdf",
+                                   mime='application/octet-stream')
+            """
             with st.expander('Sažetak', True):
                 # Generate the summary by running the chain on the input documents and store it in an AIMessage object
                 st.write(st.session_state.dld)  # Displaying the summary
