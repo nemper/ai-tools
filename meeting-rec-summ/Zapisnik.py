@@ -276,64 +276,64 @@ def main():
                 st.write(st.session_state.dld)  # Displaying the summary
 
 
-        if prompt := st.chat_input(placeholder="Unesite sve napomene/komentare koje imate u vezi sa performansama programa."):
-            st.chat_message("user", avatar="👽").write(prompt)
-            st.session_state['user_feedback'] = prompt
-            st.chat_input(placeholder="Vaš feedback je sačuvan!", disabled=True)
-            st.session_state.feedback = None
-            st.session_state.feedback_update = None
-            with st.chat_message("assistant", avatar="🤖"):
-                message_placeholder = st.empty()
-                message_placeholder.markdown("Samo sekund!")
-                run_collector = RunCollectorCallbackHandler()
-                message_placeholder.markdown("Samo još ocenite od 1 do 5 dobijene rezultate.")
-                    
-                memory = ConversationBufferMemory(
-                    chat_memory=StreamlitChatMessageHistory(key="langchain_messages"),
-                    return_messages=True,
-                    memory_key="chat_history",
-                )
+    if prompt := st.chat_input(placeholder="Unesite sve napomene/komentare koje imate u vezi sa performansama programa."):
+        st.chat_message("user", avatar="👽").write(prompt)
+        st.session_state['user_feedback'] = prompt
+        st.chat_input(placeholder="Vaš feedback je sačuvan!", disabled=True)
+        st.session_state.feedback = None
+        st.session_state.feedback_update = None
+        with st.chat_message("assistant", avatar="🤖"):
+            message_placeholder = st.empty()
+            message_placeholder.markdown("Samo sekund!")
+            run_collector = RunCollectorCallbackHandler()
+            message_placeholder.markdown("Samo još ocenite od 1 do 5 dobijene rezultate.")
                 
-                chain = get_llm_chain("Hi", memory)
+            memory = ConversationBufferMemory(
+                chat_memory=StreamlitChatMessageHistory(key="langchain_messages"),
+                return_messages=True,
+                memory_key="chat_history",
+            )
+            
+            chain = get_llm_chain("Hi", memory)
 
-                x = chain.invoke(
-                    {"input": "Hi."}, config=RunnableConfig(
-                    callbacks=[run_collector], tags=["Streamlit Chat"],)
-                    )["text"]
-                
-                message_placeholder.markdown("Samo još ocenite od 1 do 5 dobijene rezultate.")
-                run = run_collector.traced_runs[0]
-                run_collector.traced_runs = []
-                st.session_state.run_id = run.id
-                wait_for_all_tracers()
-                client.share_run(run.id)
+            x = chain.invoke(
+                {"input": "Hi."}, config=RunnableConfig(
+                callbacks=[run_collector], tags=["Streamlit Chat"],)
+                )["text"]
+            
+            message_placeholder.markdown("Samo još ocenite od 1 do 5 dobijene rezultate.")
+            run = run_collector.traced_runs[0]
+            run_collector.traced_runs = []
+            st.session_state.run_id = run.id
+            wait_for_all_tracers()
+            client.share_run(run.id)
 
-        if st.session_state.get("run_id"):
-            feedback = streamlit_feedback(feedback_type="faces", key=f"feedback_{st.session_state.run_id}",)
-            scores = {"😞": 1, "🙁": 2, "😐": 3, "🙂": 4, "😀": 5}
-            if feedback:
-                score = scores[feedback["score"]]
-                feedback = client.create_feedback(st.session_state.run_id, "ocena", score=score)
-                st.session_state.feedback = {"feedback_id": str(feedback.id), "score": score}
+    if st.session_state.get("run_id"):
+        feedback = streamlit_feedback(feedback_type="faces", key=f"feedback_{st.session_state.run_id}",)
+        scores = {"😞": 1, "🙁": 2, "😐": 3, "🙂": 4, "😀": 5}
+        if feedback:
+            score = scores[feedback["score"]]
+            feedback = client.create_feedback(st.session_state.run_id, "ocena", score=score)
+            st.session_state.feedback = {"feedback_id": str(feedback.id), "score": score}
 
-        if st.session_state.get("feedback"):
-            feedback = st.session_state.get("feedback")
-            feedback_id = feedback["feedback_id"]
-            score = feedback["score"]
+    if st.session_state.get("feedback"):
+        feedback = st.session_state.get("feedback")
+        feedback_id = feedback["feedback_id"]
+        score = feedback["score"]
 
-            st.session_state.feedback_update = {
-                "comment": st.session_state['user_feedback'],
-                "feedback_id": feedback_id,
-            }
-            client.update_feedback(feedback_id)
-            st.chat_input(placeholder="To je to - hvala puno!", disabled=True)
+        st.session_state.feedback_update = {
+            "comment": st.session_state['user_feedback'],
+            "feedback_id": feedback_id,
+        }
+        client.update_feedback(feedback_id)
+        st.chat_input(placeholder="To je to - hvala puno!", disabled=True)
 
-        if st.session_state.get("feedback_update"):
-            feedback_update = st.session_state.get("feedback_update")
-            feedback_id = feedback_update.pop("feedback_id")
-            client.update_feedback(feedback_id, **feedback_update)
-            st.session_state.feedback = None
-            st.session_state.feedback_update = None
+    if st.session_state.get("feedback_update"):
+        feedback_update = st.session_state.get("feedback_update")
+        feedback_id = feedback_update.pop("feedback_id")
+        client.update_feedback(feedback_id, **feedback_update)
+        st.session_state.feedback = None
+        st.session_state.feedback_update = None
 
 
 def korekcija_imena():
