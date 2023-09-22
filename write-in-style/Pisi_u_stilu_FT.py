@@ -13,7 +13,6 @@ from langchain.prompts.chat import SystemMessagePromptTemplate, HumanMessageProm
 from html2docx import html2docx
 from myfunc.mojafunkcija import st_style, positive_login, open_file
 import markdown
-import pdfkit
 from langchain.utilities.google_search import GoogleSearchAPIWrapper
 
 from langchain.callbacks.tracers.run_collector import RunCollectorCallbackHandler
@@ -31,6 +30,9 @@ os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.langchain.plus"
 os.environ.get("LANGCHAIN_API_KEY")
 
+# from xhtml2pdf import pisa
+# import io
+
 version = "21.09.23."
 
 st.set_page_config(
@@ -38,7 +40,6 @@ st.set_page_config(
     page_icon="👉",
     layout="wide"
 )
-
 
 def main():
     GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
@@ -125,7 +126,7 @@ def main():
         st.caption("Temperatura za stil treba de je što bliže 1.0")
         st.session_state.thold = st.slider(
             'Set relevance (0=any, 1=strict)', 0.0, 1.0, step=0.1, value=0.5)
-        st.caption("Relevantost za temu određuje koji dokmenti će se korsititi iz indeksa. Ako je vrednost 0.0 onda se koriste svi dokumenti, a za 1.0 samo oni koji su najrelevantniji.")
+        st.caption("Relevantnost za temu određuje koji dokmenti će se korsititi iz indeksa. Ako je vrednost 0.0 onda se koriste svi dokumenti, a za 1.0 samo oni koji su najrelevantniji.")
 
     # define model, vestorstore and retriever
     llm = ChatOpenAI(model_name=st.session_state.model, temperature=st.session_state.temp,
@@ -209,21 +210,19 @@ def main():
             st.markdown(st.session_state.odgovor)
         html = markdown.markdown(st.session_state.odgovor)
         buf = html2docx(html, title="Zapisnik")
-        # create pdf
-        options = {
-            'encoding': 'UTF-8',  # Set the encoding to UTF-8
-            'no-outline': None,
-            'quiet': ''
-        }
-        pdf_data = pdfkit.from_string(html, False, options=options)
 
-        # download
-        st.download_button("Download TekstuStilu.txt",
-                           st.session_state.odgovor, file_name="TekstuStilu.txt")
+        x = """
+        x = io.BytesIO()
+        pisa.CreatePDF(html, dest=x, encoding='utf-8')
+        pdf_data = x.getvalue()
         st.download_button(label="Download TekstuStilu.pdf",
                            data=pdf_data,
                            file_name="TekstuStilu.pdf",
                            mime='application/octet-stream')
+        """
+        st.download_button("Download TekstuStilu.txt",
+                           st.session_state.odgovor, file_name="TekstuStilu.txt")
+        
         st.download_button(
             label="Download TekstuStilu.docx",
             data=buf.getvalue(),
