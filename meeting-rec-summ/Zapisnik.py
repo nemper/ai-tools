@@ -37,7 +37,6 @@ from vanilla_chain import get_llm_chain
 client = Client()
 
 import pdfkit
-from xhtml2pdf import pisa
 import PyPDF2
 import re
 import io
@@ -215,7 +214,7 @@ def main():
                         st.session_state.dld = suma.content
                         html = markdown.markdown(st.session_state.dld)
                         buf = html2docx(html, title="Zapisnik")
-                        pdf_data = pisa.CreatePDF(src=html, encoding='utf-8')
+                        pdf_data = pdfkit.from_string(html, False, options=options)
                     except Exception as e:
                         greska(e)
 

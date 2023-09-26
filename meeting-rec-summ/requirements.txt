@@ -172,7 +172,6 @@ websockets==10.4
 Werkzeug==2.3.7
 wget==3.2
 win32-setctime==1.1.0
-xhtml2pdf==0.2.11
 yarg==0.1.9
 yarl==1.9.2
 yfinance==0.2.27
