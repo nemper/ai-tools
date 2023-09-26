@@ -14,7 +14,7 @@ from html2docx import html2docx
 from myfunc.mojafunkcija import st_style, positive_login, open_file
 import markdown
 from langchain.utilities.google_search import GoogleSearchAPIWrapper
-
+import pdfkit
 from langchain.callbacks.tracers.run_collector import RunCollectorCallbackHandler
 from langchain.memory import StreamlitChatMessageHistory, ConversationBufferMemory
 from langchain.schema.runnable import RunnableConfig
@@ -211,15 +211,16 @@ def main():
         html = markdown.markdown(st.session_state.odgovor)
         buf = html2docx(html, title="Zapisnik")
 
-        x = """
-        x = io.BytesIO()
-        pisa.CreatePDF(html, dest=x, encoding='utf-8')
-        pdf_data = x.getvalue()
+        options = {
+            'encoding': 'UTF-8',  # Set the encoding to UTF-8
+            'no-outline': None,
+            'quiet': ''
+            }
+        pdf_data = pdfkit.from_string(html, cover_first=False, options=options)
         st.download_button(label="Download TekstuStilu.pdf",
                            data=pdf_data,
                            file_name="TekstuStilu.pdf",
                            mime='application/octet-stream')
-        """
         st.download_button("Download TekstuStilu.txt",
                            st.session_state.odgovor, file_name="TekstuStilu.txt")
         
