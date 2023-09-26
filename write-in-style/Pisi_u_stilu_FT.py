@@ -261,7 +261,10 @@ def main():
             run_collector.traced_runs = []
             st.session_state.run_id = run.id
             wait_for_all_tracers()
-            client.share_run(run.id)
+            try:
+                client.share_run(run.id)
+            except:
+                st.write("errors")
 
     if st.session_state.get("run_id"):
         feedback = streamlit_feedback(feedback_type="faces", key=f"feedback_{st.session_state.run_id}",)
