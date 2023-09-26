@@ -333,7 +333,7 @@ def main():
             try:
                 client.share_run(run.id)
             except:
-                st.write("errors")
+                st.write("?")
 
     if st.session_state.get("run_id"):
         feedback = streamlit_feedback(
@@ -360,7 +360,10 @@ def main():
             "comment": st.session_state["user_feedback"],
             "feedback_id": feedback_id,
         }
-        client.update_feedback(feedback_id)
+        try:
+            client.update_feedback(feedback_id)
+        except:
+            st.write("??")
         st.chat_input(placeholder="To je to - hvala puno!", disabled=True)
 
     if st.session_state.get("feedback_update"):
