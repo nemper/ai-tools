@@ -250,16 +250,17 @@ def main():
                         token_max=4000,
                     )
                     # Load the summarization chain with verbose mode
-                    try:
-                        suma = AIMessage(
-                            content=chain.run(
-                                input_documents=texts, opis=opis, opis_kraj=opis_kraj
-                            )
-                        )
 
-                        st.session_state.dld = suma.content
-                        html = markdown.markdown(st.session_state.dld)
-                        buf = html2docx(html, title="Zapisnik")
+                    suma = AIMessage(
+                        content=chain.run(
+                            input_documents=texts, opis=opis, opis_kraj=opis_kraj
+                        )
+                    )
+
+                    st.session_state.dld = suma.content
+                    html = markdown.markdown(st.session_state.dld)
+                    buf = html2docx(html, title="Zapisnik")
+                    try:
                         pdf_data = pdfkit.from_string(html, False, options=options)
                     except:
                         st.write(
@@ -364,25 +365,27 @@ def main():
                 "feedback_id": str(feedback.id),
                 "score": score,
             }
+    try:
+        if st.session_state.get("feedback"):
+            feedback = st.session_state.get("feedback")
+            feedback_id = feedback["feedback_id"]
+            score = feedback["score"]
 
-    if st.session_state.get("feedback"):
-        feedback = st.session_state.get("feedback")
-        feedback_id = feedback["feedback_id"]
-        score = feedback["score"]
+            st.session_state.feedback_update = {
+                "comment": st.session_state["user_feedback"],
+                "feedback_id": feedback_id,
+            }
+            client.update_feedback(feedback_id)
+            st.chat_input(placeholder="To je to - hvala puno!", disabled=True)
 
-        st.session_state.feedback_update = {
-            "comment": st.session_state["user_feedback"],
-            "feedback_id": feedback_id,
-        }
-        client.update_feedback(feedback_id)
-        st.chat_input(placeholder="To je to - hvala puno!", disabled=True)
-
-    if st.session_state.get("feedback_update"):
-        feedback_update = st.session_state.get("feedback_update")
-        feedback_id = feedback_update.pop("feedback_id")
-        client.update_feedback(feedback_id, **feedback_update)
-        st.session_state.feedback = None
-        st.session_state.feedback_update = None
+        if st.session_state.get("feedback_update"):
+            feedback_update = st.session_state.get("feedback_update")
+            feedback_id = feedback_update.pop("feedback_id")
+            client.update_feedback(feedback_id, **feedback_update)
+            st.session_state.feedback = None
+            st.session_state.feedback_update = None
+    except:
+        st.write(".")
 
 
 def korekcija_imena():
