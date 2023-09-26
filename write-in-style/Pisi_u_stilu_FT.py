@@ -38,7 +38,7 @@ os.environ.get("LANGCHAIN_API_KEY")
 # from xhtml2pdf import pisa
 # import io
 
-version = "21.09.23."
+version = "26.09.23."
 
 st.set_page_config(page_title="Pisi u stilu", page_icon="👉", layout="wide")
 
@@ -350,28 +350,29 @@ def main():
                 "feedback_id": str(feedback.id),
                 "score": score,
             }
+    try:
+        if st.session_state.get("feedback"):
+            feedback = st.session_state.get("feedback")
+            feedback_id = feedback["feedback_id"]
+            score = feedback["score"]
 
-    if st.session_state.get("feedback"):
-        feedback = st.session_state.get("feedback")
-        feedback_id = feedback["feedback_id"]
-        score = feedback["score"]
+            st.session_state.feedback_update = {
+                "comment": st.session_state["user_feedback"],
+                "feedback_id": feedback_id,
+            }
 
-        st.session_state.feedback_update = {
-            "comment": st.session_state["user_feedback"],
-            "feedback_id": feedback_id,
-        }
-        try:
             client.update_feedback(feedback_id)
-        except:
-            st.write("??")
-        st.chat_input(placeholder="To je to - hvala puno!", disabled=True)
 
-    if st.session_state.get("feedback_update"):
-        feedback_update = st.session_state.get("feedback_update")
-        feedback_id = feedback_update.pop("feedback_id")
-        client.update_feedback(feedback_id, **feedback_update)
-        st.session_state.feedback = None
-        st.session_state.feedback_update = None
+            st.chat_input(placeholder="To je to - hvala puno!", disabled=True)
+
+        if st.session_state.get("feedback_update"):
+            feedback_update = st.session_state.get("feedback_update")
+            feedback_id = feedback_update.pop("feedback_id")
+            client.update_feedback(feedback_id, **feedback_update)
+            st.session_state.feedback = None
+            st.session_state.feedback_update = None
+    except:
+        st.write(".")
 
 
 # Login
