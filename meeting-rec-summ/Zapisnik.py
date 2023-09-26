@@ -34,7 +34,6 @@ from langsmith import Client
 from streamlit_feedback import streamlit_feedback
 from langchain.callbacks.tracers.langchain import wait_for_all_tracers
 from vanilla_chain import get_llm_chain
-client = Client()
 
 import pdfkit
 import PyPDF2
@@ -57,6 +56,7 @@ st.set_page_config(
 st_style()
 
 def main():
+    client = Client()
     side_zapisnik()
     # Read OpenAI API key from envtekst za
     openai.api_key = os.environ.get('OPENAI_API_KEY')
