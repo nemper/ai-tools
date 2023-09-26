@@ -114,6 +114,11 @@ def main():
     # html to docx
     buf = html2docx(html, title="Zapisnik")
 
+    options = {
+        'encoding': 'UTF-8',  # Set the encoding to UTF-8
+        'no-outline': None,
+        'quiet': ''
+        }
     pdf_data = pdfkit.from_string(html, cover_first=False, options=options)
 
     # summarize chosen file
