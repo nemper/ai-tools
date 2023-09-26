@@ -36,6 +36,7 @@ from langchain.callbacks.tracers.langchain import wait_for_all_tracers
 from vanilla_chain import get_llm_chain
 client = Client()
 
+import pdfkit
 from xhtml2pdf import pisa
 import PyPDF2
 import re
@@ -113,38 +114,7 @@ def main():
     # html to docx
     buf = html2docx(html, title="Zapisnik")
 
-    # pdf_data = pdfkit.from_string(html, cover_first=False, options=options)
-
-    html1 = """
-    <html>
-        <head>
-            <meta charset="UTF-8">
-            <style>
-                @font-face {
-                    font-family: Arial;
-                    src: url(path/to/arial.ttf); /* Replace with the actual path to your font file */
-                }
-                body {
-                    font-family: Arial, sans-serif;
-                }
-            </style>
-        </head>
-        <body>
-            <p>
-            """ + markdown.markdown(st.session_state.dld) + """
-            </p>
-        </body>
-    </html>
-    """
-
-    x = """
-    html_io = io.BytesIO(html.encode('UTF-8'))
-    pdf_data = io.BytesIO()
-    pisa.CreatePDF(html_io, pdf_data, encoding='UTF-8', embed_font=True)
-    pdf_data.seek(0)
-    pdf_data = pdf_data.getvalue()
-    st.write(pdf_data)
-    """
+    pdf_data = pdfkit.from_string(html, cover_first=False, options=options)
 
     # summarize chosen file
     if uploaded_file is not None:
@@ -255,7 +225,7 @@ def main():
                 st.download_button("Download prompt 2 as .txt",
                                    opis_kraj, file_name="prompt2.txt")
             st.write("Download-ujte vas zapisnik")
-            col1, col2 = st.columns(2)
+            col1, col2, col3 = st.columns(3)
             with col1:
                 st.download_button("Download Zapisnik as .txt",
                                    st.session_state.dld, file_name=out_name + ".txt")
@@ -264,13 +234,11 @@ def main():
                                    data=buf.getvalue(),
                                    file_name=out_name + ".docx",
                                    mime="docx")
-            x = """ izmeni i poziv st.columns iznad
             with col3:
                 st.download_button(label="Download Zapisnik as .pdf",
                                    data=pdf_data,
                                    file_name=out_name + ".pdf",
                                    mime='application/octet-stream')
-            """
             with st.expander('Sažetak', True):
                 # Generate the summary by running the chain on the input documents and store it in an AIMessage object
                 st.write(st.session_state.dld)  # Displaying the summary
