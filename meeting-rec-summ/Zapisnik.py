@@ -1,7 +1,7 @@
 # This code does summarization
 
 # Importing necessary modules
-from langchain.document_loaders import UnstructuredPDFLoader, UnstructuredFileLoader
+from langchain.document_loaders import UnstructuredFileLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains.summarize import load_summarize_chain
 from langchain.chat_models import ChatOpenAI
@@ -12,6 +12,7 @@ from langchain.prompts import (
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate,
 )
+from langchain import LLMChain
 import streamlit as st
 import os
 from html2docx import html2docx
@@ -26,14 +27,12 @@ from myfunc.mojafunkcija import (
     show_logo,
     def_chunk,
 )
-
+from random import randint
 from langchain.callbacks.tracers.run_collector import RunCollectorCallbackHandler
-from langchain.memory import StreamlitChatMessageHistory, ConversationBufferMemory
 from langchain.schema.runnable import RunnableConfig
 from langsmith import Client
 from streamlit_feedback import streamlit_feedback
 from langchain.callbacks.tracers.langchain import wait_for_all_tracers
-from vanilla_chain import get_llm_chain
 
 import pdfkit
 import PyPDF2
@@ -46,7 +45,7 @@ os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.langchain.plus"
 os.environ.get("LANGCHAIN_API_KEY")
 
-version = "21.09.23."
+version = "27.09.23."
 
 st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
 st_style()
@@ -133,12 +132,8 @@ def main():
         "no-outline": None,
         "quiet": "",
     }
-    try:
-        pdf_data = pdfkit.from_string(html, cover_first=False, options=options)
-    except:
-        st.write(
-            "Za pdf fajl restartujte app za 5 minuta. Osvezavanje aplikacije je u toku"
-        )
+
+    pdf_data = pdfkit.from_string(html, cover_first=False, options=options)
 
     # summarize chosen file
     if uploaded_file is not None:
@@ -205,7 +200,7 @@ def main():
         )
         if chunkova == 1:
             st.info(
-                "Tekst je kratak i biće obradjen u celini koristeći samo drugi prompt"
+                "Tekst je kratak i biće obrađen u celini koristeći samo drugi prompt."
             )
 
         out_elements = [
@@ -260,12 +255,8 @@ def main():
                     st.session_state.dld = suma.content
                     html = markdown.markdown(st.session_state.dld)
                     buf = html2docx(html, title="Zapisnik")
-                    try:
-                        pdf_data = pdfkit.from_string(html, False, options=options)
-                    except:
-                        st.write(
-                            "Restartujte app za 5 minuta. Osvezavanje aplikacije je u toku"
-                        )
+
+                    pdf_data = pdfkit.from_string(html, False, options=options)
 
         if st.session_state.dld != "Zapisnik":
             st.write("Download-ujte vaše promptove")
@@ -294,98 +285,67 @@ def main():
                     mime="docx",
                 )
             with col3:
-                try:
-                    st.download_button(
-                        label="Download Zapisnik as .pdf",
-                        data=pdf_data,
-                        file_name=out_name + ".pdf",
-                        mime="application/octet-stream",
-                    )
-                except:
-                    st.write(
-                        "Za pdf fajl restartujte app za 5 minuta. Osvezavanje aplikacije je u toku"
-                    )
+                st.download_button(
+                    label="Download Zapisnik as .pdf",
+                    data=pdf_data,
+                    file_name=out_name + ".pdf",
+                    mime="application/octet-stream",
+                )
             with st.expander("Sažetak", True):
                 # Generate the summary by running the chain on the input documents and store it in an AIMessage object
                 st.write(st.session_state.dld)  # Displaying the summary
 
-    if prompt := st.chat_input(
-        placeholder="Unesite sve napomene/komentare koje imate u vezi sa performansama programa."
-    ):
-        st.chat_message("user", avatar="👽").write(prompt)
+
+    if prompt := st.chat_input(placeholder="Unesite komentare na rad programa."):
         st.session_state["user_feedback"] = prompt
-        st.chat_input(placeholder="Vaš feedback je sačuvan!", disabled=True)
+        st.chat_input(placeholder="Feedback je sačuvan!", disabled=True)
         st.session_state.feedback = None
         st.session_state.feedback_update = None
-        with st.chat_message("assistant", avatar="🤖"):
-            message_placeholder = st.empty()
-            message_placeholder.markdown("Samo sekund!")
-            run_collector = RunCollectorCallbackHandler()
-            message_placeholder.markdown(
-                "Samo još ocenite od 1 do 5 dobijene rezultate."
-            )
+        run_collector = RunCollectorCallbackHandler()
 
-            memory = ConversationBufferMemory(
-                chat_memory=StreamlitChatMessageHistory(key="langchain_messages"),
-                return_messages=True,
-                memory_key="chat_history",
-            )
+        prompt = ChatPromptTemplate.from_messages([("system", "Hi"), ("human", "Hi")])
+        llm = ChatOpenAI(temperature=0.7)
+        chain = LLMChain(prompt=prompt, llm=llm)
 
-            chain = get_llm_chain("Hi", memory)
+        x = chain.invoke(
+            {"input": "Hi."},
+            config=RunnableConfig(
+                callbacks=[run_collector],
+                tags=["Streamlit Chat"],
+            ),
+        )["text"]
 
-            x = chain.invoke(
-                {"input": "Hi."},
-                config=RunnableConfig(
-                    callbacks=[run_collector],
-                    tags=["Streamlit Chat"],
-                ),
-            )["text"]
-
-            message_placeholder.markdown(
-                "Samo još ocenite od 1 do 5 dobijene rezultate."
-            )
-            run = run_collector.traced_runs[0]
-            run_collector.traced_runs = []
-            st.session_state.run_id = run.id
-            wait_for_all_tracers()
-            client.share_run(run.id)
+        run = run_collector.traced_runs[0]
+        run_collector.traced_runs = []
+        st.session_state.run_id = run.id
+        wait_for_all_tracers()
+        client.share_run(run.id)
 
     if st.session_state.get("run_id"):
+        with st.chat_message("assistant", avatar="🤖"):
+            message_placeholder = st.empty()
+            message_placeholder.markdown(
+                ":rainbow[Samo jos ocenite od 1 do 5 dobijene rezultate.]"
+            )
         feedback = streamlit_feedback(
-            feedback_type="faces",
-            key=f"feedback_{st.session_state.run_id}",
+            feedback_type="faces", key=f"feedback_{st.session_state.run_id}"
         )
         scores = {"😞": 1, "🙁": 2, "😐": 3, "🙂": 4, "😀": 5}
         if feedback:
             score = scores[feedback["score"]]
             feedback = client.create_feedback(
-                st.session_state.run_id, "ocena", score=score
+                st.session_state.run_id, "ocena", score=score, comment=st.session_state["user_feedback"]
             )
             st.session_state.feedback = {
                 "feedback_id": str(feedback.id),
                 "score": score,
             }
-    try:
-        if st.session_state.get("feedback"):
-            feedback = st.session_state.get("feedback")
-            feedback_id = feedback["feedback_id"]
-            score = feedback["score"]
 
-            st.session_state.feedback_update = {
-                "comment": st.session_state["user_feedback"],
-                "feedback_id": feedback_id,
-            }
-            client.update_feedback(feedback_id)
-            st.chat_input(placeholder="To je to - hvala puno!", disabled=True)
-
-        if st.session_state.get("feedback_update"):
-            feedback_update = st.session_state.get("feedback_update")
-            feedback_id = feedback_update.pop("feedback_id")
-            client.update_feedback(feedback_id, **feedback_update)
-            st.session_state.feedback = None
-            st.session_state.feedback_update = None
-    except:
-        st.write(".")
+    if st.session_state.get("feedback"):
+        feedback = st.session_state.get("feedback")
+        x = ["🎭", "🐯", "👺", "👻", "😸", "🤓", "🤡", "🦄", "🧟‍♀️", "☘️"]
+        st.write(f"{x[randint(0, len(x) - 1)]} Ova aplikacija NE radi iterativno - mora refresh stranice!")
+        st.chat_input(placeholder="To je to - hvala puno!", disabled=True)
 
 
 def korekcija_imena():
