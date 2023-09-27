@@ -328,7 +328,7 @@ def main():
         with st.chat_message("assistant", avatar="🤖"):
             message_placeholder = st.empty()
             message_placeholder.markdown(
-                ":rainbow[Samo jos ocenite od 1 do 5 dobijene rezultate.]"
+                ":rainbow[Samo još ocenite od 1 do 5 dobijene rezultate.]"
             )
         feedback = streamlit_feedback(
             feedback_type="faces", key=f"feedback_{st.session_state.run_id}"
