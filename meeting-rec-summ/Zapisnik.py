@@ -321,7 +321,7 @@ def main():
         wait_for_all_tracers()
         try:
             client.share_run(run.id)
-        except:
+        except ValueError:
             st.write("...")
 
     if st.session_state.get("run_id"):
