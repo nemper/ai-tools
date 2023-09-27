@@ -16,13 +16,12 @@ import markdown
 from langchain.utilities.google_search import GoogleSearchAPIWrapper
 import pdfkit
 from langchain.callbacks.tracers.run_collector import RunCollectorCallbackHandler
-from langchain.memory import StreamlitChatMessageHistory, ConversationBufferMemory
 from langchain.schema.runnable import RunnableConfig
 from langsmith import Client
 from streamlit_feedback import streamlit_feedback
 from langchain.callbacks.tracers.langchain import wait_for_all_tracers
-from vanilla_chain import get_llm_chain
 client = Client()
+from random import randint
 
 # these are the environment variables that need to be set for LangSmith to work
 os.environ["LANGCHAIN_PROJECT"] = "Stil"
@@ -30,10 +29,7 @@ os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.langchain.plus"
 os.environ.get("LANGCHAIN_API_KEY")
 
-# from xhtml2pdf import pisa
-# import io
-
-version = "21.09.23."
+version = "27.09.23."
 
 st.set_page_config(
     page_title="Pisi u stilu",
@@ -231,67 +227,56 @@ def main():
             mime="docx"
         )
 
-    if prompt := st.chat_input(placeholder="Unesite sve napomene/komentare koje imate u vezi sa performansama programa."):
-        st.chat_message("user", avatar="👽").write(prompt)
-        st.session_state['user_feedback'] = prompt
-        st.chat_input(placeholder="Vaš feedback je sačuvan!", disabled=True)
+    if prompt := st.chat_input(placeholder="Unesite komentare na rad programa."):
+        st.session_state["user_feedback"] = prompt
+        st.chat_input(placeholder="Feedback je sačuvan!", disabled=True)
         st.session_state.feedback = None
         st.session_state.feedback_update = None
-        with st.chat_message("assistant", avatar="🤖"):
-            message_placeholder = st.empty()
-            message_placeholder.markdown("Samo sekund!")
-            run_collector = RunCollectorCallbackHandler()
-            message_placeholder.markdown("Samo još ocenite od 1 do 5 dobijene rezultate.")
-                
-            memory = ConversationBufferMemory(
-                chat_memory=StreamlitChatMessageHistory(key="langchain_messages"),
-                return_messages=True,
-                memory_key="chat_history",
-            )
-            
-            chain = get_llm_chain("Hi", memory)
+        run_collector = RunCollectorCallbackHandler()
 
-            x = chain.invoke(
-                {"input": "Hi."}, config=RunnableConfig(
-                callbacks=[run_collector], tags=["Streamlit Chat"],)
-                )["text"]            
-            
-            message_placeholder.markdown("Samo još ocenite od 1 do 5 dobijene rezultate.")
-            run = run_collector.traced_runs[0]
-            run_collector.traced_runs = []
-            st.session_state.run_id = run.id
-            wait_for_all_tracers()
-            try:
-                client.share_run(run.id)
-            except:
-                st.write("errors")
+        prompt = ChatPromptTemplate.from_messages([("system", "Hi"), ("human", "Hi")])
+        llm = ChatOpenAI(temperature=0.7)
+        chain = LLMChain(prompt=prompt, llm=llm)
+
+        x = chain.invoke(
+            {"input": "Hi."},
+            config=RunnableConfig(
+                callbacks=[run_collector],
+                tags=["Streamlit Chat"],
+            ),
+        )["text"]
+
+        run = run_collector.traced_runs[0]
+        run_collector.traced_runs = []
+        st.session_state.run_id = run.id
+        wait_for_all_tracers()
+        client.share_run(run.id)
 
     if st.session_state.get("run_id"):
-        feedback = streamlit_feedback(feedback_type="faces", key=f"feedback_{st.session_state.run_id}",)
+        with st.chat_message("assistant", avatar="🤖"):
+            message_placeholder = st.empty()
+            message_placeholder.markdown(
+                ":rainbow[Samo još ocenite od 1 do 5 dobijene rezultate.]"
+            )
+        feedback = streamlit_feedback(
+            feedback_type="faces", key=f"feedback_{st.session_state.run_id}"
+        )
         scores = {"😞": 1, "🙁": 2, "😐": 3, "🙂": 4, "😀": 5}
         if feedback:
             score = scores[feedback["score"]]
-            feedback = client.create_feedback(st.session_state.run_id, "ocena", score=score)
-            st.session_state.feedback = {"feedback_id": str(feedback.id), "score": score}
+            feedback = client.create_feedback(
+                st.session_state.run_id, "ocena", score=score, comment=st.session_state["user_feedback"]
+            )
+            st.session_state.feedback = {
+                "feedback_id": str(feedback.id),
+                "score": score,
+            }
 
     if st.session_state.get("feedback"):
         feedback = st.session_state.get("feedback")
-        feedback_id = feedback["feedback_id"]
-        score = feedback["score"]
-
-        st.session_state.feedback_update = {
-            "comment": st.session_state['user_feedback'],
-            "feedback_id": feedback_id,
-        }
-        client.update_feedback(feedback_id)
+        x = ["🎭", "🐯", "👺", "👻", "😸", "🤓", "🤡", "🦄", "🧟‍♀️", "☘️"]
+        st.write(f"{x[randint(0, len(x) - 1)]} Ova aplikacija NE radi iterativno - mora refresh stranice!")
         st.chat_input(placeholder="To je to - hvala puno!", disabled=True)
-
-    if st.session_state.get("feedback_update"):
-        feedback_update = st.session_state.get("feedback_update")
-        feedback_id = feedback_update.pop("feedback_id")
-        client.update_feedback(feedback_id, **feedback_update)
-        st.session_state.feedback = None
-        st.session_state.feedback_update = None
 
 # Login
 st_style()
