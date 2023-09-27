@@ -289,19 +289,11 @@ def main():
         st.chat_input(placeholder="Feedback je sačuvan!", disabled=True)
         st.session_state.feedback = None
         st.session_state.feedback_update = None
-        with st.chat_message("assistant", avatar="🤖"):
-            message_placeholder = st.empty()
-            message_placeholder.markdown("Samo sekund!")
-            run_collector = RunCollectorCallbackHandler()
-            message_placeholder.markdown("Samo još ocenite od 1 do 5 dobijene rezultate.")
-                
-            memory = ConversationBufferMemory(
-                chat_memory=StreamlitChatMessageHistory(key="langchain_messages"),
-                return_messages=True,
-                memory_key="chat_history",
-            )
-            
-            chain = get_llm_chain("Hi", memory)
+        run_collector = RunCollectorCallbackHandler()
+
+        prompt = ChatPromptTemplate.from_messages([("system", "Hi"), ("human", "Hi")])
+        llm = ChatOpenAI(temperature=0.7)
+        chain = LLMChain(prompt=prompt, llm=llm)
 
         x = chain.invoke(
             {"input": "Hi."},
