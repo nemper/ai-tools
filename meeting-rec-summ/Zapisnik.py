@@ -137,7 +137,7 @@ def main():
 
     # summarize chosen file
     if uploaded_file is not None:
-        model, temp = init_cond_llm()
+        model, temp = init_cond_llm(1)
         # Initializing ChatOpenAI model
         llm = ChatOpenAI(
             model_name=model, temperature=temp, openai_api_key=openai.api_key
@@ -354,7 +354,7 @@ def main():
 def korekcija_imena():
     with st.sidebar:
         openai_api_key = os.environ.get("OPENAI_API_KEY")
-        model, temp = init_cond_llm()
+        model, temp = init_cond_llm(2)
         chat = ChatOpenAI(model=model, temperature=temp)
         template = (
             "You are a helpful assistant that fixes misspelled names in transcript."
