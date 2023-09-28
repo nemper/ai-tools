@@ -45,7 +45,7 @@ os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.langchain.plus"
 os.environ.get("LANGCHAIN_API_KEY")
 
-version = "27.09.23."
+version = "28.09.23."
 
 st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
 st_style()
