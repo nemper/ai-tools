@@ -29,7 +29,7 @@ client = Client()
 from random import randint
 
 # these are the environment variables that need to be set for LangSmith to work
-os.environ["LANGCHAIN_PROJECT"] = "Stil"
+os.environ["LANGCHAIN_PROJECT"] = "Stil bis i pravnik"
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.langchain.plus"
 os.environ.get("LANGCHAIN_API_KEY")
