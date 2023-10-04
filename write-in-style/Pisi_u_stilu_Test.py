@@ -183,6 +183,7 @@ def main():
         temperature=st.session_state.temp,
         openai_api_key=openai_api_key,
     )
+
     vectorstore = Pinecone.from_existing_index(
         st.session_state.index_name,
         embeddings,
@@ -211,9 +212,9 @@ def main():
             height=150,
         )
         submit_button = st.form_submit_button(label="Submit")
-        st.session_state.tematika = vectorstore.similarity_search_with_score(
-            zahtev, k=3
-        )
+
+        st.session_state.tematika = vectorstore.similarity_search_with_score(zahtev)
+
     # pocinje obrada, prvo se pronalazi tematika, zatim stil i na kraju se generise odgovor
     if submit_button:
         with st.spinner("Obrađujem temu..."):
