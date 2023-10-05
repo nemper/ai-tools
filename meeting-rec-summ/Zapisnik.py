@@ -45,7 +45,7 @@ os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.langchain.plus"
 os.environ.get("LANGCHAIN_API_KEY")
 
-version = "28.09.23."
+version = "05.10.23."
 
 st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
 st_style()
@@ -295,7 +295,6 @@ def main():
                 # Generate the summary by running the chain on the input documents and store it in an AIMessage object
                 st.write(st.session_state.dld)  # Displaying the summary
 
-
     if prompt := st.chat_input(placeholder="Unesite komentare na rad programa."):
         st.session_state["user_feedback"] = prompt
         st.chat_input(placeholder="Feedback je sačuvan!", disabled=True)
@@ -337,7 +336,10 @@ def main():
         if feedback:
             score = scores[feedback["score"]]
             feedback = client.create_feedback(
-                st.session_state.run_id, "ocena", score=score, comment=st.session_state["user_feedback"]
+                st.session_state.run_id,
+                "ocena",
+                score=score,
+                comment=st.session_state["user_feedback"],
             )
             st.session_state.feedback = {
                 "feedback_id": str(feedback.id),
@@ -347,7 +349,9 @@ def main():
     if st.session_state.get("feedback"):
         feedback = st.session_state.get("feedback")
         x = ["🎭", "🐯", "👺", "👻", "😸", "🤓", "🤡", "🦄", "🧟‍♀️", "☘️"]
-        st.write(f"{x[randint(0, len(x) - 1)]} Ova aplikacija NE radi iterativno - mora refresh stranice!")
+        st.write(
+            f"{x[randint(0, len(x) - 1)]} Ova aplikacija NE radi iterativno - mora refresh stranice!"
+        )
         st.chat_input(placeholder="To je to - hvala puno!", disabled=True)
 
 
@@ -379,6 +383,8 @@ def korekcija_imena():
         )
 
         if dokum:
+            with io.open(dokum.name, "wb") as file:
+                file.write(dokum.getbuffer())
             loader = UnstructuredFileLoader(dokum.name, encoding="utf-8")
 
             data = loader.load()
@@ -415,11 +421,17 @@ def korekcija_imena():
 
                         with st.expander("Obrađen tekst"):
                             st.write(result_string)
-                        with open(f"out_{dokum.name}", "w", encoding="utf-8") as file:
-                            file.write(result_string)
-                        st.success(
-                            f"Tekst je sačuvan u out_{dokum.name} i može se dalje raditi Embeding"
-                        )
+            if result_string:
+                skinuto = st.download_button(
+                    "Download txt",
+                    data=result_string,
+                    file_name=f"{dokum.name}.txt",
+                    help="Download obradjenog dokumenta",
+                )
+                if skinuto:
+                    st.success(f"Tekstovi sačuvani na {dokum.name}")
+                    # with open(f"out_{dokum.name}", "w", encoding="utf-8") as file:
+                    #     file.write(result_string)
 
 
 def transkript():
