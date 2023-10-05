@@ -361,7 +361,7 @@ def korekcija_imena():
     file_name = " "
     with st.sidebar:
         st.info(
-            "Korekcija imena učesnika sastanka. Radi sa gpt-4, temp=0, overlap treba da je 0. Prima ulaz iz txt fajla. Ne cuva formatiranje teksta."
+            "Korekcija imena učesnika sastanka. Radi sa gpt-4, temp=0, overlap treba da je 0. Ne cuva formatiranje teksta."
         )
         openai_api_key = os.environ.get("OPENAI_API_KEY")
         model = "gpt-4"
@@ -390,7 +390,7 @@ def korekcija_imena():
         dokum = st.file_uploader(
             "Izaberite .txt",
             key="upload_file_fix_names",
-            type=["txt"],
+            type=["txt", "pdf", "docx"],
             help="Izaberite fajl za korekciju imena",
         )
 
