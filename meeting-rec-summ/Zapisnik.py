@@ -356,17 +356,29 @@ def main():
 
 
 def korekcija_imena():
+    if "result_string" not in st.session_state:
+        st.session_state.result_string = ""
+    file_name = " "
     with st.sidebar:
+        st.info(
+            "Korekcija imena učesnika sastanka. Radi sa gpt-4, temp=0, overlap treba da je 0. Prima ulaz iz txt fajla. Ne cuva formatiranje teksta."
+        )
         openai_api_key = os.environ.get("OPENAI_API_KEY")
-        model, temp = init_cond_llm(2)
-        chat = ChatOpenAI(model=model, temperature=temp)
+        model = "gpt-4"
+        temp = 0
+        chat = ChatOpenAI(model=model, temperature=temp, openai_api_key=openai_api_key)
         template = (
             "You are a helpful assistant that fixes misspelled names in transcript."
         )
         system_message_prompt = SystemMessagePromptTemplate.from_template(template)
         result_string = ""
         prompt = PromptTemplate(
-            template="Please only fix the names of the people mentioned that are misspelled in this text: ### {text} ### The correct names are {ucesnici}. Do not write any comment, just the original text with corrected names. If there are no corrections to be made, just write the original text again ",
+            template="""Please only fix the names of the people mentioned that are misspelled in this text: 
+            {text} 
+            
+            The correct names are {ucesnici}. 
+            
+            Do not write any comment, just the original text with corrected names. If there are no corrections to be made, just write the original text again.""",
             input_variables=["ucesnici", "text"],
         )
         human_message_prompt = HumanMessagePromptTemplate(prompt=prompt)
@@ -379,7 +391,7 @@ def korekcija_imena():
             "Izaberite .txt",
             key="upload_file_fix_names",
             type=["txt"],
-            help="Izaberite .txt fajl koji želite da obradite",
+            help="Izaberite fajl za korekciju imena",
         )
 
         if dokum:
@@ -421,17 +433,39 @@ def korekcija_imena():
 
                         with st.expander("Obrađen tekst"):
                             st.write(result_string)
-            if result_string:
+                        st.session_state.result_string = result_string
+            if st.session_state.result_string != "":
+                html = markdown.markdown(st.session_state.result_string)
+                buf = html2docx(html, title="Zapisnik")
+
+                options = {
+                    "encoding": "UTF-8",  # Set the encoding to UTF-8
+                    "no-outline": None,
+                    "quiet": "",
+                }
+
+                pdf_data = pdfkit.from_string(html, cover_first=False, options=options)
+                name_without_extension = os.path.splitext(dokum.name)[0]
                 skinuto = st.download_button(
-                    "Download txt",
-                    data=result_string,
-                    file_name=f"{dokum.name}.txt",
+                    "Download .txt",
+                    data=st.session_state.result_string,
+                    file_name=f"fix_{name_without_extension}.txt",
                     help="Download obradjenog dokumenta",
                 )
+                skinuto = st.download_button(
+                    label="Download .docx",
+                    data=buf.getvalue(),
+                    file_name=f"fix_{name_without_extension}.docx",
+                    mime="docx",
+                )
+                skinuto = st.download_button(
+                    label="Download .pdf",
+                    data=pdf_data,
+                    file_name=f"fix_{name_without_extension}.pdf",
+                    mime="application/octet-stream",
+                )
                 if skinuto:
-                    st.success(f"Tekstovi sačuvani na {dokum.name}")
-                    # with open(f"out_{dokum.name}", "w", encoding="utf-8") as file:
-                    #     file.write(result_string)
+                    st.success(f"Tekstovi sačuvani na {file_name}")
 
 
 def transkript():
