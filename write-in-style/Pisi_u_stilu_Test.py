@@ -25,14 +25,14 @@ from langsmith import Client
 from streamlit_feedback import streamlit_feedback
 from langchain.callbacks.tracers.langchain import wait_for_all_tracers
 
-client = Client()
+# client = Client()
 from random import randint
 
 # these are the environment variables that need to be set for LangSmith to work
-os.environ["LANGCHAIN_PROJECT"] = "Stil bis i pravnik"
-os.environ["LANGCHAIN_TRACING_V2"] = "true"
-os.environ["LANGCHAIN_ENDPOINT"] = "https://api.langchain.plus"
-os.environ.get("LANGCHAIN_API_KEY")
+# os.environ["LANGCHAIN_PROJECT"] = "Stil bis i pravnik"
+# os.environ["LANGCHAIN_TRACING_V2"] = "true"
+# os.environ["LANGCHAIN_ENDPOINT"] = "https://api.langchain.plus"
+# os.environ.get("LANGCHAIN_API_KEY")
 
 version = "06.10.23."
 
@@ -314,64 +314,64 @@ def main():
             mime="docx",
         )
 
-    if prompt := st.chat_input(placeholder="Unesite komentare na rad programa."):
-        st.session_state["user_feedback"] = prompt
-        st.chat_input(placeholder="Feedback je sačuvan!", disabled=True)
-        st.session_state.feedback = None
-        st.session_state.feedback_update = None
-        run_collector = RunCollectorCallbackHandler()
+    # if prompt := st.chat_input(placeholder="Unesite komentare na rad programa."):
+    #     st.session_state["user_feedback"] = prompt
+    #     st.chat_input(placeholder="Feedback je sačuvan!", disabled=True)
+    #     st.session_state.feedback = None
+    #     st.session_state.feedback_update = None
+    #     run_collector = RunCollectorCallbackHandler()
 
-        prompt = ChatPromptTemplate.from_messages([("system", "Hi"), ("human", "Hi")])
-        llm = ChatOpenAI(temperature=0.7)
-        chain = LLMChain(prompt=prompt, llm=llm)
+    #     prompt = ChatPromptTemplate.from_messages([("system", "Hi"), ("human", "Hi")])
+    #     llm = ChatOpenAI(temperature=0.7)
+    #     chain = LLMChain(prompt=prompt, llm=llm)
 
-        x = chain.invoke(
-            {"input": "Hi."},
-            config=RunnableConfig(
-                callbacks=[run_collector],
-                tags=["Streamlit Chat"],
-            ),
-        )["text"]
+    #     x = chain.invoke(
+    #         {"input": "Hi."},
+    #         config=RunnableConfig(
+    #             callbacks=[run_collector],
+    #             tags=["Streamlit Chat"],
+    #         ),
+    #     )["text"]
 
-        run = run_collector.traced_runs[0]
-        run_collector.traced_runs = []
-        st.session_state.run_id = run.id
-        wait_for_all_tracers()
-        try:
-            client.share_run(run.id)
-        except ValueError:
-            st.write("...")
+    #     run = run_collector.traced_runs[0]
+    #     run_collector.traced_runs = []
+    #     st.session_state.run_id = run.id
+    #     wait_for_all_tracers()
+    #     try:
+    #         client.share_run(run.id)
+    #     except ValueError:
+    #         st.write("...")
 
-    if st.session_state.get("run_id"):
-        with st.chat_message("assistant", avatar="🤖"):
-            message_placeholder = st.empty()
-            message_placeholder.markdown(
-                ":rainbow[Samo još ocenite od 1 do 5 dobijene rezultate.]"
-            )
-        feedback = streamlit_feedback(
-            feedback_type="faces", key=f"feedback_{st.session_state.run_id}"
-        )
-        scores = {"😞": 1, "🙁": 2, "😐": 3, "🙂": 4, "😀": 5}
-        if feedback:
-            score = scores[feedback["score"]]
-            feedback = client.create_feedback(
-                st.session_state.run_id,
-                "ocena",
-                score=score,
-                comment=st.session_state["user_feedback"],
-            )
-            st.session_state.feedback = {
-                "feedback_id": str(feedback.id),
-                "score": score,
-            }
+    # if st.session_state.get("run_id"):
+    #     with st.chat_message("assistant", avatar="🤖"):
+    #         message_placeholder = st.empty()
+    #         message_placeholder.markdown(
+    #             ":rainbow[Samo još ocenite od 1 do 5 dobijene rezultate.]"
+    #         )
+    #     feedback = streamlit_feedback(
+    #         feedback_type="faces", key=f"feedback_{st.session_state.run_id}"
+    #     )
+    #     scores = {"😞": 1, "🙁": 2, "😐": 3, "🙂": 4, "😀": 5}
+    #     if feedback:
+    #         score = scores[feedback["score"]]
+    #         feedback = client.create_feedback(
+    #             st.session_state.run_id,
+    #             "ocena",
+    #             score=score,
+    #             comment=st.session_state["user_feedback"],
+    #         )
+    #         st.session_state.feedback = {
+    #             "feedback_id": str(feedback.id),
+    #             "score": score,
+    #         }
 
-    if st.session_state.get("feedback"):
-        feedback = st.session_state.get("feedback")
-        x = ["🎭", "🐯", "👺", "👻", "😸", "🤓", "🤡", "🦄", "🧟‍♀️", "☘️"]
-        st.write(
-            f"{x[randint(0, len(x) - 1)]} Ova aplikacija NE radi iterativno - mora refresh stranice!"
-        )
-        st.chat_input(placeholder="To je to - hvala puno!", disabled=True)
+    # if st.session_state.get("feedback"):
+    #     feedback = st.session_state.get("feedback")
+    #     x = ["🎭", "🐯", "👺", "👻", "😸", "🤓", "🤡", "🦄", "🧟‍♀️", "☘️"]
+    #     st.write(
+    #         f"{x[randint(0, len(x) - 1)]} Ova aplikacija NE radi iterativno - mora refresh stranice!"
+    #     )
+    #     st.chat_input(placeholder="To je to - hvala puno!", disabled=True)
 
 
 # Login
