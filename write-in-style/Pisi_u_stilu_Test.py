@@ -34,7 +34,7 @@ os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_ENDPOINT"] = "https://api.langchain.plus"
 os.environ.get("LANGCHAIN_API_KEY")
 
-version = "04.10.23."
+version = "06.10.23."
 
 
 def main():
