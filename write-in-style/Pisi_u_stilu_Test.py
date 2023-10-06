@@ -121,12 +121,14 @@ def main():
             (
                 "koder",
                 "positive",
-                "pravnik01",
-                "pravnik02",
-                "pravnik03",
-                "bis01",
-                "bis02",
-                "bis03",
+                "pravnikprazan",
+                "pravnikprefix",
+                "pravnikschema",
+                "pravnikfull",
+                "bisprazan",
+                "bisprefix",
+                "bisschema",
+                "bisfull",
             ),
         )
 
