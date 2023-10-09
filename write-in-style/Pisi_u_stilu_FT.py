@@ -205,7 +205,7 @@ def main():
                 st.info(
                     "Nisam u mogućnosti da pronađem odgovor u indeksu. Pretražujem internet..."
                 )
-                uk_teme = search.results(zahtev, 4)
+                uk_teme = search.results(zahtev)
             st.info(
                 f"Za relevantnost veću od {st.session_state.thold} broj pronađenih dokumenata je {len(doclist)} "
             )
