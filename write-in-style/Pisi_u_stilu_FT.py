@@ -18,7 +18,7 @@ from langchain.prompts.chat import (
 from html2docx import html2docx
 from myfunc.mojafunkcija import st_style, positive_login, open_file
 import markdown
-from langchain.utilities.google_search import GoogleSearchAPIWrapper
+from langchain.utilities import GoogleSerperAPIWrapper
 import pdfkit
 
 
@@ -31,6 +31,9 @@ version = "09.10.23. - 3"
 def main():
     GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
     GOOGLE_CSE_ID = os.environ.get("GOOGLE_CSE_ID")
+    if "SERPER_API_KEY" not in st.session_state:
+        st.session_state.serper_api_key = os.environ.get("SERPER_API_KEY")
+
     # Retrieving API keys from env
     openai_api_key = os.environ.get("OPENAI_API_KEY")
     # Initialize Pinecone
@@ -40,7 +43,7 @@ def main():
     )
     # Initialize OpenAI embeddings
     embeddings = OpenAIEmbeddings()
-    search = GoogleSearchAPIWrapper()
+    search = GoogleSerperAPIWrapper()
     # Initialize OpenAI embeddings and LLM and all variables
 
     if "model" not in st.session_state:

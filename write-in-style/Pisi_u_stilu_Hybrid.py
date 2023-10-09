@@ -20,7 +20,7 @@ import pdfkit
 from langchain.retrievers import PineconeHybridSearchRetriever
 from pinecone_text.sparse import BM25Encoder
 
-version = "09.10.23. Hybrid - 3"
+version = "09.10.23. Hybrid - variable k"
 
 
 def main():
@@ -50,6 +50,8 @@ def main():
         st.session_state.odgovor = ""
     if "tematika" not in st.session_state:
         st.session_state.tematika = ""
+    if "broj_k" not in st.session_state:
+        st.session_state.broj_k = 3
     if "stil" not in st.session_state:
         st.session_state.stil = ""
     ft_model = "Standard"
@@ -78,7 +80,15 @@ def main():
             "Set temperature (0=strict, 1=creative)", 0.0, 2.0, step=0.1, value=0.0
         )
         st.caption("Temperatura za hybrid search treba de je što bliže 0")
-
+        st.session_state.broj_k = st.number_input(
+            "Set number of returned documents",
+            min_value=1,
+            max_value=5,
+            value=3,
+            step=1,
+            key="broj_k_key",
+            help="Broj dokumenata koji se vraćaju iz indeksa",
+        )
     # define model, vestorstore and retriever
     # vazno ako ne stavimo u session state, jako usporava jer inicijalizacija dugo traje!
     if "index" not in st.session_state:
@@ -101,7 +111,7 @@ def main():
         sparse_encoder=st.session_state.bm25_encoder,
         index=st.session_state.index,
         namespace=st.session_state.namespace,
-        top_k=3,
+        top_k=st.session_state.broj_k,
     )
 
     # Prompt template - Loading text from the file
