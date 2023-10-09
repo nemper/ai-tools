@@ -32,13 +32,11 @@ from random import randint
 # os.environ.get("LANGCHAIN_API_KEY")
 
 version = "09.10.23. - variabilni k"
-
+os.environ.get("GOOGLE_API_KEY")
+os.environ.get("GOOGLE_CSE_ID")
+os.environ.get("SERPER_API_KEY")
 
 def main():
-    GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
-    GOOGLE_CSE_ID = os.environ.get("GOOGLE_CSE_ID")
-    SERPER_API_KEY = os.environ.get("SERPER_API_KEY")
-
     # Retrieving API keys from env
     openai_api_key = os.environ.get("OPENAI_API_KEY")
     # Initialize Pinecone
