@@ -31,7 +31,7 @@ from random import randint
 # os.environ["LANGCHAIN_ENDPOINT"] = "https://api.langchain.plus"
 # os.environ.get("LANGCHAIN_API_KEY")
 
-version = "09.10.23. - 3"
+version = "09.10.23. - variabilni k"
 
 
 def main():
@@ -65,6 +65,8 @@ def main():
         st.session_state.tematika = ""
     if "thold" not in st.session_state:
         st.session_state.thold = 0.5
+    if "broj_k" not in st.session_state:
+        st.session_state.broj_k = 3
     if "stil" not in st.session_state:
         st.session_state.stil = ""
 
@@ -169,6 +171,16 @@ def main():
             "Set temperature (0=strict, 1=creative)", 0.0, 2.0, step=0.1, value=1.0
         )
         st.caption("Temperatura za stil treba de je što bliže 1.0")
+        st.session_state.broj_k = st.number_input(
+            "Set number of returned documents",
+            min_value=1,
+            max_value=5,
+            value=3,
+            step=1,
+            key="broj_k_key",
+            help="Broj dokumenata koji se vraćaju iz indeksa",
+        )
+
         st.session_state.thold = st.slider(
             "Set relevance (0=any, 1=strict)", 0.0, 1.0, step=0.1, value=0.5
         )
@@ -213,7 +225,7 @@ def main():
         submit_button = st.form_submit_button(label="Submit")
 
         st.session_state.tematika = vectorstore.similarity_search_with_score(
-            zahtev, k=3
+            zahtev, k=st.session_state.broj_k
         )
 
     # pocinje obrada, prvo se pronalazi tematika, zatim stil i na kraju se generise odgovor
