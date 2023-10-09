@@ -43,7 +43,9 @@ def main():
     if "text" not in st.session_state:
         st.session_state.text = "text"
     if "index_name" not in st.session_state:
-        st.session_state.index_name = "positive-hybrid"
+        st.session_state.index_name = "bis"
+    if "namespace" not in st.session_state:
+        st.session_state.namespace = "bis01"
     if "odgovor" not in st.session_state:
         st.session_state.odgovor = ""
     if "tematika" not in st.session_state:
@@ -83,7 +85,11 @@ def main():
         st.session_state.index = pinecone.Index(st.session_state.index_name)
     if "bm25_encoder" not in st.session_state:
         st.session_state.bm25_encoder = BM25Encoder().default()
-
+    with st.sidebar:
+        st.session_state.namespace = st.selectbox(
+            "Odaberite oblast",
+            ("bis01",),
+        )
     zahtev = ""
     llm = ChatOpenAI(
         model_name=st.session_state.model,
@@ -94,6 +100,7 @@ def main():
         embeddings=embeddings,
         sparse_encoder=st.session_state.bm25_encoder,
         index=st.session_state.index,
+        namespace=st.session_state.namespace,
     )
 
     # Prompt template - Loading text from the file
