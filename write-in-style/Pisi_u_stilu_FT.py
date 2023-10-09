@@ -153,7 +153,6 @@ def main():
         embeddings,
         st.session_state.text,
         namespace=st.session_state.namespace,
-        top_k=3,
     )
 
     # Prompt template - Loading text from the file

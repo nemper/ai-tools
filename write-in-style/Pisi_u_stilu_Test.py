@@ -188,7 +188,6 @@ def main():
         embeddings,
         st.session_state.text,
         namespace=st.session_state.namespace,
-        top_k=3,
     )
 
     # Prompt template - Loading text from the file
@@ -213,7 +212,9 @@ def main():
         )
         submit_button = st.form_submit_button(label="Submit")
 
-        st.session_state.tematika = vectorstore.similarity_search_with_score(zahtev)
+        st.session_state.tematika = vectorstore.similarity_search_with_score(
+            zahtev, k=3
+        )
 
     # pocinje obrada, prvo se pronalazi tematika, zatim stil i na kraju se generise odgovor
     if submit_button:
