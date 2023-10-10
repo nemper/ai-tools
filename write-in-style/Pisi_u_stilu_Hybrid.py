@@ -20,7 +20,7 @@ import pdfkit
 from langchain.retrievers import PineconeHybridSearchRetriever
 from pinecone_text.sparse import BM25Encoder
 
-version = "09.10.23. Hybrid - variable k"
+version = "10.10.23. Hybrid - svi namespace BIS i Pravnik"
 
 
 def main():
@@ -45,7 +45,7 @@ def main():
     if "index_name" not in st.session_state:
         st.session_state.index_name = "bis"
     if "namespace" not in st.session_state:
-        st.session_state.namespace = "bis01"
+        st.session_state.namespace = "pravnikprazan"
     if "odgovor" not in st.session_state:
         st.session_state.odgovor = ""
     if "tematika" not in st.session_state:
@@ -98,7 +98,16 @@ def main():
     with st.sidebar:
         st.session_state.namespace = st.selectbox(
             "Odaberite oblast",
-            ("bis01",),
+            (
+                "pravnikprazan",
+                "pravnikprefix",
+                "pravnikschema",
+                "pravnikfull",
+                "bisprazan",
+                "bisprefix",
+                "bisschema",
+                "bisfull",
+            ),
         )
     zahtev = ""
     llm = ChatOpenAI(
