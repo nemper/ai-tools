@@ -20,7 +20,7 @@ import pdfkit
 from langchain.retrievers import PineconeHybridSearchRetriever
 from pinecone_text.sparse import BM25Encoder
 
-version = "10.10.23. Hybrid - svi namespace BIS i Pravnik kraci prazan"
+version = "11.10.23. Hybrid - svi namespace BIS i Pravnik"
 
 
 def main():
@@ -97,6 +97,14 @@ def main():
         st.session_state.namespace = st.selectbox(
             "Odaberite oblast",
             (
+                "pravnikkraciprazan",
+                "pravnikkraciprefix",
+                "pravnikkracischema",
+                "pravnikkracifull",
+                "bishybridprazan",
+                "bishybridprefix",
+                "bishybridschema",
+                "bishybridfull",
                 "pravnikprazan",
                 "pravnikprefix",
                 "pravnikschema",
@@ -105,7 +113,6 @@ def main():
                 "bisprefix",
                 "bisschema",
                 "bisfull",
-                "pravnikkraciprazan",
             ),
         )
     zahtev = ""
