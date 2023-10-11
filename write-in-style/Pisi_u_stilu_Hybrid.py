@@ -20,7 +20,7 @@ import pdfkit
 from langchain.retrievers import PineconeHybridSearchRetriever
 from pinecone_text.sparse import BM25Encoder
 
-version = "10.10.23. Hybrid - svi namespace BIS i Pravnik"
+version = "10.10.23. Hybrid - svi namespace BIS i Pravnik kraci prazan"
 
 
 def main():
@@ -107,6 +107,7 @@ def main():
                 "bisprefix",
                 "bisschema",
                 "bisfull",
+                "pravnikkraciprazan",
             ),
         )
     zahtev = ""
