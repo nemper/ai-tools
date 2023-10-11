@@ -14,7 +14,7 @@ from langchain.prompts.chat import (
     ChatPromptTemplate,
 )
 from html2docx import html2docx
-from myfunc.mojafunkcija import st_style, positive_login, open_file
+from myfunc.mojafunkcija import st_style, positive_login, open_file, init_cond_llm
 import markdown
 import pdfkit
 from langchain.retrievers import PineconeHybridSearchRetriever
@@ -54,7 +54,7 @@ def main():
         st.session_state.broj_k = 3
     if "stil" not in st.session_state:
         st.session_state.stil = ""
-    ft_model = "Standard"
+
     # Izbor stila i teme
     st.markdown(
         f"<p style='font-size: 10px; color: grey;'>{version}</p>",
@@ -71,14 +71,12 @@ def main():
         )
 
     with st.sidebar:
-        st.session_state.model = "gpt-3.5-turbo-0613"
+        st.session_state.model, st.session_state.temp = init_cond_llm()
+        ft_model = st.session_state.model
         st.session_state.stil = (
             "You are a helpful assistent. You always answer in the Serbian language."
         )
 
-        st.session_state.temp = st.slider(
-            "Set temperature (0=strict, 1=creative)", 0.0, 2.0, step=0.1, value=0.0
-        )
         st.caption("Temperatura za hybrid search treba de je što bliže 0")
         st.session_state.broj_k = st.number_input(
             "Set number of returned documents",
