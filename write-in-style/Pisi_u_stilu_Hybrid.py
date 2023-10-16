@@ -20,7 +20,7 @@ import pdfkit
 from langchain.retrievers import PineconeHybridSearchRetriever
 from pinecone_text.sparse import BM25Encoder
 
-version = "11.10.23. Hybrid - svi namespace BIS i Pravnik"
+version = "14.10.23. Hybrid - Alpha"
 
 
 def main():
@@ -87,6 +87,14 @@ def main():
             key="broj_k_key",
             help="Broj dokumenata koji se vraćaju iz indeksa",
         )
+        st.session_state.alpha = st.slider(
+            "Set alpha",
+            0.0,
+            1.0,
+            0.5,
+            0.1,
+            help="Koeficijent koji određuje koliko će biti zastupljena pretraga po ključnim rečima, a koliko po semantičkom značenju. 0-0.4 pretezno Kljucne reci , 0.5 podjednako, 0.6-1 pretezno semanticko znacenje",
+        )
     # define model, vestorstore and retriever
     # vazno ako ne stavimo u session state, jako usporava jer inicijalizacija dugo traje!
     if "index" not in st.session_state:
@@ -127,6 +135,7 @@ def main():
         index=st.session_state.index,
         namespace=st.session_state.namespace,
         top_k=st.session_state.broj_k,
+        alpha=st.session_state.alpha,
     )
 
     # Prompt template - Loading text from the file
