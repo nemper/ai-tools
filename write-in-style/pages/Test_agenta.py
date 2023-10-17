@@ -1,5 +1,4 @@
 import os
-import io
 import sys
 from langchain.chat_models import ChatOpenAI
 from langchain.utilities import GoogleSerperAPIWrapper
@@ -20,11 +19,18 @@ from myfunc.mojafunkcija import (
     init_cond_llm,
     open_file,
 )
-from Rag_func import selfquery, hybrid_query, rag, read_csv, set_namespace
+from Test_setup import selfquery, hybrid_query, rag, read_csv, set_namespace
 
-version = "16.10.23. - Svi search Agent i memorija"
+version = "17.10.23. - Svi search Agent i memorija"
 
-st.set_page_config(page_title="Multi Tool Chatbot", page_icon="👉", layout="wide")
+if "direct_semantic" not in st.session_state:
+    st.session_state.direct_semantic = True
+if "direct_hybrid" not in st.session_state:
+    st.session_state.direct_hybrid = True
+if "direct_self" not in st.session_state:
+    st.session_state.direct_self = True
+if "direct_csv" not in st.session_state:
+    st.session_state.direct_csv = True
 
 
 def new_chat():
@@ -36,6 +42,9 @@ def new_chat():
 
 
 def main():
+    with st.sidebar:
+        st.button("New Chat", on_click=new_chat)
+        model, temp = init_cond_llm()
     st.markdown(
         f"<p style='font-size: 10px; color: grey;'>{version}</p>",
         unsafe_allow_html=True,
@@ -50,7 +59,10 @@ def main():
     with st.expander("Pročitajte uputstvo 🧜‍♂️"):
         st.caption(
             """
-                   Testiramo rad BIS i Pravnik sa upotrebom agenta
+                   Testiramo rad BIS i Pravnik sa upotrebom agenta. Na setup stranici mozete postaviti parametre za rad.
+                   Trenutno podesavanje tipa agenta, prompta agenta i opisi alata nisu podesivi iz korisnickog interfejsa.
+                   Trenutno nije u upotrebi Score limit za semantic search, koji vraca odgovor uvek ako je prozvan.
+                   Ovo su parametri koji ce se testirati u sledecim iteracijama.
                     """
         )
 
@@ -66,83 +78,6 @@ def main():
         st.session_state["messages"] = []
     search = GoogleSerperAPIWrapper()
 
-    if "name_semantic" not in st.session_state:
-        st.session_state.name_semantic = "positive"
-    if "name_self" not in st.session_state:
-        st.session_state.name_self = "sistematizacija3"
-    if "name_hybrid" not in st.session_state:
-        st.session_state.name_hybrid = "pravnikkraciprazan"
-    if "broj_k" not in st.session_state:
-        st.session_state.broj_k = 3
-    if "alpha" not in st.session_state:
-        st.session_state.alpha = 0.5
-
-    if "uploaded_file" not in st.session_state:
-        st.session_state.uploaded_file = "x.csv"
-
-    with st.sidebar:
-        st.button("New Chat", on_click=new_chat)
-        model, temp = init_cond_llm()
-
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        set_namespace()
-    with col2:
-        st.caption("Da li zelite direktan odgovor?")
-        direct_semantic = st.radio(
-            "Semantic search",
-            [True, False],
-            key="direct_semantic",
-            help="Pitanja o Positive uopstena",
-        )
-
-        direct_hybrid = st.radio(
-            "Hybrid search",
-            [True, False],
-            key="direct_hybrid",
-            help="Pitanja o opisu radnih mesta",
-        )
-
-        direct_self = st.radio(
-            "Self search",
-            [True, False],
-            key="direct_self",
-            help="Pitanja o meta poljima",
-        )
-
-        direct_csv = st.radio(
-            "CSV search",
-            [True, False],
-            key="direct_csv",
-            help="Pitanja o struktuiranim podacima",
-        )
-
-    with col3:
-        st.session_state.uploaded_file = st.file_uploader(
-            "Choose a CSV file", accept_multiple_files=False, type="csv", key="csv_key"
-        )
-        if st.session_state.uploaded_file is not None:
-            with io.open(st.session_state.uploaded_file.name, "wb") as file:
-                file.write(st.session_state.uploaded_file.getbuffer())
-
-        st.session_state.broj_k = st.number_input(
-            "Set number of returned documents - radi za sva tri indexa",
-            min_value=1,
-            max_value=5,
-            value=3,
-            step=1,
-            key="broj_k_key",
-            help="Broj dokumenata koji se vraćaju iz indeksa",
-        )
-        st.session_state.alpha = st.slider(
-            "Set alpha - radi samo za hybrid search",
-            0.0,
-            1.0,
-            0.5,
-            0.1,
-            help="Koeficijent koji određuje koliko će biti zastupljena pretraga po ključnim rečima, a koliko po semantičkom značenju. 0-0.4 pretezno Kljucne reci , 0.5 podjednako, 0.6-1 pretezno semanticko znacenje",
-        )
-
     st.session_state.tools = [
         Tool(
             name="search",
@@ -154,28 +89,28 @@ def main():
             func=rag,
             verbose=False,
             description="Useful for when you are asked about topics including Positive doo and their portfolio. Input should contain Positive.",
-            return_direct=direct_semantic,
+            return_direct=st.session_state.direct_semantic,
         ),
         Tool(
             name="Hybrid search",
             func=hybrid_query,
             verbose=False,
             description="Useful for when you are asked about topics that will list items about opis radnih mesta.",
-            return_direct=direct_hybrid,
+            return_direct=st.session_state.direct_hybrid,
         ),
         Tool(
             name="Self search",
             func=selfquery,
             verbose=False,
             description="Useful for when you are asked about topics that will look for keyword.",
-            return_direct=direct_self,
+            return_direct=st.session_state.direct_self,
         ),
         Tool(
             name="CSV search",
             func=read_csv,
             verbose=True,
             description="Useful for when you are asked about structured data like numbers, counts or sums",
-            return_direct=direct_csv,
+            return_direct=st.session_state.direct_csv,
         ),
     ]
 
@@ -205,6 +140,10 @@ def main():
         st.session_state.human_message_prompt = (
             HumanMessagePromptTemplate.from_template("{text}")
         )
+
+    # za prosledjivanje originalnog prompta alatu
+    if "fix_prompt" not in st.session_state:
+        st.session_state.fix_prompt = ""
     if "chat_prompt" not in st.session_state:
         st.session_state.chat_prompt = ChatPromptTemplate.from_messages(
             [
@@ -242,8 +181,12 @@ def main():
         with placeholder.container():
             st_redirect = StreamlitRedirect()
             sys.stdout = st_redirect
+            # za prosledjivanje originalnog prompta alatu
+            st.session_state.fix_prompt = formatted_prompt[1].content
 
-            fix_prompt = formatted_prompt[1].content
+            #
+            # testirati sa razlicitim agentima i prompt template-ima
+            #
             agent_chain = initialize_agent(
                 tools=st.session_state.tools,
                 llm=chat,
@@ -252,7 +195,6 @@ def main():
                 verbose=True,
                 memory=st.session_state.memory,
                 handle_parsing_errors=True,
-                prompt=fix_prompt,
                 max_iterations=4,
             )
             output = agent_chain.invoke(input=pitanje)
