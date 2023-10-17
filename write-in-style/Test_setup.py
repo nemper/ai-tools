@@ -44,7 +44,7 @@ with st.sidebar:
 def set_namespace():
     with col1:
         st.session_state.name_semantic = st.selectbox(
-            "Namespace za Semantic Search",
+            "Namespace za Semantic",
             (
                 "positive",
                 "pravnikprazan",
@@ -61,13 +61,13 @@ def set_namespace():
         )
     with col2:
         st.session_state.name_self = st.selectbox(
-            "Namespace za SelfQuery Search",
+            "Namespace za SelfQuery",
             ("sistematizacija3",),
             help="Pitanja o meta poljima",
         )
     with col3:
         st.session_state.name_hybrid = st.selectbox(
-            "Namespace za Hybrid Search",
+            "Namespace za Hybrid",
             (
                 "pravnikkraciprazan",
                 "pravnikkraciprefix",
@@ -142,14 +142,14 @@ with col1:
     )
 with col3:
     st.session_state.direct_hybrid = st.radio(
-        "Direktan odgovor - Hybrid search",
+        "Direktan odgovor - Hybrid",
         [True, False],
         horizontal=True,
         help="Pitanja o opisu radnih mesta",
     )
 with col2:
     st.session_state.direct_self = st.radio(
-        "Direktan odgovor - Self search",
+        "Direktan odgovor - SelfQuery",
         [True, False],
         horizontal=True,
         help="Pitanja o meta poljima",
@@ -183,7 +183,7 @@ with col4:
     )
 
     st.session_state.direct_csv = st.radio(
-        "Direktan odgovor - CSV search",
+        "Direktan odgovor - CSV",
         [True, False],
         help="Pitanja o struktuiranim podacima",
         horizontal=True,
@@ -513,8 +513,11 @@ def main():
                 handle_parsing_errors=True,
                 max_iterations=4,
             )
-            st.write(
-                f"Ulaz: {st.session_state.input_prompt}, izlaz: {st.session_state.direct_hybrid}, Alpha: {st.session_state.alpha} "
+            st.caption(
+                f"Originalni prompt: {st.session_state.input_prompt}, Semantic izlaz: {st.session_state.direct_semantic}, SelfQuery izlaz: {st.session_state.direct_self}, Hybrid izlaz: {st.session_state.direct_hybrid}, CSV izlaz: {st.session_state.direct_csv}, Alpha za Hybrid: {st.session_state.alpha} "
+            )
+            st.caption(
+                f"Broj dokumenata: {st.session_state.broj_k}, Namsepace Semantic: {st.session_state.name_semantic}, Namespace SelfQuery: {st.session_state.name_self}, Namespace Hybrid: {st.session_state.name_hybrid} "
             )
             output = agent_chain.invoke(input=pitanje)
             output_text = output.get("output", "")
