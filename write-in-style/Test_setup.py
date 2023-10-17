@@ -12,7 +12,7 @@ from pinecone_text.sparse import BM25Encoder
 from langchain.agents.agent_types import AgentType
 from langchain.agents import create_csv_agent
 from myfunc.mojafunkcija import st_style
-from mojafunkcija import positive_login
+from myfunc.mojafunkcija import positive_login
 
 
 st.set_page_config(page_title="Multi Tool Chatbot", page_icon="👉", layout="wide")
