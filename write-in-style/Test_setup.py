@@ -30,18 +30,63 @@ from myfunc.mojafunkcija import (
     open_file,
 )
 
+# setup stranica
 st.set_page_config(page_title="Multi Tool Chatbot", page_icon="👉", layout="wide")
-
 st_style()
-version = "17.10.23. - Svi search Agent i memorija"
-with st.sidebar:
+
+
+# prebaciti u mojafunkcija ?
+def app_version():
+    version = "18.10.23. - Chatbot sa memorijom, Google-om, 3 indexa i CSV agentom"
     st.markdown(
         f"<p style='font-size: 10px; color: grey;'>{version}</p>",
         unsafe_allow_html=True,
     )
 
 
-def set_namespace():
+# setup aplikacije
+def app_setup():
+    if "name_semantic" not in st.session_state:
+        st.session_state.name_semantic = "positive"
+    if "name_self" not in st.session_state:
+        st.session_state.name_self = "sistematizacija3"
+    if "name_hybrid" not in st.session_state:
+        st.session_state.name_hybrid = "pravnikkraciprazan"
+    if "broj_k" not in st.session_state:
+        st.session_state.broj_k = 3
+    if "alpha" not in st.session_state:
+        st.session_state.alpha = None
+
+    if "uploaded_file" not in st.session_state:
+        st.session_state.uploaded_file = "bnreport.csv"
+    if "direct_semantic" not in st.session_state:
+        st.session_state.direct_semantic = None
+    if "direct_hybrid" not in st.session_state:
+        st.session_state.direct_hybrid = None
+    if "direct_self" not in st.session_state:
+        st.session_state.direct_self = None
+    if "direct_csv" not in st.session_state:
+        st.session_state.direct_csv = None
+    if "input_prompt" not in st.session_state:
+        st.session_state.input_prompt = None
+
+    st.subheader("Multi Tool Chatbot")
+    with st.expander("Pročitajte uputstvo 🧜‍♂️"):
+        st.caption(
+            """
+                    Na ovom mestu podesavate parametre sistema za testiranje. Za rad CSV agenta potrebno je da uploadujete csv fajl sa struktuiranim podacima.
+                    Za rad ostalih agenata potrebno je da odlucit eda li cete korisiti originalni prompt ili upit koji formira agent. Takodje, odaberite namespace za svaki metod.
+                    Izborom izlaza odlucujete da li ce se odgovor vratiti direktno iz alata ili ce se korisiti dodatni LLM za formiranje odgovora.
+                    Za hybrid search odredite koeficijent alpha koji odredjuje koliko ce biti zastupljena pretraga po kljucnim recima, a koliko po semantickom znacenju.
+                    Mozete odabrati i broj dokumenata koji se vracaju iz indeksa.
+                    Testiramo rad BIS i Pravnik sa upotrebom agenta. Na setup stranici mozete postaviti parametre za rad.
+                    Trenutno podesavanje tipa agenta, prompta agenta i opisi alata nisu podesivi iz korisnickog interfejsa.
+                    Trenutno nije u upotrebi Score limit za semantic search, koji vraca odgovor uvek ako je prozvan.
+                    Ovo su parametri koji ce se testirati u sledecim iteracijama.
+                        """
+        )
+
+    col1, col2, col3, col4, col5 = st.columns(5)
     with col1:
         st.session_state.name_semantic = st.selectbox(
             "Namespace za Semantic",
@@ -88,108 +133,65 @@ def set_namespace():
             ),
             help="Pitanja o opisu radnih mesta",
         )
+    with col1:
+        st.session_state.direct_semantic = st.radio(
+            "Direktan odgovor - Semantic",
+            [True, False],
+            key="semantic_key",
+            horizontal=True,
+            help="Pitanja o Positive uopstena",
+        )
+    with col3:
+        st.session_state.direct_hybrid = st.radio(
+            "Direktan odgovor - Hybrid",
+            [True, False],
+            horizontal=True,
+            help="Pitanja o opisu radnih mesta",
+        )
+    with col2:
+        st.session_state.direct_self = st.radio(
+            "Direktan odgovor - SelfQuery",
+            [True, False],
+            horizontal=True,
+            help="Pitanja o meta poljima",
+        )
+
+    with col5:
+        st.session_state.alpha = st.slider(
+            "Hybrid keyword/semantic",
+            0.0,
+            1.0,
+            0.5,
+            0.1,
+            help="Koeficijent koji određuje koliko će biti zastupljena pretraga po ključnim rečima, a koliko po semantičkom značenju. 0-0.4 pretezno Kljucne reci , 0.5 podjednako, 0.6-1 pretezno semanticko znacenje",
+        )
+        st.session_state.input_prompt = st.radio(
+            "Originalni prompt?",
+            [True, False],
+            key="input_prompt_key",
+            horizontal=True,
+            help="Ako je odgovor False, onda se koristi upit koji formira Agent",
+        )
+    with col4:
+        st.session_state.broj_k = st.number_input(
+            "Broj dokumenata - svi indexi",
+            min_value=1,
+            max_value=5,
+            value=3,
+            step=1,
+            key="broj_k_key",
+            help="Broj dokumenata koji se vraćaju iz indeksa",
+        )
+
+        st.session_state.direct_csv = st.radio(
+            "Direktan odgovor - CSV",
+            [True, False],
+            help="Pitanja o struktuiranim podacima",
+            horizontal=True,
+        )
 
 
-if "name_semantic" not in st.session_state:
-    st.session_state.name_semantic = "positive"
-if "name_self" not in st.session_state:
-    st.session_state.name_self = "sistematizacija3"
-if "name_hybrid" not in st.session_state:
-    st.session_state.name_hybrid = "pravnikkraciprazan"
-if "broj_k" not in st.session_state:
-    st.session_state.broj_k = 3
-if "alpha" not in st.session_state:
-    st.session_state.alpha = None
-
-if "uploaded_file" not in st.session_state:
-    st.session_state.uploaded_file = "bnreport.csv"
-if "direct_semantic" not in st.session_state:
-    st.session_state.direct_semantic = None
-if "direct_hybrid" not in st.session_state:
-    st.session_state.direct_hybrid = None
-if "direct_self" not in st.session_state:
-    st.session_state.direct_self = None
-if "direct_csv" not in st.session_state:
-    st.session_state.direct_csv = None
-if "input_prompt" not in st.session_state:
-    st.session_state.input_prompt = None
-
-
-st.subheader("Multi Tool Chatbot")
-with st.expander("Pročitajte uputstvo 🧜‍♂️"):
-    st.caption(
-        """
-                Na ovom mestu podesavate parametre sistema za testiranje. Za rad CSV agenta potrebno je da uploadujete csv fajl sa struktuiranim podacima.
-                Za rad ostalih agenata potrebno je da odlucit eda li cete korisiti originalni prompt ili upit koji formira agent. Takodje, odaberite namespace za svaki metod.
-                Izborom izlaza odlucujete da li ce se odgovor vratiti direktno iz alata ili ce se korisiti dodatni LLM za formiranje odgovora.
-                Za hybrid search odredite koeficijent alpha koji odredjuje koliko ce biti zastupljena pretraga po kljucnim recima, a koliko po semantickom znacenju.
-                Mozete odabrati i broj dokumenata koji se vracaju iz indeksa.
-                Testiramo rad BIS i Pravnik sa upotrebom agenta. Na setup stranici mozete postaviti parametre za rad.
-                Trenutno podesavanje tipa agenta, prompta agenta i opisi alata nisu podesivi iz korisnickog interfejsa.
-                Trenutno nije u upotrebi Score limit za semantic search, koji vraca odgovor uvek ako je prozvan.
-                Ovo su parametri koji ce se testirati u sledecim iteracijama.
-                    """
-    )
-col1, col2, col3, col4, col5 = st.columns(5)
-set_namespace()
-with col1:
-    st.session_state.direct_semantic = st.radio(
-        "Direktan odgovor - Semantic",
-        [True, False],
-        key="semantic_key",
-        horizontal=True,
-        help="Pitanja o Positive uopstena",
-    )
-with col3:
-    st.session_state.direct_hybrid = st.radio(
-        "Direktan odgovor - Hybrid",
-        [True, False],
-        horizontal=True,
-        help="Pitanja o opisu radnih mesta",
-    )
-with col2:
-    st.session_state.direct_self = st.radio(
-        "Direktan odgovor - SelfQuery",
-        [True, False],
-        horizontal=True,
-        help="Pitanja o meta poljima",
-    )
-
-with col5:
-    st.session_state.alpha = st.slider(
-        "Hybrid keyword/semantic",
-        0.0,
-        1.0,
-        0.5,
-        0.1,
-        help="Koeficijent koji određuje koliko će biti zastupljena pretraga po ključnim rečima, a koliko po semantičkom značenju. 0-0.4 pretezno Kljucne reci , 0.5 podjednako, 0.6-1 pretezno semanticko znacenje",
-    )
-    st.session_state.input_prompt = st.radio(
-        "Originalni prompt?",
-        [True, False],
-        key="input_prompt_key",
-        horizontal=True,
-        help="Ako je odgovor False, onda se koristi upit koji formira Agent",
-    )
-with col4:
-    st.session_state.broj_k = st.number_input(
-        "Broj dokumenata - svi indexi",
-        min_value=1,
-        max_value=5,
-        value=3,
-        step=1,
-        key="broj_k_key",
-        help="Broj dokumenata koji se vraćaju iz indeksa",
-    )
-
-    st.session_state.direct_csv = st.radio(
-        "Direktan odgovor - CSV",
-        [True, False],
-        help="Pitanja o struktuiranim podacima",
-        horizontal=True,
-    )
-
-
+# citanje csv fajla i pretraga po njemu
 def read_csv(upit):
     agent = create_csv_agent(
         ChatOpenAI(temperature=0),
@@ -214,17 +216,13 @@ def rag(upit):
         environment=os.environ["PINECONE_API_ENV"],
     )
     index_name = "embedings1"
-
     index = pinecone.Index(index_name)
-    # vectorstore = Pinecone(
-    #     index=index, embedding=OpenAIEmbeddings(), text_key=upit, namespace=namespace
-    # )
     text = "text"
 
     # verizja sa score-om
     # za prosledjivanje originalnog prompta alatu alternativa je upit
     if st.session_state.input_prompt == True:
-        odg = Pinecone(
+        ceo_odgovor = Pinecone(
             index=index,
             embedding=OpenAIEmbeddings(),
             text_key=text,
@@ -233,26 +231,12 @@ def rag(upit):
             st.session_state.fix_prompt, k=st.session_state.broj_k
         )
     else:
-        odg = Pinecone(
+        ceo_odgovor = Pinecone(
             index=index,
             embedding=OpenAIEmbeddings(),
             text_key=text,
             namespace=st.session_state.name_semantic,
         ).similarity_search_with_score(upit, k=st.session_state.broj_k)
-
-    ceo_odgovor = odg
-
-    # verzija bez score-a
-    # odg = Pinecone(
-    #    index=index,
-    #    embedding=OpenAIEmbeddings(),
-    #    text_key=text,
-    #    namespace=st.session_state.name_semantic,
-    # ).as_retriever(search_kwargs={"k": st.session_state.broj_k})
-
-    # ceo_odgovor = odg.get_relevant_documents(
-    #     st.session_state.fix_prompt,
-    # )
 
     odgovor = ""
 
@@ -271,7 +255,7 @@ def selfquery(upit):
     )
 
     llm = ChatOpenAI(temperature=0)
-    # Define metadata fields
+    # Define metadata fields obratiti paznju
     metadata_field_info = [
         AttributeInfo(name="title", description="Tema dokumenta", type="string"),
         AttributeInfo(name="keyword", description="reci za pretragu", type="string"),
@@ -305,6 +289,7 @@ def selfquery(upit):
         verbose=True,
         search_kwargs={"k": st.session_state.broj_k},
     )
+
     # za prosledjivanje originalnog prompta alatu alternativa je upit
     if st.session_state.input_prompt == True:
         ceo_odgovor = ret.get_relevant_documents(st.session_state.fix_prompt)
@@ -352,16 +337,7 @@ def hybrid_query(upit):
     return odgovor
 
 
-# if "direct_semantic" not in st.session_state:
-#     st.session_state.direct_semantic = None
-if "direct_hybrid" not in st.session_state:
-    st.session_state.direct_hybrid = None
-if "direct_self" not in st.session_state:
-    st.session_state.direct_self = None
-if "direct_csv" not in st.session_state:
-    st.session_state.direct_csv = None
-
-
+# pocinje novi chat, brise se memorija
 def new_chat():
     st.session_state["generated"] = []
     st.session_state["past"] = []
@@ -370,17 +346,20 @@ def new_chat():
     st.session_state["messages"] = []
 
 
+# glavna aplikacija - Chatbot
 def main():
+    app_setup()
     with st.sidebar:
+        app_version()
         st.button("New Chat", on_click=new_chat)
         model, temp = init_cond_llm()
 
         st.session_state.uploaded_file = st.file_uploader(
             "Choose a CSV file", accept_multiple_files=False, type="csv", key="csv_key"
         )
-    if st.session_state.uploaded_file is not None:
-        with io.open(st.session_state.uploaded_file.name, "wb") as file:
-            file.write(st.session_state.uploaded_file.getbuffer())
+        if st.session_state.uploaded_file is not None:
+            with io.open(st.session_state.uploaded_file.name, "wb") as file:
+                file.write(st.session_state.uploaded_file.getbuffer())
 
     if "generated" not in st.session_state:
         st.session_state["generated"] = []
@@ -392,8 +371,10 @@ def main():
         st.session_state["input"] = ""
     if "messages" not in st.session_state:
         st.session_state["messages"] = []
+
     search = GoogleSerperAPIWrapper()
 
+    # definicija alata - vazno definisati kvalitetno description !!! - videti kako da ne koristi nista ako ne mora, mozda je u promptu agenta?
     st.session_state.tools = [
         Tool(
             name="search",
@@ -501,7 +482,7 @@ def main():
             st.session_state.fix_prompt = formatted_prompt[1].content
 
             #
-            # testirati sa razlicitim agentima i prompt template-ima
+            # testirati sa razlicitim agentima i prompt template-ima !!!
             #
             agent_chain = initialize_agent(
                 tools=st.session_state.tools,
@@ -547,7 +528,6 @@ def main():
                 st.download_button("Download", download_str)
 
 
-st_style()
 # Koristi se samo za deploy na streamlit.io
 deployment_environment = os.environ.get("DEPLOYMENT_ENVIRONMENT")
 
