@@ -1,0 +1,566 @@
+Na osnovu Člana 24. Zakona o radu („Sl. glasnik RS", br. 24/2005, 61/2005, 54/2009, 32/2013, 75/2014, 13/2017 - odluka US, 113/2017 i 95/2018 - autentično tumačenje) direktor POSITIVE DOO NOVI SAD Miljan Radanović (u daljem tekstu: Direktor) dana 22.12.2020. godine donosi:
+PRAVILNIK O ORGANIZACIJI I SISTEMATIZACIJI RADNIH MESTA
+
++++ Član 1.
+Pravilnikom o organizaciji i sistematizaciji radnih mesta (u daljem tekstu: Pravilnik) uređuje se organizacija preduzeća POSITIVE DOO NOVI SAD (u daljem tekstu: preduzeće), vrste i nazivi radnih mesta, broj izvršilaca na određenom radnom mestu, poslovi koji se obavljaju, zahtevi u pogledu stepena stručne spreme, određene vrste zanimanja, radnog iskustva, posebni uslovi za vršenje poslova na određenom radnom mestu, kao i radna mesta na koja se raspoređuju invalidi rada i pripravnici. 
+
++++ Član 2.
+Utvrđivanje organizacije rada i sistematizacija poslova i radnih zadataka ima za cilj da se obezbedi organizaciona efikasnost i kvalitet rada, povećanje produktivnosti rada i poboljšanje organizacije i radnog procesa u kome će se ostvariti puna zaposlenost svih zaposlenih u obavljanju delatnosti.
+
++++ Član 3.
+U preduzeću postoje sledeći organizacioni delovi:
+  Menadžment;
+  Sektor za informacione tehnologije, u kojem se nalaze službe:
+ Služba IT podrške
+ Služba za razvoj i digitalnu transformaciju
+  Sektor finansija, opštih i pravnih poslova;
+  Sektor prodaje.
+
+Organizacija radnih mesta po organizacionim delovima (sektorima) se može videti u organizacionoj šemi koja predstavlja sastavni deo ovog Pravilnika.
+
++++ Član 4.
+Radno mesto kao osnovni oblik rada kod poslodavca čine pojedini radni zadaci ili homogeno ili međusobno povezani skup radnih zadataka koji čine tehnološku celinu, čija složenost je jednakog ili približno jednakog stepena i koje jedan ili više zaposlenih obavljaju na određenom prostoru, sa određenim sredstvima rada, po predviđenom postupku i u datim radnim uslovima.
+
++++ Član 5.
+Nazive radnih mesta, utvrđene ovim Pravilnikom, opredeljuju karakter poslova koji se obavljaju, složenost tih poslova, potrebna stručna sprema i drugi uslovi za obavljanje tih poslova.
+
++++ Član 6.
+Pored opštih uslova, utvrđenih zakonom, svako lice da bi radilo na poslovima utvrđenim ovim Pravilnikom, mora ispunjavati i posebne uslove utvrđene ovim Pravilnikom, poput: visine i vrste stručne spreme, radnog iskustva, posedovanje određenih znanja i veština i dr.
+
++++ Član 7.
+Stepen stručne spreme stiče se savladavanjem odgovarajućeg programa u vaspitno-obrazovanim organizacijama, odnosno završavanjem škole u skladu sa zakonom.
+
+Pod radnim iskustvom  podrazumeva se staž koji je radnik ostvario u redovnom radnom odnosu na poslovima sa istim ili višim stepenom stručne spreme u odnosu na zahtevani stepen stručne spreme radnog mesta.
+
+Pod znanjima i veštinama mogu se podrazumevati:
+  Znanje određenog stranog jezika;
+  Korišćenje određenih programa i programskih paketa (poput MS Office i sl.);
+  Vozačka dozvola određene kategorije;
+  Posedovanje određenih sertifikata;
+  I drugo.
+
++++ Član 8.
+U preduzeću ne postoje radna mesta sa posebnim uslovima rada, odnosno poslovi na kojima postoji povećana opasnost od povreda i zdravstvenih oštećenja i čije se štetno dejstvo na radnu sposobnost i zdravlje radnika ne može u potpunosti otkloniti zaštitnim merama, u skladu sa zakonom.
+
++++ Član 9.
+Zaposleni se može primiti samo na radno mesto za koje ispunjava sve uslove pr Opisane ovim Pravilnikom.
+
+Svaki zaposleni koji je u stalnom radnom odnosu ima pravo da bude raspoređen na određeno radno mesto predviđeno ovim Pravilnikom.
+
++++ Član 10.
+Svaki zaposleni je dužan da u okviru svog radnog mesta obavlja poslove i radne zadatke tog radnog mesta u skladu sa uslovima definisanim jedinstvenom nomenklaturom zanimanja.
+Zaposleni je dužan da obavlja poslove i drugog radnog mesta iste vrste školske spreme ukoliko je to neophodno za nesmetano odvijanje procesa rada kod poslodavca.
+Zaposleni može odbiti nalog za obavljanje poslova svog ili drugog radnog mesta samo ukoliko bi time učinio krivično delo, povredu radne dužnosti ili bi izvršavanje tog naloga moglo ugroziti njegov život i zdravlje ili život i zdravlje drugih lica ili prouzrokovati štetne posledice za poslodavca.
+
++++ Član 11.
+Zaposleni koji u toku radnog odnosa stekne viši stepen školske spreme može biti raspoređen na odgovarajuće radno mesto prema stečenoj školskoj spremi i drugim uslovima ukoliko kod poslodavca za to postoje uslovi.
+Stečena kvalifikacija odnosno školska sprema je samo jedan od uslova za raspoređivanje na odgovarajuće radno mesto, ali ne i obaveza poslodavca da takvo raspoređivanje i vrši.
+
++++ Član 12.
+U preduzeću postoje sledeća radna mesta, sa  Opisom poslova i zadataka, neophodnim uslovima i brojem izvršilaca:
+
++++ DIREKTOR PREDUZEĆA
+  Opis poslova i zadataka:
+  Zastupa i predstavlja preduzeće u zemlji i inostranstvu, prema trećim licima, državnim telima i institucijama.
+  Donosi viziju i misiju preduzeća, kao i strategiju organizacije, poslovni plan i ciljeve preduzeća.
+  Donosi politiku kvaliteta, bezbednosti informacija, upravljanja uslugama, kontinuiteta poslovanja.
+  Vrši preispitivanje poslovanja preduzeća na godišnjem nivou.
+  Nadgleda izvršenje zadataka i komunicira sa zaposlenima u meri u kojoj je potrebno.
+  Organizuje i vodi poslovanje preduzeća.
+  Odgovara za zakonitost rada.
+  Zaključuje i potpisuje ugovore i kontroliše njihovo sprovođenje.
++++ DIREKTOR PREDUZEĆA
+  Odgovoran je za uvođenje standarda, definisanje i sprovođenje procedura i novih softvera.
+  Odgovoran je za donošenje i sprovođenje planova razvoja, za investicije u objekte i opremu, osiguranje imovine i zaposlenih. 
+  Zajedno sa Tehničkim direktorom i Službom za razvoj i digitalnu transformaciju određuje pravce i prioritete u oblasti istraživanja i razvoja. 
+  Održava direktne kontakte sa najvećim korisnicima u javnoj i privatnoj sferi (SMB) i učestvuje u sklapanju bitnih poslova.
+  Učestvuje u upravljanju odnosa sa bitnim dobavljačima.
+  Potpisuje ugovore o radu i druge ugovore o angažovanju.
+  Radi mesečne i godišnje analize poslovanja na osnovu ERP-a (BN) i ostalih podataka koje mu dostavlja Izvršni direktor, Direktor prodaje i po potrebi drugi zaposleni, komunicira o postignutim rezultatima sa zaposlenima u meri u kojoj to smatra potrebnim.
++++ DIREKTOR PREDUZEĆA  
+ Odlučuje o nabavci potrebne opreme, ocenjuje opravdanost svih ulaganja u potrošna i osnovna sredstva i razvojne investicije preduzeća.
+  Učestvuje u donošenju marketing strategija i koordiniše aktivnosti na realizaciji marketinških aktivnosti.
+  Odgovoran je za Employer Branding.
+  Sprovodi aktivnosti u polju privrednog Networking-a.
+  Zajedno sa Izvršnim direktorom određuje i sprovodi strateške aktivnosti.
+  Aktivno učestvuje u radu kolegijuma.
+Posebni uslovi:
+VII stepen stručne spreme, 3 godine radnog iskustva na rukovodećim poslovima i znanje jednog stranog jezika. Organizacione, liderske i analitičke veštine. Sposobnost planiranja. Znanje engleskog jezika i rada na računaru (MS Office: Word, Excel, Outlook...).
+Broj izvršilaca: 1 (jedan).
+
++++ IZVRŠNI DIREKTOR
+  Opis  poslova i zadataka:
+  Zastupa i predstavlja preduzeće u zemlji i inostranstvu, prema trećim licima.
+  U komunikaciji sa direktorom preduzeća organizuje, koordinira, planira i analizira rad kompletnog preduzeća. Kreira i sprovodi planove sektora na mesečnom i godišnjem nivou i nadgleda njihovo ostvarivanje, a u cilju postizanja što boljih rezultata. Inicira donošenje planova rada i kontroliše sprovođenje istih.
+  Vrši analizu izveštavanja o poslovanju.
+  Sprovodi strateške odluke preduzeća na svim nivoima. Daje idejna rešenja za rešavanje eventualnih problema u poslovanju.
+  Osigurava optimalne uslove rada svih organizacionih celina preduzeća.
+  Prati kretanja konkurencije iste ili srodne delatnosti na tržištu.
+  Održava direktne kontakte sa najvećim korisnicima u javnoj i privatnoj sferi (SMB) i učestvuje u sklapanju bitnih poslova.
++++ IZVRŠNI DIREKTOR
+  Brine o finansijskoj stabilnosti preduzeća, direktno rukovodi finansijama: finansijska analiza i planiranje, kontinuirano praćenje cash flow-a i izrada finansijskog menadžment report-a na mesečnom nivou, politiku plaćanja dobavljačima, naplate podraživanja od kupaca, kreditne aranžmane sa bankama i fondovima, odobrava operativnu listu za plaćanje.
+  Definiše i sprovodi politiku zapošljavanja i odgovoran za HR menadžment i kontinuirano obrazovanje zaposlenih.
+  Koordiniše aktivnosti i donosi odluke iz oblasti računovodstva i knjigovodstva, u saradnji sa spoljnim saradnicima kao što su knjigovodstvene agencije i konsultanti.
+  Vrši izbor zaposlenih i odlučuje o pojedinačnim pravima, obavezama i odgovornostima zaposlenih u skladu sa važećim pr  Opis ima i aktima preduzeća. Raspoređuje zaduženja, koordinira izvršenje zadataka i prati rezultate rada zaposlenih.
+  Nadgleda rad šefova sektora i daje smernice za rad. Odgovoran je za ispunjavanje zadatih ciljeva, zakonitosti poslovanja i unapređenje postojećeg stanja.
+  Definiše i sprovodi sistem plata i nagrađivanja prema rezultatima rada.
+ +++ IZVRŠNI DIREKTOR
+ Prati sprovođenje definisanih procedura i ostvarenja KPI-eva.
+  Prati ostvarenje planova prodaje na dnevnom, nedeljnom, mesečnom i godišnjem nivou.
+  Prati opterećenost zaposlenih, a posebno u Sektoru za informacione tehnologije.
+  Savesno, kvalitetno i u predviđenim rokovima obavlja svoje poslove.
+  Brine o izgradnji imidža i negovanju dobrog ugleda preduzeća.
+  Redovno izveštava Direktora preduzeća o sprovedenim aktivnostima i finansijskom poslovanju.
+  Odgovara za pravilno sprovođenje mera iz oblasti sigurnosti, bezbednosti i zdravlja na radu i protivpožarne zaštite.
+  Obezbeđuje poštovanje procedura i pr  Opis a.
+  Aktivno učestvuje u radu kolegijuma.
+  Direktno je odgovoran Direktoru preduzeća.
+Posebni uslovi:
+VII stepen stručne spreme, 3 godine radnog iskustva na rukovodećim poslovima i znanje jednog stranog jezika. Organizacione, liderske i analitičke veštine. Sposobnost komunikacije, planiranja, takođe potrebna sposobnost za multitasking. Znanje engleskog jezika i rada na računaru (MS Office: Word, Excel, Outlook...).
+Broj izvršilaca: 1 (jedan).
+
++++ SAVETNIK DIREKTORA
+   Opis  poslova i zadataka:
+  Obavlja mentorske i recenzentske poslove.
+  Daje savete Direktoru preduzeća za rukovođenje finansijama: politika plaćanja dobavljačima, kreditni aranžmani sa bankama, fondovima i lizing kućama.
+  Pruža savetodavnu uslugu vezano za viziju i misiju preduzeća, strateške odluke, planove razvoja i slično.
+  Odgovoran ja za stanje i razvoj ERP sistema (BN).
+  Nadgleda rad zaposlenih koji imaju radne zadatke iz obasti finansija i knjigovodstva, daje im smernice za rad.
+  Pomaže u razvoju ERP sistema (BN Navigatora).
+  Daje idejna rešenja za rešavanje eventualnih problema u poslovanju.
+Posebni uslovi:
+VII stepen stručne spreme, znanje jednog stranog jezika. Potrebne su organizacione i analitičke veštine, kao i sposobnost planiranja. Poznavanje finansija. Napredno znanje opštih alata (MS Office: Word, Excel, Outlook...), poznavanje osnova programiranja.
+Broj izvršilaca: 1 (jedan).
+
++++ TEHNIČKI DIREKTOR 
+  Opis  poslova i zadataka:
+  Rukovodi i organizuje rad Sektora za informacione tehnologije – to podrazumeva godišnje, tromesečne i po potrebi mesečne i nedeljne planove rada za svakog zaposlenog u svom sektoru radi obezbeđivanja pune zaposlenosti radnika.
+  Planira i razvija nove usluge.
+  Aktivno učestvuje u strateškom planiranju i dizajniranju IT usluge (početak životnog ciklusa IT usluge).
+  Planira obuke zaposlenih vezano za nove usluge,
+  Izrađuje propratnu dokumentaciju (dizajn usluge, SLA, plan budžeta, itd.).
++++ TEHNIČKI DIREKTOR  
+ Usmerava i pruža podršku Sektoru prodaje, kao i svom sektoru.
+  Komunicira sa vendorima radi obezbeđivanja podrške, analizira i procenjuje ostvarene rezultate.
+  Priprema d  Opis e i izveštaje.
+  Ima obavezu da kontinuirano stiče nove i obnavlja već stečene, a potrebne sertifikate.
+  Aktivno i ravnopravno učestvuje u radu kolegijuma.
+  Za svoj rad odgovara Izvršnom direktoru.
+  Savesno, kvalitetno i u predviđenim rokovima obavlja svoje poslove.
+Posebni uslovi:
+IV stepen stručne spreme, 3 godine radnog iskustva na rukovodećim poslovima i obavezno znanje engleskog. Vozačka dozvola B kategorije. Osnovno poznavanje opštih alata (MS Office: Word, Excel, Outlook...).
+Broj izvršilaca: 1 (jedan).
+
++++ SARADNIK ZA SERVERE, VIRTUALIZACIJU, MREŽE i BEKAP
+  Opis  poslova i zadataka:
+  Obavlja poslove i ima kompetencije za instalaciju i konfiguraciju serverskih servisa na Windows server i Linux platformama - AD/LDAP, DHCP, DNS, Mail (Exchange, Potfix), File share.
+  Konfigurisanje serverskih računara i storage uređaja za rad u Hyper-V ili VMWare okruženju.
+  Konfigurisanje Hyper-V / VMWare servisa.
+  Praćenje rada servera, administracija Windows i Linux klijenata.
+  Kreiranje backup-a.
+  Tehnička podrška korisnicima.
+  Rad na poslovima help desk aktivnosti.
+  Provera tehničke ispravnosti računarskih sistema.
++++ SARADNIK ZA SERVERE, VIRTUALIZACIJU, MREŽE i BEKAP
+  Sprovođenje politike bezbednosti.
+  Ažuriranje postojećeg i implementacija novog softvera.
+  Daljinski nadzor.
+  Obavezan je da generiše izveštaje po zahtevima standarda koji su primenjeni u preduzeću.
+  Aktivno učestvuje u životnom ciklusu IT usluga ( tranzicija, operativna upotreba i stalno poboljšanje IT usluga), po potrebi učestvuje i u početnim fazama razvoja: planiranje i dizajn.
+  Obavezan je da ukazuje na eventualne nepredviđene rizike, odnosno da predlaže mere za poboljšanje IT usluge.
+  Učestvuje u planiranim obukama.
+  Izrađuje standardima zahtevanu dokumentaciju.
+  Obavezan je da vodi računa o poštovanju SLA ugovora.
+  Obavlja poslove i poznaje rad u softverima za daljinski nadzor, uključujući i nadzor vozila, administraciju, podešavanja, praćenja, kastomizacije.
+  Podešavanja i praćenja rada share point portala.
+ +++ SARADNIK ZA SERVERE, VIRTUALIZACIJU, MREŽE i BEKAP
+ Instalacija, podešavanje, kastomizacija i održavanje komercijalnih cloud servisa (google, microsoft, sophos...), kao i servisa baziranih na internim cloud rešenjima, kao što je sigurnosni backup, i druge usluge.
+  Poseduje potrebna znanja iz održavanja i servisiranja računarske opreme i operativnog sistema Windows za personalne računare.
+  Dokumentovanje svih aktivnosti.
+  Savesno, kvalitetno i u predviđenim rokovima obavlja svoje poslove.
+  Odgovoran je Tehničkom direktoru.
+Posebni uslovi:
+VI/VII stepen odgovarajuće stručne spreme ili priznatu internu kvalifikaciju na određeni rok i definisan plan stručnog osposobljavanja. Poznavanje engleskog jezika i vozačka dozvola B kategorije. Poznavanje UNIX/Linux i Microsoft baziranih operativnih sistema, osnovno poznavanje opštih alata (MS Office: Word, Excel, Outlook...). Potrebno je da ima najmanje jedan odgovarajući sertifikat koji se odnosi na datu oblast i u obavezi je da stiče kompetencije predviđene individualnim godišnjim planom obuke. Znanje iz oblasti održavanja i servisiranja računarske opreme i operativnog sistema Windows. Potrebno je da ima najmanje jedan odgovarajući sertifikat koji se odnosi na datu oblast i u obavezi je da stiče kompetencije predviđene individualnim godišnjim planom obuke.
+Broj izvršilaca: 2 (dva).
+
++++ TEHNIČAR ZA IP TEHNOLOGIJE 
+  Opis  poslova i zadataka:
+  Visok nivo znanja iz oblasti implementacije/administracije aktivne mrežne opreme (ruteri, svičevi  i sl.).
+  Detaljno poznavanje TCP/IP protokola.
+  Visok nivo znanja u sledećim tehnološkim oblastima: Ethernet, VPN, VoIP, Wireless i sl.
+  Visok nivo znanja u oblasti bezbednosti računarskih mreža i firewall-a.
+  Konfigurisanje mrežne opreme raznih proizvođača, L2, L3 i Wi-Fi servisa (routing, switching, VPN…).
+  Konfigurisanje opreme prema zahtevu korisnika - zone, pristup, bekap.
+  Instalacija i konfigurisanje sistema za kontrolu pristupa i sl.
+  Sprovodi politiku bezbednosti informacija.
+  Obezbeđuje tehnička rešenja i listu robe koju treba nabaviti za potrebe projekata i sarađuje sa Sektorom prodaje.
+  Potrebno je poznavanje proizvoda (projektovanje i priprema ponuda), izrada obračuna, projekta, šema i elaborata.
+  Sastavni deo posla je generisanje izveštaja po zahtevima standarda koji su u primeni u preduzeću.
++++ TEHNIČAR ZA IP TEHNOLOGIJE 
+  Aktivno učestvuje u životnom ciklusu IT usluga ( tranzicija, operativna upotreba i stalno poboljšanje IT usluga), po potrebi učestvuje i u početnim fazama razvoja: planiranje i dizajn.
+  Obavezan je da ukazuje na eventualne nepredviđene rizike, odnosno da predlaže mere za poboljšanje IT usluge.
+  Učestvuje u planiranim obukama.
+  Izrađuje standardima zahtevanu dokumentaciju.
+  Obavezan je da vodi računa o poštovanju SLA ugovora.
+  Obavlja poslove i poznaje rad u softverima za daljinski nadzor.
+  Instalacija, podešavanje, kastomizacija i održavanje komercijalnih cloud servisa (google, microsoft, sophos...), kao i servisa baziranih na internim cloud rešenjima, kao što je sigurnosni backup, i druge usluge.
+  Poseduje potrebna znanja iz održavanja i servisiranja računarske opreme i operativnog sistema Windows za personalne računare.
+ +++ TEHNIČAR ZA IP TEHNOLOGIJE 
+ Dokumentovanje svih aktivnosti.
+  Savesno, kvalitetno i u predviđenim rokovima obavlja svoje poslove.
+  Odgovoran je Tehničkom direktoru.
+Posebni uslovi:
+III/IV stepen stručne spreme elektrotehničkog ili informatičkog usmerenja ili priznatu internu kvalifikaciju na određeni rok i definisan plan stručnog osposobljavanja. Poznavanje engleskog jezika i vozačka dozvola B kategorije. Poznavanje UNIX/Linux i Microsoft baziranih operativnih sistema, osnovno poznavanje opštih alata (MS Office: Word, Excel, Outlook...). Potrebno je da ima najmanje jedan odgovarajući sertifikat koji se odnosi na datu oblast i u obavezi je da stiče kompetencije predviđene individualnim godišnjim planom obuke. Znanje iz oblasti održavanja i servisiranja računarske opreme i operativnog sistema Windows. Potrebno je da ima najmanje Cisco CCNA sertifikat, i u obavezi je da stiče kompetencije predviđene individualnim godišnjim planom obuke.
+Broj izvršilaca: 1 (jedan).
+
++++ TEHNIČAR ZA PASIVNU MREŽNU INFRASTRUKTURU
+  Opis  poslova i zadataka:
+  Izvođenje radova na ugradnji pasivne mrežne opreme.
+  Srednji nivo znanja iz oblasti implementacije/administracije aktivne mrežne opreme (ruteri, svičevi  i sl.).
+  Poznavanje TCP/IP protokola.
+  Srednji nivo znanja u sledećim tehnološkim oblastima: Ethernet, VPN, VoIP i sl.
+  Srednji nivo znanja u oblasti bezbednosti računarskih mreža.
+  Konfigurisanje switching mrežne opreme raznih proizvođača, L2 i Wi-Fi servisa.
+  Sprovodi politiku bezbednosti informacija.
+  Obezbeđuje tehnička rešenja i listu robe koju treba nabaviti za potrebe projekata i sarađuje sa Sektorom prodaje.
+  Potrebno je poznavanje proizvoda (projektovanje i priprema ponuda), izrada obračuna i projekta izvedenog stanja.
+  Sastavni deo posla je generisanje izveštaja po zahtevima standarda koji su u primeni u preduzeću.
++++ TEHNIČAR ZA PASIVNU MREŽNU INFRASTRUKTURU
+  Aktivno učestvuje u životnom ciklusu IT usluga ( tranzicija, operativna upotreba i stalno poboljšanje IT usluga), po potrebi učestvuje i u početnim fazama razvoja: planiranje i dizajn.
+  Obavezan je da ukazuje na eventualne nepredviđene rizike, odnosno da predlaže mere za poboljšanje IT usluge.
+  Učestvuje u planiranim obukama.
+  Izrađuje standardima zahtevanu dokumentaciju.
+  Obavezan je da vodi računa o poštovanju SLA ugovora.
+  Poseduje potrebna znanja iz održavanja i servisiranja računarske opreme i operativnog sistema Windows za personalne računare.
+ +++ TEHNIČAR ZA PASIVNU MREŽNU INFRASTRUKTURU
+ Dokumentovanje svih aktivnosti.
+  Savesno, kvalitetno i u predviđenim rokovima obavlja svoje poslove.
+  Odgovoran je Tehničkom direktoru.
+Posebni uslovi:
+III/IV stepen stručne spreme elektrotehničkog ili informatičkog usmerenja ili priznatu internu kvalifikaciju na određeni rok i definisan plan stručnog osposobljavanja. Vozačka dozvola B kategorije. Osnovno poznavanje rada u opštim alatima (MS Office: Word, Excel, Outlook...). U obavezi je da stiče kompetencije predviđene individualnim godišnjim planom obuke.
+Broj izvršilaca: 2 (dva).
+
++++ SARADNIK ZA LINUX SISTEME
+  Opis  poslova i zadataka:
+  Obavlja poslove i ima kompetencije za instalaciju i konfiguraciju serverskih servisa Linux platformama - AD/LDAP, DHCP, DNS, Mail, File share.
+  Praćenje rada servera, administracija Linux klijenata.
+  Poznavanje sistema backup-a.
+  Tehnička podrška korisnicima.
+  Rad na poslovima help desk aktivnosti.
+  Provera tehničke ispravnosti računarskih sistema.
+  Sprovođenje politike bezbednosti.
+  Ažuriranje postojećeg i implementacija novog softvera.
+  Daljinski nadzor.
+  Obavezan je da generiše izveštaje po zahtevima standarda koji su primenjeni u preduzeću.
++++ SARADNIK ZA LINUX SISTEME
+  Aktivno učestvuje u životnom ciklusu IT usluga ( tranzicija, operativna upotreba i stalno poboljšanje IT usluga), po potrebi učestvuje i u početnim fazama razvoja: planiranje i dizajn
+  Obavezan je da ukazuje na eventualne nepredviđene rizike, odnosno da predlaže mere za poboljšanje IT usluge.
+  Učestvuje u planiranim obukama.
+  Izrađuje standardima zahtevanu dokumentaciju.
+  Obavezan je da vodi računa o poštovanju SLA ugovora.
+  Obavlja poslove i poznaje rad u softverima za daljinski nadzor.
++++ SARADNIK ZA LINUX SISTEME
+  Instalacija, podešavanje, kastomizacija i održavanje komercijalnih cloud servisa (google, microsoft, sophos...), kao i servisa baziranih na internim cloud rešenjima, kao što je sigurnosni backup, i druge usluge.
+  Poseduje potrebna znanja iz održavanja i servisiranja računarske opreme i operativnog sistema Windows za personalne računare.
+  Poseduje potrebna znanja u oblasti antivirus zaštite (poželjno Sophos).
+  Dokumentovanje svih aktivnosti.
+  Savesno, kvalitetno i u predviđenim rokovima obavlja svoje poslove.
+  Odgovoran je Tehničkom direktoru.
+Posebni uslovi:
+VII stepen odgovarajuće stručne spreme ili priznatu internu kvalifikaciju na određeni rok i definisan plan stručnog osposobljavanja. Poznavanje engleskog jezika i vozačka dozvola B kategorije. Poznavanje UNIX/Linux baziranih operativnih sistema, osnovno poznavanje opštih alata (MS Office: Word, Excel, Outlook...). U obavezi je da stiče kompetencije predviđene individualnim godišnjim planom obuke. Znanje iz oblasti održavanja i servisiranja računarske opreme i operativnog sistema Linux. 
+Broj izvršilaca: 1 (jedan).
+
++++ SERVISER RAČUNARA I OPREME
+  Opis  poslova i zadataka:
+  Proizvodnja računara, montaža opreme na terenu, servisiranje, održavanje i preventivno čišćenje računara i dodatne opreme, ispod nivoa ovlašćenog servisa.
+  Instalacija operativnih sistema i softvera.
+  Dijagnostika i otklanjanje kvarova.
+  Konfigurisanje klijentskih servisa.
+  Prijem i otprema neispravnih delova, kao i postupak prilikom završavanja reklamacija, do kontakta sa krajnjim korisnikom.
+  Dokumentovanje svih aktivnosti.
+  Savesno, kvalitetno i u predviđenim rokovima obavlja svoje poslove.
+  Obavezan je da generiše izveštaje po zahtevima standarda koji su primenjeni u preduzeću.
+  Odgovoran je Tehničkom direktoru.
++++ SERVISER RAČUNARA I OPREME
+Posebni uslovi:
+IV stepen odgovarajuće stručne spreme ili priznatu internu kvalifikaciju na određeni rok i definisan plan stručnog osposobljavanja. Poznavanje softvera i hardvera, poznavanje rada u Windows i Linux okruženju. Osnovno znanje vezano za računarske mreže. Poznavanje Windows 7, 8, 10 i serverskih operativnih sistema. Osnovno poznavanje opštih alata (MS Office: Word, Excel, Outlook...). Poznavanje engleskog jezika i vozačka dozvola B kategorije.
+Broj izvršilaca: 3 (tri).
+
++++ TEHNIČAR ZA AUDIO OPREMU
+  Opis  poslova i zadataka:
+  Proizvodnja i popravka elektronskih sklopova za audio opremu.
+  Priprema audio opreme za isporuku krajnjem klijentu.
+  Dijagnostika i otklanjanje kvarova na audio opremi.
+  Prijem i otprema neispravnih delova, kao i postupak prilikom završavanja reklamacija, do kontakta sa krajnjim korisnikom.
+  Dokumentovanje svih aktivnosti.
+  Savesno, kvalitetno i u predviđenim rokovima obavlja svoje poslove.
+  Obavezan je da generiše izveštaje po zahtevima standarda koji su primenjeni u preduzeću.
+  Odgovoran je Tehničkom direktoru.
++++ TEHNIČAR ZA AUDIO OPREMU
+Posebni uslovi:
+III/IV stepen odgovarajuće stručne spreme ili priznatu internu kvalifikaciju na određeni rok i definisan plan stručnog osposobljavanja. Poznavanje elektronskih komponenti i sklopova. U obavezi je da stiče kompetencije predviđene individualnim godišnjim planom obuke. Osnovno poznavanje opštih alata (MS Office: Word, Excel, Outlook...). Poznavanje engleskog jezika i vozačka dozvola B kategorije.
+Broj izvršilaca: 4 (četiri).
+
++++ MENADŽER ZA RAZVOJ USLUGA 
+  Opis  poslova i zadataka:
+  Planira i razvija nove usluge.
+  Aktivno učestvuje u strateškom planiranju i dizajniranju IT usluge (početak životnog ciklusa IT usluge).
+  Planira obuke zaposlenih vezano za nove usluge.
+  Izrađuje propratnu dokumentaciju (dizajn usluge, SLA, plan budžeta, itd.).
+  Usmerava i pruža podršku kako Sektoru prodaje, tako i  Sektoru za informacione tehnologije.
+  Komunicira sa vendorima radi obezbeđivanja podrške, analizira i procenjuje ostvarene rezultate.
+  Priprema d  Opis e i izveštaje.
++++ MENADŽER ZA RAZVOJ USLUGA 
+  Uz navedene poslove, obavlja i poslove menadžera za Microsoft i Sophos proizvode. Kao Microsoft i Sophos Product manager ima zadatak: da poznaje robu (asortiman, cene i primenu), dobavljače, da održava najbolje moguće odnose sa vendorima, učestvuje u organizaciji unapređenja prodaje kroz upoznavanje prodavaca sa portfoliom i primenom, obezbeđuje marketinška sredstava vendora i organizaciju događaja, kao i drugih aktivnosti koje u saradnji sa vendorom ili kroz sistem internih obuka ili drugih aktivnosti doprinose prodaji. Product manager obrađuje kompleksne zahteve i pruža pretprodajnu podršku Članovima svog tima, a zatim i Sektoru prodaje, Tehničkom sektoru i zaposlenima na poslovima nabavke. Product manager može da ugovara projektne ponude – ponude veće vrednosti ili kompleksnosti (sa strane dobavljača i sa strane kupca).
+  Ima obavezu da kontinuirano stiče nove i obnavlja već stečene, a potrebne sertifikate.
+  Samostalno obavlja poslove u oblasti spoljne trgovine.
+  Vodi poslovnu korespodenciju sa ino-partnerima (kupcima, dobavljačima) i o organizaciji transporta, špediterskim poslovima i carinjenju repromaterijala.
+  Savesno, kvalitetno i u predviđenim rokovima obavlja svoje poslove.
+  Za svoj rad odgovara Tehničkom direktoru.
+Posebni uslovi:
+VII stepen stručne spreme, znanje jednog stranog jezika. Osnovno poznavanje opštih alata (MS Office, Aris Express, SharePoint...).
+Broj izvršilaca: 1 (jedan).
+
++++ MENADŽER ZA RAZVOJ USLUGA BAZIRANIH NA SOFTVERU 
+  Opis  poslova i zadataka:
+  Učestvuje u definisanju i izradi procedura.
+  Ustrojava primene procedura, evidencije i kontrole.
+  Identifikacija i   Opis  poslovnih procesa, grafički prikazani u Aris Expressu.
+  Učešće u aktivnostima koje preduzeće pruža trećim licima (kao što je konsalting kod uvođenja standarda, optimizacije poslovnih procesa i sl.).
+  Organizacija dokumentacije preduzeća na SharePoint portalu.
++++ MENADŽER ZA RAZVOJ USLUGA BAZIRANIH NA SOFTVERU 
+  Testiranje i uvođenje različitih softverskih rešenja (besplatnih ili licenciranih, kao i iz sopstvenog razvoja), koje će pomoći da se održava evidencija procedura – izveštavanja, komunikacije sa klijentima itd. Ovo obuhvata i istraživanje, obuku i rad sa tehničkim sektorom, uz insistiranje na poštovanju procedura i uputstava, naročito u oblasti evidencije.
+  Pomaže u razvoju ERP sistema (BN).
+  Razvija i implementira nove usluge koje se oslanjaju na softverska rešenja.
+  Učestvuje u projektima iz oblasti Bezbednosti informacioih sistema.
+  Aktivno učestvuje u dizajniranju i razvoju IT usluge u svim njenim ciklusima.
+  Održava obuke zaposlenima vezano za nove usluge ili unapređenje postojećih.
+  Aktivno učestvuje u izradi propratne dokumentacije (dizajn usluge, SLA, plan budžeta, itd.).
+  Ima obavezu da kontinuirano stiče nove i obnavlja već stečene, a potrebne sertifikate.
+  Savesno, kvalitetno i u predviđenim rokovima obavlja svoje poslove.
+  Za svoj rad odgovara Tehničkom direktoru.
+Posebni uslovi:
+VII stepen stručne spreme, znanje jednog stranog jezika. Osnovno poznavanje opštih alata (MS Office, Aris Express, SharePoint...).
+Broj izvršilaca: 1 (jedan).
+
++++ ŠEF SEKTORA FINANSIJA, OPŠTIH I PRAVNIH POSLOVA
+  Opis  poslova i zadataka:
+  Organizuje i prati rad sektora.
+  Prati zakone i druge pr  Opis e i sa njima usaglašava opšte akte preduzeća.
+  Izrada svih vrsta rešenja i odluka  (o radnom vremenu, zaposlenju, ličnom dohotku, odsustvu, penzionisanju, prestanku radnog odnosa, itd.), promene pravilnika i sl.
+  Priprema materijal za zastupanje i zastupa preduzeće pred sudovima.
+  Obavlja poslove vezane za izradu i ocenu pravne valjanosti ugovora.
+  Kontrola, organizacija i obavljanje poslova iz domena računovodstva: obrada, knjiženje, obračuni, izrada finansijskih izveštaja, PDV prijava.
+  Sprovodi finansijsku politiku preduzeća.
+  Nadležan za organizaciju i kontrolu kadrovskih poslova.
+  Nadležan za organizaciju i kontrolu opštih poslova.
+  Po potrebi učestvuje na projektima, prevashodno u javnoj sferi. 
+  Prati i stara se o primeni pr  Opis a u oblasti računovodstva i delokruga poslova sektora.
+  Sastavlja i podnosi izveštaj o poslovanju Menadžmentu.
+  Učestvuje u izradi godišnjih finansijskih planova.
+  Kreira i stara se o implementiranju finansijskih i računovodstvenih procedura i sistema izveštavanja unutar preduzeća.
+  Generiše potrebne izveštaje.
+  Odovoran za pravilno vođenje arhive i dokumentacije.
+  Savesno, kvalitetno i u predviđenim rokovima obavlja svoje poslove.
+  Aktivno i ravnopravno učestvuje u radu kolegijuma.
+  Za svoj rad i rad i rezultate rada sektora odgovoran je Izvršnom direktoru.
+Posebni uslovi:
+VII stepen stručne spreme, 3 godine radnog iskustva na rukovodećim poslovima i znanje jednog stranog jezika. Osnovno poznavanje opštih alata (MS Office: Word, Excel, Outlook...). Potrebne osobine: komunikativnost, organizovanost, diskrecija, fleksibilnost, odgovornost i preciznost, sposobnost rada u timu.
+Broj izvršilaca: 1 (jedan).
+
++++ SARADNIK ZA POSLOVE LJUDSKIH RESURSA
+  Opis  poslova i zadataka:
+  Samostalno obavlja poslove u oblasti upravljanja ljudskim resursima, koji obuhvataju sve procese evidencije i dokumentovanja zapošljavanja, evidencije rada, kadrovske evidencije, uključujući godišnje odmore, slobodne dane, bolovanja i druga odsustva sa posla, sankcije i nagrade i drugo prema ISO procedurama i uputstvima.
+  Ispostavlja račune za pružene usluge na mesečnom nivou.
+  Vodi delovodnik, knjigu pošte, knjigu odluka, radne dosijee i opštu dokumentaciju.
+  Prima i prosleđuje dokumentaciju i pošiljke/poštu.
++++ SARADNIK ZA POSLOVE LJUDSKIH RESURSA
+  Arhivira dokumentaciju (osim komercijalne).
+  Poslovi info pulta.
+  Nabavlja interni režijski materijal i materijal za tekuće održavanje objekta.
+  Vrši nabavku internog kancelarijskog, higijenskog i režijskog materijala.
+  Po potrebi kontaktira dobavljače za nabavku robe manje vrednosti.
+  Priprema i kompletira dokumentaciju u slučaju referenta nabavke.
+  Generiše potrebne izveštaje.
+  Po potrebi kuva kafu i sprema tople i hladne napitke za poslovne partnere i goste preduzeća.
+  Za svoj rad odgovara Šefu sektora finansija, opštih i pravnih poslova.
+  Savesno, kvalitetno i u predviđenim rokovima obavlja svoje poslove.
+Posebni uslovi:
+VI stepen stručne spreme, znanje jednog stranog jezika. Osnovno poznavanje opštih alata (MS Office: Word, Excel, Outlook...).
+Broj izvršilaca: 1 (jedan).
+
++++ REFERENT ZA FINANSIJSKE I RAČUNOVODSTVENE POSLOVE
+  Opis  poslova i zadataka:
+  Odgovoran za vođenje poslovnih knjiga i pomoćnih evidencija.
+  Dužan je da redovno proverava ažurnost i tačnost kompletne evidencije.
+  Na osnovu uputstva Menadžmenta vodi pojedinačne evidencije i analize, planove plaćanja i naplate.
+  Održava veze sa odgovarajućim sektorima kupaca i dobavljača i vodi računa kako o obavezama prema dobavljačima, tako i prema bankama, lizing kućama, poreskim i drugim državnim organima i sl.
+  Izvršava plaćanja obaveza (dinarski i devizni platni promet).
+  Usaglašava finansijski saldo sa kupcima i dobavljačima.
++++ REFERENT ZA FINANSIJSKE I RAČUNOVODSTVENE POSLOVE
+  Održava kontakt i konsultuje se sa knjigovodstvenom agencijom i konsultantima, i u saradnji sa njima sastavlja potrebne izveštaje, a sve u skladu sa definisanim ISO procedurama i uputstvima.
+  Vodi blagajničko poslovanje.
+  Obračunava i prijavljuje PDV i druge poreze na mesečnom/tromesečnom nivou.
+  Priprema potrebnu dokumentaciju za bankarske i faktoring ugovore, lizing ugovore i sl.
+  Redovno šalje definisane izveštaje.
++++ REFERENT ZA FINANSIJSKE I RAČUNOVODSTVENE POSLOVE
+  Vođenje evidencije osnovnih sredstava – knjiženje (kupovina i prodaja, amortizacija, p  Opis i).
+  Kontrola ulaznih, izlaznih faktura, kontrola knjiženja.
+  Praćenje važećih pr  Opis a iz područja računovodstva te njihova pravovremena primena.
+  Kontira i knjiži svu finansijsku dokumentaciju.
+  Priprema i sastavlja bruto bilans.
+  Vodi robno i materijalno knjigovodstvo, kartice i knjigu osnovnih sredstava.
+  Vrši obračun amortizacije i revalorizacije osnovnih sredstava.
+  Vrši usklađivanje salda kupaca i dobavljača.
+  Knjigovodstvena evidencija poslovnih promena.
+  Za svoj rad odgovara Šefu sektora finansija, opštih i pravnih poslova.
+  Aktivno i ravnopravno učestvuje u radu kolegijuma.
+  Savesno, kvalitetno i u predviđenim rokovima obavlja svoje poslove.
+Posebni uslovi:
+IV stepen stručne spreme iz oblasti ekonomskog obrazovanja. Osnovno poznavanje opštih alata (MS Office: Word, Excel, Outlook...).
+Broj izvršilaca: 1 (jedan).
+
++++ REFERENT ZA OPŠTE POSLOVE 
+  Opis  poslova i zadataka:
+  Samostalno učestvuje u pripremanju ponuda za javni sektor, predaji ponuda preko Portala javnih nabavki i priprema svu potrebnu dokumentaciju sa ponude i zaključenje ugovora.
+  Registruje menice i priprema prateću dokumentaciju.
+  Vodi evidencije i poštuje procedure iz oblasti upravljanja dokumentima (delovodnik, skeniranje dokumentacije i postavljanje/odlaganje iste). 
+  Ispostavlja račune za pružene usluge na mesečnom nivou i za jednokratne poslove.
+  Odgovoran je za ispravnost i kompletnost dokumentacije za poslove koji su mu dodeljeni.
+  Učestvuje u pripremi ugovora za klijente i poslove koji su mu dodeljeni.
++++ REFERENT ZA OPŠTE POSLOVE 
+  Po potrebi kontaktira dobavljače za nabavku robe za klijente i poslove koji su mu dodeljeni.
+  Generiše potrebne izveštaje.
+  Menja Saradnika za poslove ljudskih resursa kada je isti odsutan.  
+  Za svoj rad odgovara Šefu sektora finansija, opštih i pravnih poslova.
+  Savesno, kvalitetno i u predviđenim rokovima obavlja svoje poslove.
+Posebni uslovi:
+IV stepen stručne spreme, poznavanje engleskog jezika. Osnovno poznavanje opštih alata (MS Office: Word, Excel, Outlook...).
+Broj izvršilaca: 1 (jedan).
+
++++ DIREKTOR PRODAJE
+  Opis  poslova i zadataka:
+  Organizuje i vodi poslovanje svog sektora.
+  Kreira mesečne, nedeljne i po potrebi dnevne planove rada (nabavke, lagera i prodaje) i održava odgovarajuće sastanke sa zaposlenima.
+  Održava sastanke sa ključnim i potencijalnim novim klijentima.
+  Kontroliše ispunjenje zadataka svakog zaposlenog u svom sektoru na nedeljnom nivou.
++++ DIREKTOR PRODAJE
+  Podnosi nedeljni izveštaj Prodajnih procesa i njihovih trenutnih statusa Direktoru preduzeća, takođe je obavezan da generiše izveštaje po zahtevima standarda koji su primenjeni u preduzeću.
+  Koordinira aktivnosti između sektora, kad je to potrebno.
+  Pruža potrebnu pomoć zaposlenima u svom sektoru.
+  Predlaže i kontroliše plan kontinuiranog obučavanja svakog zaposlenog iz sektora prodaje.
+  Kreira i implementira strategiju prodaje
++++ DIREKTOR PRODAJE
+  Predlaže i sprovodi plan razvoja i unapređenja svog sektora, uvodi nove proizvode, usluge i tehnologije, uključujući i one potrebne za kvalitetno obavljanje zadataka (opreme za rad i opštih uslova rada).
+  Odgovoran je za komercijalnu stranu ponuda u okviru projekata prodaje proizvoda i usluga, uključujući zajedničke sastanke sa potencijalnim korisnikom.
+  Obezbeđuje punu dnevnu zaposlenost radnika, stara se o racionalnom korišćenju radnog vremena i sredstava rada.
+  Na osnovu internih istraživanja, povratnih informacija od korisnika i dostupnih informacija sa tržišta, kao i on line zajednice, predlaže kreiranje novih proizvoda i usluga u okviru projekata prodaje proizvoda i usluga. Učestvuje u zajedničkim sastancima sa potencijalnim korisnikom i radi komercijalnu analizu potreba klijenta. Učestvuje u kreiranju marketinškog materijala za sve kanale prodaje i oblike oglašavanja. Odgovoran za generisanje izveštaja po zahtevima ISO standarda.
++++ DIREKTOR PRODAJE
+  Savesno, kvalitetno i u predviđenim rokovima obavlja svoje poslove.
+  Aktivno i ravnopravno učestvuje u radu kolegijuma.
+  Za svoj rad i rad i rezultate rada sektora odgovoran je Direktoru preduzeća.
+Posebni uslovi: 
+VI/VII stepen stručne spreme iz oblasti ekonomije, prava, elektrotehnike, informatike ili menadžmenta, 2 godine radnog iskustva na rukovodećim poslovima i znanje jednog stranog jezika. Osnovno poznavanje opštih alata (MS Office: Word, Excel, Outlook, Power Point...).
+Broj izvršilaca: 1 (jedan).
+
++++ SARADNIK ZA PRODAJU
+  Opis  poslova i zadataka:
+  Razvija i održava dobre poslovne odnose sa klijentima.
+  Odgovoran za prodaju robe, proizvoda i usluga iz portfolija preduzeća.
+  Saradnik za prodaju mora biti obučen za prodaju celokupnog prodajnog portfolija preduzeća.
+  Prati trendove u oblasti IT tehnologija.
+  Odgovoran je za ažurne i kompletne podatke za svakog svog klijenta (nivo podataka zavisi od veličine i značaja klijenta).
++++ SARADNIK ZA PRODAJU
+  Zadužen je za pronalaženje klijenata, prikupljanje podataka o njegovim potrebama, davanje ponude, fakturisanje i praćenje isporuke, kompletiranje posla i naplatu (kompletna briga o prodajnom procesu, od ponude do naplate).
+  Prati i nastoji povećavati nivo zadovoljstva kupca pruženom poslovnom uslugom.
+  Obezbeđuje potpunu dokumentovanost poslovnih odnosa sa kupcem.
+  Saradnik za prodaju posluje prema pojedinačnim godišnjim, kvartalnim, mesečnim i nedeljnim planovima koje pr  Opis uje šef sektora, takođe je obavezan da generiše izveštaje po zahtevima standarda koji su primenjeni u preduzeću.
+ +++ SARADNIK ZA PRODAJU
+ Učestvuje aktivno u predlaganju i razvoju prodajnog portfolija preduzeća.
+  Savesno, kvalitetno i u predviđenim rokovima obavlja svoje poslove.
+  Odgovara Direktoru prodaje.
+Posebni uslovi:
+VI/VII stepen stručne spreme iz oblasti ekonomije, informatike, elektrotehnike ili menadžmenta, znanje jednog stranog jezika. Osnovno poznavanje opštih alata (MS Office: Word, Excel, Outlook...).
+Broj izvršilaca: 1 (jedan).
+
++++ SARADNIK ZA POSLOVNE PROCESE I MAGACIONER
+  Opis  poslova i zadataka:
+  Odgovoran za izradu, čuvanje i izmene šeme i   Opis a svakog radnog mesta i ažuriranje informacija u skladu sa trenutnom postavkom zaposlenih.
+  Odgovoran za Onboarding procedure, i to:
+ Novi zaposleni, procedura koja se odnosi na to da mu:
+ Zadužuje reversom računar, telefon, kancelarijsku opremu,
+ Obezbeđuje mu kancelarijski potrošni materijal, naloge za pristup alatima (Kolaboracija i ERP) i slično, 
+ Priprema dokumentaciju od ugovora do   Opis a radnog mesta,
+ Organizuje obuku zaštite na radu,
+ Upoznaje ga sa svim bitnim procedurama u preduzeću,
+ Sve navedeno radi u stalnoj koordinaciji sa Saradnikom ljudskih resursa i šefom Sektora finansija, opštih i pravnih poslova.
++++ SARADNIK ZA POSLOVNE PROCESE I MAGACIONER
+ Bivši zaposleni, procedura koja se odnosi na to da mu:
+ jasno definiše kome se preusmeravaju službeni e-mailovi u periodu tranzicije,
+ jasno definiše u kom trenutku se gase svi nalozi u službenoj upotrebi,
+ Jasno definiše rok u kom se obaveštavaju sva lica sa kojima je bivši zaposleni bio u komunikaciji,
+ Učestvuje u razduživanju i kvalitativnoj i kvantitativnoj kontroli opreme.
+ Rad sa klijentima, procedura koja se odnosi na
+ Obučavanju u upotrebi, ažuriranju i kontroli tabele ugovornih obaveza prema klijentima sa kojima postoji ugovorni aranžman,
+ Učestvuje u izradi procedura i plana rada u vidu dokumenta koji se predočava klijentu sa kojima postoji ugovor o nadzoru i održavanju informacionog sistema
++++ SARADNIK ZA POSLOVNE PROCESE I MAGACIONER
+ Dostavlja postojećim i novim klijentima jasne instrukcije koje se odnose na način komunikacije, prava i obaveza (tiketing sistem, postupak rešavanja problema u radu i načina komunikacije kada je to neophodno.
+  Odgovoran je za izradu predloga procedura kao i praćenje realizacije usvojenih u preduzeću koja se odnose na poslove koji su vezani za odnose sa klijentima.
+  Odgovoran je za definisanje procesa i kontrolu sprovođenja istih u domenu usluga i proizvoda  koje vrši preduzeće (napr. Od prihvaćene ponude klijenta, preko iznošenja opreme iz magacina i postavke kod krajnjeg korisnika) za sve usluge. Izveštava šefa sektora o primećenim neusaglašenostima kako bi se mogla raditi unapređenja.
+  Praćenje i određivanje KPI vezanih za poslovne procese i kvalitet vršenja usluga u saradnji sa Menadžmentom preduzeća.
+ KPI definiše Menadžment preduzeća, a praćenje podataka prati saradnik za poslovne procese i magacioner i izveštava Menadžment o stanju na nedeljnom, mesečnom, kvartalnom i godišnjem nivou.
++++ SARADNIK ZA POSLOVNE PROCESE I MAGACIONER
+  Usklađuje sve inerne procedure sa trenutno važećim ISO standardima u preduzeću.
+  U stalnoj je komunikaciji sa resertifikacionim telom ISO standarda i učestvuje u pripremi i realizaciji resertifikacije preduzeća.
+  Obavlja poslove definisane u ISO procedurama u vezi zaprimanja, evidencije i isporuke robe.
+  Vrši p  Opis  robe u magacinu najmanje jednom, a po potrebi i više puta godišnje.
+  Po potrebi vrši isporuke i druge kurirske poslove na teritoriji grada Novog Sada.
+  Obavezan je da generiše izveštaje po zahtevima standarda koji se primenjuju u preduzeću.
+  Savesno, kvalitetno i u predviđenim rokovima obavlja svoje poslove.
+  Odgovoran je Direktoru prodaje.
+Posebni uslovi:
+VI stepen stručne spreme. Znanje jednog stranog jezika i vozačka dozvola B kategorije. Osnovno poznavanje opštih alata (MS Office: Word, Excel, Outlook...).
+Broj izvršilaca: 1 (jedan).
+
++++ SARADNIK ZA ODNOSE SA KLIJENTIMA
+   Opis  poslova i zadataka:
+  Razvija i održava profitabilne poslovne odnose sa klijentima.
+  Nadzire saradnje internih timova sa klijentima i prati zadovoljstvo klijenata.
+  Rešava prigovore klijenata brzo i efikasno.
+  Informiše klijente o novim uslugama, opcijama saradnje, kao i miksom različitih usluga sa ciljem postizanja UpSell-a.
+  Redovno učestvuje na sastancima sa Menadžmentom preduzeća u cilju strateškog planiranja razvoja klijenata.
+  Razumevanje ključnih potreba klijenata i komuniciranje sa klijentima na osnovu toga.
+  Učestvuje u praćenju konkurencije i prati njihove aktivnosti.
+  Prikuplja, unosi i ažurira informacije u CRM softver.
+  Prati trendove u oblasti IT tehnologija.
+  Odgovoran je za ažurne i kompletne podatke za svakog svog klijenta (nivo podataka zavisi od veličine i značaja klijenta).
+  Nadzire i komunicira sa klijentima u praćenju naplate izvršenih poslova.
+  Prati i nastoji povećavati nivo zadovoljstva kupca pruženom poslovnom uslugom.
+  Obezbeđuje potpunu dokumentovanost poslovnih odnosa sa kupcem.
+  Vrši poslove nabavke materijala i opreme.
+  Učestvuje aktivno u predlaganju i razvoju prodajnog portfolija preduzeća.
+  Savesno, kvalitetno i u predviđenim rokovima obavlja svoje poslove.
+  Odgovara Direktoru prodaje.
+Posebni uslovi:
+VI/VII stepen stručne spreme iz oblasti ekonomije, informatike, elektrotehnike ili menadžmenta, znanje jednog stranog jezika. Osnovno poznavanje opštih alata (MS Office: Word, Excel, Outlook...).
+Broj izvršilaca: 1 (jedan).
+
++++ Član 13.
+Klauzula o zabrani konkurencije važi za sva radna mesta definisana u prethodnom Članu. Dužina trajanja klauzule o zabrani konkurencije je definisana Pravilnikom o radu.
+
++++ Član 14.
+Danom stupanja na snagu ovog Pravilnika prestaje da važi prethodni Pravilnik o unutrašnjoj organizaciji rada i sistematizaciji poslova i radnih zadataka. Za sve što nije regulisano ovim Pravilnikom primenjuju se odredbe Zakona o radu.
++++ Član 15.
+Izmene i dopune ovog Pravilnika se vrše po istom postupku kao za njegovo donošenje.
+
++++ Član 16.
+Ovaj Pravilnik stupa na snagu osmog dana od dana objavljivanja na oglasnoj tabli preduzeća.
+Pravilnik je objavljen 22.12.2020. godine na oglasnoj tabli i dostavljen elektronskim putem svim zaposlenima.
+
+
+
+
+
+
+
+
