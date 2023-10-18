@@ -19,8 +19,9 @@ import markdown
 import pdfkit
 from langchain.retrievers import PineconeHybridSearchRetriever
 from pinecone_text.sparse import BM25Encoder
+import openai
 
-version = "14.10.23. Hybrid - Alpha"
+version = "18.10.23. Hybrid - Alpha i Score"
 
 
 def main():
@@ -32,7 +33,7 @@ def main():
         environment=os.environ["PINECONE_ENVIRONMENT_POS"],
     )
     # Initialize OpenAI embeddings
-    embeddings = OpenAIEmbeddings()
+    # embeddings = OpenAIEmbeddings()
 
     # Initialize OpenAI embeddings and LLM and all variables
 
@@ -54,6 +55,8 @@ def main():
         st.session_state.broj_k = 3
     if "stil" not in st.session_state:
         st.session_state.stil = ""
+    if "score" not in st.session_state:
+        st.session_state.score = 0.9
 
     # Izbor stila i teme
     st.markdown(
@@ -95,10 +98,18 @@ def main():
             0.1,
             help="Koeficijent koji određuje koliko će biti zastupljena pretraga po ključnim rečima, a koliko po semantičkom značenju. 0-0.4 pretezno Kljucne reci , 0.5 podjednako, 0.6-1 pretezno semanticko znacenje",
         )
+        st.session_state.score = st.slider(
+            "Set score",
+            0.00,
+            2.00,
+            0.90,
+            0.01,
+            help="Koeficijent koji određuje kolji će biti prag relevantnosti dokumenata uzetih u obzir za odgovore. 0 je svi dokumenti, veci broj je stroziji kriterijum. Score u hybrid searchu moze biti proizvoljno veliki.",
+        )
     # define model, vestorstore and retriever
     # vazno ako ne stavimo u session state, jako usporava jer inicijalizacija dugo traje!
     if "index" not in st.session_state:
-        st.session_state.index = pinecone.Index(st.session_state.index_name)
+        st.session_state.index = pinecone.Index("bis")
     if "bm25_encoder" not in st.session_state:
         st.session_state.bm25_encoder = BM25Encoder().default()
     with st.sidebar:
@@ -129,14 +140,14 @@ def main():
         temperature=st.session_state.temp,
         openai_api_key=openai_api_key,
     )
-    vectorstore = PineconeHybridSearchRetriever(
-        embeddings=embeddings,
-        sparse_encoder=st.session_state.bm25_encoder,
-        index=st.session_state.index,
-        namespace=st.session_state.namespace,
-        top_k=st.session_state.broj_k,
-        alpha=st.session_state.alpha,
-    )
+    # vectorstore = PineconeHybridSearchRetriever(
+    #     embeddings=embeddings,
+    #     sparse_encoder=st.session_state.bm25_encoder,
+    #     index=st.session_state.index,
+    #     namespace=st.session_state.namespace,
+    #     top_k=st.session_state.broj_k,
+    #     alpha=st.session_state.alpha,
+    # )
 
     # Prompt template - Loading text from the file
     prompt_file = st.file_uploader(
@@ -164,9 +175,37 @@ def main():
     if zahtev != " " and zahtev != "":
         with st.spinner("Obrađujem temu..."):
             uk_teme = ""
-            st.session_state.tematika = vectorstore.get_relevant_documents(zahtev)
-            for document in st.session_state.tematika:
-                uk_teme += document.page_content + "\n"
+
+            def get_embedding(text, model="text-embedding-ada-002"):
+                text = text.replace("\n", " ")
+                return openai.Embedding.create(input=[text], model=model)["data"][0][
+                    "embedding"
+                ]
+
+            def hybrid_query(question, top_k, alpha):
+                bm25 = BM25Encoder().default()
+                sparse_vec = bm25.encode_queries(question)
+                dense_vec = get_embedding(question)
+                # query pinecone with the query parameters
+                result = st.session_state.index.query(
+                    vector=dense_vec,
+                    sparse_vector=sparse_vec,
+                    alpha=alpha,
+                    top_k=top_k,
+                    include_metadata=True,
+                    namespace=st.session_state.namespace,
+                )
+                # return search results as dict
+                return result.to_dict()
+
+            # st.session_state.tematika = vectorstore.get_relevant_documents(zahtev)
+            st.session_state.tematika = hybrid_query(
+                zahtev, top_k=st.session_state.broj_k, alpha=st.session_state.alpha
+            )
+            for ind, item in enumerate(st.session_state.tematika["matches"]):
+                if item["score"] > st.session_state.score:
+                    st.info(f'Za odgovor broj {ind + 1} score je {item["score"]}')
+                    uk_teme += item["metadata"]["context"] + "\n\n"
 
         # Read prompt template from the file
         sve_zajedno = open_file("prompt_FT.txt")
