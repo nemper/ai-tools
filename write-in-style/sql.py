@@ -5,6 +5,8 @@ from langchain.agents.agent_types import AgentType
 from langchain.chat_models import ChatOpenAI
 import streamlit as st
 
+# db se kreira kao naziv servisa://user:pass@url:port/db  ako je local. ako je cloud onda kako god taj servis trazi
+
 db = SQLDatabase.from_uri(f"mysql+pymysql://root:Present1!@localhost:3310/sys")
 llm = ChatOpenAI(temperature=0)
 toolkit = SQLDatabaseToolkit(db=db, llm=llm)

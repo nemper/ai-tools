@@ -94,6 +94,7 @@ def app_setup():
             "Namespace za Semantic",
             (
                 "positive",
+                "miljan",
                 "pravnikprazan",
                 "pravnikprefix",
                 "pravnikschema",
@@ -531,11 +532,6 @@ def main():
                 f"Broj dokumenata: {st.session_state.broj_k}, Namsepace Semantic: {st.session_state.name_semantic}, Namespace SelfQuery: {st.session_state.name_self}, Namespace Hybrid: {st.session_state.name_hybrid}, Score: {st.session_state.score} "
             )
             output = agent_chain.invoke(input=pitanje)
-
-            #
-            #### st.error(output) neka greska u agentu !!!!
-            #
-
             output_text = output.get("output", "")
 
             #            output_text = chat.predict(pitanje)
