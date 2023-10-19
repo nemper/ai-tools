@@ -1,6 +1,7 @@
 import os
 import sys
 import io
+import openai
 import pinecone
 import streamlit as st
 from langchain.embeddings.openai import OpenAIEmbeddings
@@ -37,7 +38,7 @@ st_style()
 
 # prebaciti u mojafunkcija ?
 def app_version():
-    version = "18.10.23. - Chatbot sa memorijom, Google-om, 3 indexa i CSV agentom"
+    version = "19.10.23. - Hybrid i Semantic with Score, Chatbot sa memorijom, Google-om, 3 indexa i CSV agentom - Neprecizni opisi alata i agent promptovi"
     st.markdown(
         f"<p style='font-size: 10px; color: grey;'>{version}</p>",
         unsafe_allow_html=True,
@@ -56,7 +57,8 @@ def app_setup():
         st.session_state.broj_k = 3
     if "alpha" not in st.session_state:
         st.session_state.alpha = None
-
+    if "score" not in st.session_state:
+        st.session_state.score = None
     if "uploaded_file" not in st.session_state:
         st.session_state.uploaded_file = "bnreport.csv"
     if "direct_semantic" not in st.session_state:
@@ -165,6 +167,14 @@ def app_setup():
             0.1,
             help="Koeficijent koji određuje koliko će biti zastupljena pretraga po ključnim rečima, a koliko po semantičkom značenju. 0-0.4 pretezno Kljucne reci , 0.5 podjednako, 0.6-1 pretezno semanticko znacenje",
         )
+        st.session_state.score = st.slider(
+            "Set score",
+            0.00,
+            2.00,
+            0.90,
+            0.01,
+            help="Koeficijent koji određuje kolji će biti prag relevantnosti dokumenata uzetih u obzir za odgovore kod semantic i hybrid searcha. 0 je svi dokumenti, veci broj je stroziji kriterijum. Score u hybrid searchu moze biti proizvoljno veliki.",
+        )
         st.session_state.input_prompt = st.radio(
             "Originalni prompt?",
             [True, False],
@@ -239,9 +249,12 @@ def rag(upit):
         ).similarity_search_with_score(upit, k=st.session_state.broj_k)
 
     odgovor = ""
-
-    for member in ceo_odgovor:
-        odgovor += member.page_content + "\n\n"
+    for item in ceo_odgovor:
+        page_cont = item[0].page_content
+        decimal_number = item[1]
+        if decimal_number >= st.session_state.score:
+            st.info(f"Score: {decimal_number}")
+            odgovor += page_cont + "\n\n"
 
     return odgovor
 
@@ -296,6 +309,7 @@ def selfquery(upit):
     else:
         ceo_odgovor = ret.get_relevant_documents(upit)
     odgovor = ""
+
     for member in ceo_odgovor:
         odgovor += member.page_content + "\n\n"
 
@@ -310,30 +324,46 @@ def hybrid_query(upit):
         environment=os.environ["PINECONE_ENVIRONMENT_POS"],
     )
     # # Initialize OpenAI embeddings
-    embeddings = OpenAIEmbeddings()
+    # embeddings = OpenAIEmbeddings()
     index_name = "bis"
-
     index = pinecone.Index(index_name)
-    bm25_encoder = BM25Encoder().default()
-
-    vectorstore = PineconeHybridSearchRetriever(
-        embeddings=embeddings,
-        sparse_encoder=bm25_encoder,
-        index=index,
-        namespace=st.session_state.name_hybrid,
-        top_k=st.session_state.broj_k,
-        alpha=st.session_state.alpha,
-    )
     # za prosledjivanje originalnog prompta alatu alternativa je upit
     if st.session_state.input_prompt == True:
-        ceo_odgovor = vectorstore.get_relevant_documents(st.session_state.fix_prompt)
+        ceo_odgovor = st.session_state.fix_prompt
     else:
-        ceo_odgovor = vectorstore.get_relevant_documents(upit)
-
+        ceo_odgovor = upit
     odgovor = ""
-    for member in ceo_odgovor:
-        odgovor += member.page_content + "\n\n"
 
+    def get_embedding(text, model="text-embedding-ada-002"):
+        text = text.replace("\n", " ")
+        return openai.Embedding.create(input=[text], model=model)["data"][0][
+            "embedding"
+        ]
+
+    def hybrid_query(question, top_k, alpha):
+        bm25 = BM25Encoder().default()
+        sparse_vec = bm25.encode_queries(question)
+        dense_vec = get_embedding(question)
+        # query pinecone with the query parameters
+        result = index.query(
+            vector=dense_vec,
+            sparse_vector=sparse_vec,
+            top_k=top_k,
+            alpha=alpha,
+            include_metadata=True,
+            namespace=st.session_state.name_hybrid,
+        )
+        # return search results as dict
+        return result.to_dict()
+
+    # st.session_state.tematika = vectorstore.get_relevant_documents(zahtev)
+    st.session_state.tematika = hybrid_query(
+        ceo_odgovor, top_k=st.session_state.broj_k, alpha=st.session_state.alpha
+    )
+    for ind, item in enumerate(st.session_state.tematika["matches"]):
+        if item["score"] > st.session_state.score:
+            st.info(f'Za odgovor broj {ind + 1} score je {item["score"]}')
+            odgovor += item["metadata"]["context"] + "\n\n"
     return odgovor
 
 
@@ -384,21 +414,21 @@ def main():
         Tool(
             name="Semantic search",
             func=rag,
-            verbose=False,
+            verbose=True,
             description="Useful for when you are asked about topics including Positive doo and their portfolio. Input should contain Positive.",
             return_direct=st.session_state.direct_semantic,
         ),
         Tool(
             name="Hybrid search",
             func=hybrid_query,
-            verbose=False,
+            verbose=True,
             description="Useful for when you are asked about topics that will list items about opis radnih mesta.",
             return_direct=st.session_state.direct_hybrid,
         ),
         Tool(
             name="Self search",
             func=selfquery,
-            verbose=False,
+            verbose=True,
             description="Useful for when you are asked about topics that will look for keyword.",
             return_direct=st.session_state.direct_self,
         ),
@@ -479,7 +509,7 @@ def main():
             st_redirect = StreamlitRedirect()
             sys.stdout = st_redirect
             # za prosledjivanje originalnog prompta alatu
-            st.session_state.fix_prompt = formatted_prompt[1].content
+            st.session_state.fix_prompt = pitanje
 
             #
             # testirati sa razlicitim agentima i prompt template-ima !!!
@@ -498,9 +528,14 @@ def main():
                 f"Originalni prompt: {st.session_state.input_prompt}, Semantic izlaz: {st.session_state.direct_semantic}, SelfQuery izlaz: {st.session_state.direct_self}, Hybrid izlaz: {st.session_state.direct_hybrid}, CSV izlaz: {st.session_state.direct_csv}, Alpha za Hybrid: {st.session_state.alpha} "
             )
             st.caption(
-                f"Broj dokumenata: {st.session_state.broj_k}, Namsepace Semantic: {st.session_state.name_semantic}, Namespace SelfQuery: {st.session_state.name_self}, Namespace Hybrid: {st.session_state.name_hybrid} "
+                f"Broj dokumenata: {st.session_state.broj_k}, Namsepace Semantic: {st.session_state.name_semantic}, Namespace SelfQuery: {st.session_state.name_self}, Namespace Hybrid: {st.session_state.name_hybrid}, Score: {st.session_state.score} "
             )
             output = agent_chain.invoke(input=pitanje)
+
+            #
+            #### st.error(output) neka greska u agentu !!!!
+            #
+
             output_text = output.get("output", "")
 
             #            output_text = chat.predict(pitanje)

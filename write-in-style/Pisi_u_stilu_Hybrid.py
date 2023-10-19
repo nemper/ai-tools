@@ -140,14 +140,6 @@ def main():
         temperature=st.session_state.temp,
         openai_api_key=openai_api_key,
     )
-    # vectorstore = PineconeHybridSearchRetriever(
-    #     embeddings=embeddings,
-    #     sparse_encoder=st.session_state.bm25_encoder,
-    #     index=st.session_state.index,
-    #     namespace=st.session_state.namespace,
-    #     top_k=st.session_state.broj_k,
-    #     alpha=st.session_state.alpha,
-    # )
 
     # Prompt template - Loading text from the file
     prompt_file = st.file_uploader(
