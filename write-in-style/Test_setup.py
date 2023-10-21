@@ -38,7 +38,7 @@ st_style()
 
 # prebaciti u mojafunkcija ?
 def app_version():
-    version = "19.10.23. - Hybrid i Semantic with Score, Chatbot sa memorijom, Google-om, 3 indexa i CSV agentom - Neprecizni opisi alata i agent promptovi"
+    version = "21.10.23. - Hybrid i Semantic with Score, Chatbot sa memorijom, Google-om, 3 indexa i CSV agentom - Neprecizni opisi alata i agent promptovi"
     st.markdown(
         f"<p style='font-size: 10px; color: grey;'>{version}</p>",
         unsafe_allow_html=True,
@@ -172,7 +172,7 @@ def app_setup():
             "Set score",
             0.00,
             2.00,
-            0.90,
+            0.50,
             0.01,
             help="Koeficijent koji određuje kolji će biti prag relevantnosti dokumenata uzetih u obzir za odgovore kod semantic i hybrid searcha. 0 je svi dokumenti, veci broj je stroziji kriterijum. Score u hybrid searchu moze biti proizvoljno veliki.",
         )
@@ -341,16 +341,36 @@ def hybrid_query(upit):
             "embedding"
         ]
 
+    def hybrid_score_norm(dense, sparse, alpha: float):
+        """Hybrid score using a convex combination
+
+        alpha * dense + (1 - alpha) * sparse
+
+        Args:
+            dense: Array of floats representing
+            sparse: a dict of `indices` and `values`
+            alpha: scale between 0 and 1
+        """
+        if alpha < 0 or alpha > 1:
+            raise ValueError("Alpha must be between 0 and 1")
+        hs = {
+            "indices": sparse["indices"],
+            "values": [v * (1 - alpha) for v in sparse["values"]],
+        }
+        return [v * alpha for v in dense], hs
+
     def hybrid_query(question, top_k, alpha):
         bm25 = BM25Encoder().default()
-        sparse_vec = bm25.encode_queries(question)
-        dense_vec = get_embedding(question)
-        # query pinecone with the query parameters
+        sparse_vector = bm25.encode_queries(question)
+        dense_vector = get_embedding(question)
+        hdense, hsparse = hybrid_score_norm(
+            dense_vector, sparse_vector, alpha=st.session_state.alpha
+        )
+
         result = index.query(
-            vector=dense_vec,
-            sparse_vector=sparse_vec,
             top_k=top_k,
-            alpha=alpha,
+            vector=hdense,
+            sparse_vector=hsparse,
             include_metadata=True,
             namespace=st.session_state.name_hybrid,
         )

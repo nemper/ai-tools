@@ -7,7 +7,6 @@ import pinecone
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import LLMChain
-from langchain import LLMChain
 from langchain.prompts.chat import (
     SystemMessagePromptTemplate,
     HumanMessagePromptTemplate,
@@ -21,7 +20,7 @@ from langchain.retrievers import PineconeHybridSearchRetriever
 from pinecone_text.sparse import BM25Encoder
 import openai
 
-version = "18.10.23. Hybrid - Alpha i Score"
+version = "21.10.23. Hybrid - Alpha i Score"
 
 
 def main():
@@ -108,10 +107,9 @@ def main():
         )
     # define model, vestorstore and retriever
     # vazno ako ne stavimo u session state, jako usporava jer inicijalizacija dugo traje!
-    if "index" not in st.session_state:
-        st.session_state.index = pinecone.Index("bis")
-    if "bm25_encoder" not in st.session_state:
-        st.session_state.bm25_encoder = BM25Encoder().default()
+
+    index = pinecone.Index("bis")
+
     with st.sidebar:
         st.session_state.namespace = st.selectbox(
             "Odaberite oblast",
@@ -174,16 +172,36 @@ def main():
                     "embedding"
                 ]
 
+            def hybrid_score_norm(dense, sparse, alpha: float):
+                """Hybrid score using a convex combination
+
+                alpha * dense + (1 - alpha) * sparse
+
+                Args:
+                    dense: Array of floats representing
+                    sparse: a dict of `indices` and `values`
+                    alpha: scale between 0 and 1
+                """
+                if alpha < 0 or alpha > 1:
+                    raise ValueError("Alpha must be between 0 and 1")
+                hs = {
+                    "indices": sparse["indices"],
+                    "values": [v * (1 - alpha) for v in sparse["values"]],
+                }
+                return [v * alpha for v in dense], hs
+
             def hybrid_query(question, top_k, alpha):
                 bm25 = BM25Encoder().default()
-                sparse_vec = bm25.encode_queries(question)
-                dense_vec = get_embedding(question)
-                # query pinecone with the query parameters
-                result = st.session_state.index.query(
-                    vector=dense_vec,
-                    sparse_vector=sparse_vec,
-                    alpha=alpha,
+                sparse_vector = bm25.encode_queries(question)
+                dense_vector = get_embedding(question)
+                hdense, hsparse = hybrid_score_norm(
+                    dense_vector, sparse_vector, alpha=st.session_state.alpha
+                )
+
+                result = index.query(
                     top_k=top_k,
+                    vector=hdense,
+                    sparse_vector=hsparse,
                     include_metadata=True,
                     namespace=st.session_state.namespace,
                 )
