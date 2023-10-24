@@ -10,7 +10,7 @@ import streamlit as st
 llm = ChatOpenAI(temperature=0)
 
 db = SQLDatabase.from_uri(
-    f"mssql+pyodbc://@DJORDJE-E15\SQLEXPRESS01/sqltest?driver=ODBC+Driver+17+for+SQL+Server&trusted_connection=yes&charset=utf8"
+    f"mssql+pyodbc://@DJORDJE-E15\SQLEXPRESS01/sqltest?driver=ODBC+Driver+17+for+SQL+Server&trusted_connection=yes&charset=UTF-8"
 )
 
 toolkit = SQLDatabaseToolkit(db=db, llm=OpenAI(temperature=0))
@@ -26,5 +26,9 @@ st.subheader("Upit u SQL bazu")
 st.caption("Ver. 24.10.23")
 pitanje = st.text_input("Unesi upit u SQL bazu")
 if pitanje:
+    pitanje = (
+        "Show only top 5 results for the query. If you can not find the answer, say I don.t know. When using LIKE allways add N in fornt of '%  "
+        + pitanje
+    )
     odgovor = agent_executor.run(pitanje)
     st.write(odgovor)
