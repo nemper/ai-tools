@@ -4,7 +4,6 @@
 import os
 import streamlit as st
 import pinecone
-from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import LLMChain
 from langchain.prompts.chat import (
@@ -16,7 +15,6 @@ from html2docx import html2docx
 from myfunc.mojafunkcija import st_style, positive_login, open_file, init_cond_llm
 import markdown
 import pdfkit
-from langchain.retrievers import PineconeHybridSearchRetriever
 from pinecone_text.sparse import BM25Encoder
 import openai
 
@@ -201,6 +199,7 @@ def main():
                 result = index.query(
                     top_k=top_k,
                     vector=hdense,
+                    alpha=alpha,
                     sparse_vector=hsparse,
                     include_metadata=True,
                     namespace=st.session_state.namespace,

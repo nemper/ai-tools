@@ -8,9 +8,7 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores.pinecone import Pinecone
 from langchain.retrievers.self_query.base import SelfQueryRetriever
 from langchain.chains.query_constructor.base import AttributeInfo
-from langchain.retrievers import PineconeHybridSearchRetriever
 from pinecone_text.sparse import BM25Encoder
-from langchain.agents.agent_types import AgentType
 from langchain.agents import create_csv_agent
 from langchain.agents import Tool, AgentType, initialize_agent
 from langchain.chat_models import ChatOpenAI
@@ -21,7 +19,6 @@ from langchain.prompts import (
     SystemMessagePromptTemplate,
     HumanMessagePromptTemplate,
 )
-
 from myfunc.mojafunkcija import (
     st_style,
     positive_login,
@@ -30,6 +27,7 @@ from myfunc.mojafunkcija import (
     init_cond_llm,
     open_file,
 )
+
 
 # setup stranica
 st.set_page_config(page_title="Multi Tool Chatbot", page_icon="👉", layout="wide")
@@ -370,6 +368,7 @@ def hybrid_query(upit):
         result = index.query(
             top_k=top_k,
             vector=hdense,
+            alpha=alpha,
             sparse_vector=hsparse,
             include_metadata=True,
             namespace=st.session_state.name_hybrid,
@@ -545,6 +544,7 @@ def main():
                 handle_parsing_errors=True,
                 max_iterations=4,
             )
+
             st.caption(
                 f"Originalni prompt: {st.session_state.input_prompt}, Semantic izlaz: {st.session_state.direct_semantic}, SelfQuery izlaz: {st.session_state.direct_self}, Hybrid izlaz: {st.session_state.direct_hybrid}, CSV izlaz: {st.session_state.direct_csv}, Alpha za Hybrid: {st.session_state.alpha} "
             )
