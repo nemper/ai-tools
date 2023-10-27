@@ -10,6 +10,7 @@ from custom_llm_agent import our_custom_agent
 
 version = "27.10.23. Nemanja"
 
+st_style()
 
 def main():
     default_session_states = {
@@ -161,8 +162,6 @@ def main():
             file_name="Odgovor.docx",
             mime="docx",
             )
-
-st_style()
 
 if environ.get("DEPLOYMENT_ENVIRONMENT") == "Streamlit":
     name, authentication_status, username = positive_login(main, " ")
