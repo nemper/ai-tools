@@ -112,13 +112,13 @@ def our_custom_agent(question: str, session_state: dict):
             agent_type=AgentType.OPENAI_FUNCTIONS,
             handle_parsing_errors=True,
             )
-        # za prosledjivanje originalnog prompta alatu alternativa je upit
         if session_state["input_prompt"] == True:
             odgovor = agent.run(session_state["fix_prompt"])
         else:
             odgovor = agent.run(upit)
         return str(odgovor)
 
+    # All Tools #1-3
     tools = [
         Tool(
             name="Web search",
