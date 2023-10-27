@@ -107,7 +107,7 @@ def our_custom_agent(question: str, session_state: dict):
     def csv_file_search(upit):
         agent = create_csv_agent(
             llm=ChatOpenAI(temperature=0),
-            path=session_state["uploaded_file"]["name"],
+            path=session_state["uploaded_file"].name,
             verbose=True,
             agent_type=AgentType.OPENAI_FUNCTIONS,
             handle_parsing_errors=True,
