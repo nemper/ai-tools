@@ -30,5 +30,6 @@ if pitanje:
         "Show only top 5 results for the query. If you can not find the answer, say I don.t know. When using LIKE allways add N in fornt of '%  "
         + pitanje
     )
+    st.write(pitanje)
     odgovor = agent_executor.run(pitanje)
     st.write(odgovor)
