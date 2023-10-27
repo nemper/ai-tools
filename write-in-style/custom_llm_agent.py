@@ -35,7 +35,7 @@ def our_custom_agent(question: str, session_state: dict):
     from json import dumps
     from re import search, DOTALL
     from typing import List, Union
-
+    import pandas as pd
     from openai import Embedding
     import pinecone
     from pinecone_text.sparse import BM25Encoder
@@ -105,15 +105,36 @@ def our_custom_agent(question: str, session_state: dict):
         return ChatPromptTemplate(messages=[system_message, human_message])
 
     # Tool #3 CSV search
-    def csv_file_search(upit):
-        agent = create_csv_agent(
+    def csv_file_analyzer(upit):
+        extract_code_from_response = lambda response: (lambda match: match.group(1).strip() if match else None)
+        (search(r"```python(.*?)```", response, DOTALL))
+
+        csv_agent = create_csv_agent(
             llm=ChatOpenAI(temperature=0, model="gpt-3.5-turbo", verbose=True),
             path=session_state["uploaded_file"].name,
             verbose=True,
             agent_type=AgentType.OPENAI_FUNCTIONS,
             handle_parsing_errors=True,
             )
-        return str(agent.run(dumps(upit)))
+        x = extract_code_from_response(response=str(agent.run(dumps(upit))))
+
+        try:
+            # Properly format the user's input and wrap it with the required "input" key
+            tool_input = {
+                "input": {
+                    "name": "python",
+                    "arguments": upit
+                }
+            }
+            
+            response = agent.run(tool_input)
+            return response
+        except Exception as e:
+            st.write(f"Error: {e}")
+            return None
+        
+        extract_code_from_response = lambda response: (lambda match: match.group(1).strip() if match else None)
+        (search(r"```python(.*?)```", response, DOTALL))
 
     # All Tools
     tools = [
@@ -141,7 +162,7 @@ def our_custom_agent(question: str, session_state: dict):
             ),
         Tool(
             name="CSV search",
-            func=csv_file_search,
+            func=csv_file_analyzer,
             verbose=True,
             description="""
             This tool should be use when you are asked about structured data, e.g: numbers, counts or sums.
