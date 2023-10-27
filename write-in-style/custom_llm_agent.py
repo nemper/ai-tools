@@ -32,6 +32,7 @@ def our_custom_agent(question: str, session_state: dict):
     from langchain.utilities import GoogleSerperAPIWrapper
 
     from os import environ
+    from json import dumps
     from re import search, DOTALL
     from typing import List, Union
 
@@ -106,13 +107,13 @@ def our_custom_agent(question: str, session_state: dict):
     # Tool #3 CSV search
     def csv_file_search(upit):
         agent = create_csv_agent(
-            llm=ChatOpenAI(temperature=0),
+            llm=ChatOpenAI(temperature=0, model="gpt-3.5-turbo", verbose=True),
             path=session_state["uploaded_file"].name,
             verbose=True,
             agent_type=AgentType.OPENAI_FUNCTIONS,
             handle_parsing_errors=True,
             )
-        return str(agent.run(upit))
+        return str(agent.run(dumps(upit)))
 
     # All Tools
     tools = [
