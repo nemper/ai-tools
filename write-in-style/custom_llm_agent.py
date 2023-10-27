@@ -116,25 +116,21 @@ def our_custom_agent(question: str, session_state: dict):
             agent_type=AgentType.OPENAI_FUNCTIONS,
             handle_parsing_errors=True,
             )
-        x = extract_code_from_response(response=str(agent.run(dumps(upit))))
 
         try:
             # Properly format the user's input and wrap it with the required "input" key
             tool_input = {
                 "input": {
                     "name": "python",
-                    "arguments": upit
+                    "arguments": extract_code_from_response(response=str(agent.run(dumps(upit))))
                 }
             }
             
-            response = agent.run(tool_input)
+            response = csv_agent.run(tool_input)
             return response
         except Exception as e:
-            st.write(f"Error: {e}")
-            return None
+            return e
         
-        extract_code_from_response = lambda response: (lambda match: match.group(1).strip() if match else None)
-        (search(r"```python(.*?)```", response, DOTALL))
 
     # All Tools
     tools = [
