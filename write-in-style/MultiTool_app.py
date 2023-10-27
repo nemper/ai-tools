@@ -103,7 +103,7 @@ def main():
             label="Choose a CSV file", accept_multiple_files=False, type="csv", key="csv_key",
             )
         if st.session_state["uploaded_file"] is not None:
-            with io.open(st.session_state["uploaded_file"]["name"], "wb") as file:
+            with io.open(st.session_state["uploaded_file"].name, "wb") as file:
                 file.write(st.session_state["uploaded_file"].getbuffer())
 
     zahtev = ""

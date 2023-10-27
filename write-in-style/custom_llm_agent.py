@@ -135,8 +135,7 @@ def our_custom_agent(question: str, session_state: dict):
             description="""
             This tool combines the capabilities of Pinecone's semantic and keyword search to provide a comprehensive search solution. \
             It uses machine learning models for semantic understanding and also matches specific keywords in the database. \
-            This tool is ideal when you need the flexibility of semantic understanding and the precision of keyword matching. 
-            The input must include the word 'Positive', i.e. it should be about the company Positive doo.
+            This tool is ideal when you need the flexibility of semantic understanding and the precision of keyword matching.
             """,
             ),
         Tool(
@@ -144,14 +143,13 @@ def our_custom_agent(question: str, session_state: dict):
             func=csv_file_search,
             verbose=True,
             description="""
-            This tool should be use when you are asked about structured data, e.g: numbers, counts or sums. 
-            The input must include the word 'Positive', i.e. it should be about the company Positive doo.
+            This tool should be use when you are asked about structured data, e.g: numbers, counts or sums.
             """,
             ),
         ]
 
 
-    template = """Answer the following questions as best you can, but speaking as a pirate might speak. You have access to the following tools:
+    template = """Answer the following questions as best you can. You have access to the following tools:
     {tools}
 
     Only answer questions using the tools above. If you can't use a tool to answer a question, say "I don't know".
@@ -166,7 +164,7 @@ def our_custom_agent(question: str, session_state: dict):
     Thought: I now know the final answer
     Final Answer: the final answer to the original input question
 
-    Begin! Remember to speak as a pirate when giving your final answer. Use lots of "Arg"s
+    Begin!
 
     Question: {input}
     {agent_scratchpad}"""
