@@ -106,30 +106,16 @@ def our_custom_agent(question: str, session_state: dict):
 
     # Tool #3 CSV search
     def csv_file_analyzer(upit):
-        extract_code_from_response = lambda response: (lambda match: match.group(1).strip() if match else None)
-        (search(r"```python(.*?)```", response, DOTALL))
 
         csv_agent = create_csv_agent(
-            llm=ChatOpenAI(temperature=0, model="gpt-3.5-turbo", verbose=True),
-            path=session_state["uploaded_file"].name,
+            ChatOpenAI(temperature=0.0, model_name="gpt-4", verbose=True),
+            session_state["uploaded_file"].name,
             verbose=True,
             agent_type=AgentType.OPENAI_FUNCTIONS,
             handle_parsing_errors=True,
             )
 
-        try:
-            # Properly format the user's input and wrap it with the required "input" key
-            tool_input = {
-                "input": {
-                    "name": "python",
-                    "arguments": extract_code_from_response(response=str(agent.run(dumps(upit))))
-                }
-            }
-            
-            response = csv_agent.run(tool_input)
-            return response
-        except Exception as e:
-            return e
+        return str(csv_agent.run(dumps({"input": upit})))
         
 
     # All Tools
