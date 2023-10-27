@@ -8,7 +8,14 @@
 """
 
 def our_custom_agent(question: str, session_state: dict):
-    from langchain.agents import Tool, AgentExecutor, LLMSingleActionAgent, AgentOutputParser
+    from langchain.agents import (
+        Tool, 
+        AgentType,
+        AgentExecutor, 
+        LLMSingleActionAgent, 
+        AgentOutputParser,
+        create_csv_agent
+        )
     from langchain.chains import LLMChain
     from langchain.chat_models import ChatOpenAI
     from langchain.prompts.chat import (
@@ -17,7 +24,11 @@ def our_custom_agent(question: str, session_state: dict):
         ChatPromptTemplate,
         StringPromptTemplate,
         )
-    from langchain.schema import AgentAction, AgentFinish, OutputParserException
+    from langchain.schema import (
+        AgentAction, 
+        AgentFinish, 
+        OutputParserException,
+        )
     from langchain.utilities import GoogleSerperAPIWrapper
 
     from os import environ
@@ -92,18 +103,54 @@ def our_custom_agent(question: str, session_state: dict):
         
         return ChatPromptTemplate(messages=[system_message, human_message])
 
+    # Tool #3 CSV search
+    def csv_file_search(upit):
+        agent = create_csv_agent(
+            ChatOpenAI(temperature=0),
+            session_state["uploaded_file.name"],
+            verbose=True,
+            agent_type=AgentType.OPENAI_FUNCTIONS,
+            handle_parsing_errors=True,
+            )
+        # za prosledjivanje originalnog prompta alatu alternativa je upit
+        if session_state["input_prompt"] == True:
+            odgovor = agent.run(session_state["fix_prompt"])
+        else:
+            odgovor = agent.run(upit)
+        return str(odgovor)
 
     tools = [
         Tool(
             name="Web search",
             func=web_search.run,
-            description="Google search tool. Use this when you need to answer questions about recent events or if someone asks for the current time or date.",
+            verbose=True,
+            description="""
+            This tool uses Google Search to find the most relevant and up-to-date information on the web. \
+            It accepts a query string as input and returns a list of search results, including web pages, news articles, images, and more. \
+            This tool is particularly useful when you need comprehensive information on a specific topic (that isn't related to the company Positive doo), \
+            want to explore different viewpoints, or are looking for the latest news.
+            Please note that the quality and relevance of results may depend on the specificity of your query. The input must not include the word 'Positive'.
+            """,
             ),
         Tool(
             name="Pinecone Hybrid search",
             func=hybrid_search_process,
             verbose=True,
-            description="Use this when you are asked about topics including Positive doo and their portfolio. Question must include 'radno mesto'.",
+            description="""
+            This tool combines the capabilities of Pinecone's semantic and keyword search to provide a comprehensive search solution. \
+            It uses machine learning models for semantic understanding and also matches specific keywords in the database. \
+            This tool is ideal when you need the flexibility of semantic understanding and the precision of keyword matching. 
+            The input must include the word 'Positive', i.e. it should be about the company Positive doo.
+            """,
+            ),
+        Tool(
+            name="CSV search",
+            func=csv_file_search,
+            verbose=True,
+            description="""
+            This tool should be use when you are asked about structured data, e.g: numbers, counts or sums. 
+            The input must include the word 'Positive', i.e. it should be about the company Positive doo.
+            """,
             ),
         ]
 

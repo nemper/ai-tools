@@ -7,7 +7,7 @@ import streamlit as st
 from myfunc.mojafunkcija import st_style, positive_login, init_cond_llm
 from custom_llm_agent import our_custom_agent
 
-version = "26.10.23. Nemanja"
+version = "27.10.23. Nemanja"
 
 
 def main():
@@ -50,7 +50,7 @@ def main():
             body="Temperatura za hybrid search treba de je što bliže 0"
             )
         st.session_state["broj_k"] = st.number_input(
-            "Set number of returned documents",
+            label="Set number of returned documents",
             min_value=1, 
             max_value=5,
             value=3, 
@@ -127,18 +127,13 @@ def main():
 
     if st.session_state["odgovor"] != "":
         with st.expander("FINALNI TEKST", expanded=True):
-            st.markdown(st.session_state["odgovor"])
-        html = markdown(st.session_state["odgovor"])
-        buf = html2docx(html, title="Zapisnik")
+            st.markdown(body=st.session_state["odgovor"])
+        html = markdown(text=st.session_state["odgovor"])
 
-        options = {
-            "encoding": "UTF-8",
-            "no-outline": None,
-            "quiet": "",
-            }
-        
         try:
-            pdf_data = from_string(html, cover_first=False, options=options)
+            pdf_data = from_string(input=html, cover_first=False, 
+                                   options={"encoding": "UTF-8", "no-outline": None, "quiet": "",},
+                                   )
             st.download_button(
                 label="Download TekstuStilu.pdf",
                 data=pdf_data,
@@ -149,14 +144,14 @@ def main():
             st.write("Za pdf fajl restartujte app za 5 minuta. Osvezavanje aplikacije je u toku")
 
         st.download_button(
-            label="Download TekstuStilu.txt",
+            label="Download Odgovor.txt",
             data=st.session_state["odgovor"],
-            file_name="TekstuStilu.txt",
+            file_name="Odgovor.txt",
             )
         st.download_button(
-            label="Download TekstuStilu.docx",
-            data=buf.getvalue(),
-            file_name="TekstuStilu.docx",
+            label="Download Odgovor.docx",
+            data=html2docx(content=html, title="Zapisnik").getvalue(),
+            file_name="Odgovor.docx",
             mime="docx",
             )
 
