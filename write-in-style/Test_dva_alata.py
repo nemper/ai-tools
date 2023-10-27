@@ -36,7 +36,7 @@ st_style()
 
 # prebaciti u mojafunkcija ?
 def app_version():
-    version = "21.10.23. - Hybrid i Semantic with Score, Chatbot sa memorijom, Google-om, 3 indexa i CSV agentom - Neprecizni opisi alata i agent promptovi"
+    version = "24.10.23. - Hybrid with Score, Chatbot sa memorijom i CSV agentom - Neprecizni opisi alata i agent promptovi"
     st.markdown(
         f"<p style='font-size: 10px; color: grey;'>{version}</p>",
         unsafe_allow_html=True,
@@ -70,7 +70,7 @@ def app_setup():
     if "input_prompt" not in st.session_state:
         st.session_state.input_prompt = None
 
-    st.subheader("Multi Tool Chatbot")
+    st.subheader("Multi Tool Chatbot CSV i Hybrid")
     with st.expander("Pročitajte uputstvo 🧜‍♂️"):
         st.caption(
             """
@@ -86,31 +86,8 @@ def app_setup():
                         """
         )
 
-    col1, col2, col3, col4, col5 = st.columns(5)
-    with col1:
-        st.session_state.name_semantic = st.selectbox(
-            "Namespace za Semantic",
-            (
-                "positive",
-                "miljan",
-                "pravnikprazan",
-                "pravnikprefix",
-                "pravnikschema",
-                "pravnikfull",
-                "bisprazan",
-                "bisprefix",
-                "bisschema",
-                "bisfull",
-                "koder",
-            ),
-            help="Pitanja o Positive uopstena",
-        )
-    with col2:
-        st.session_state.name_self = st.selectbox(
-            "Namespace za SelfQuery",
-            ("sistematizacija3",),
-            help="Pitanja o meta poljima",
-        )
+    col1, col2, col3, col4 = st.columns(4)
+
     with col3:
         st.session_state.name_hybrid = st.selectbox(
             "Namespace za Hybrid",
@@ -134,46 +111,35 @@ def app_setup():
             ),
             help="Pitanja o opisu radnih mesta",
         )
-    with col1:
-        st.session_state.direct_semantic = st.radio(
-            "Direktan odgovor - Semantic",
-            [True, False],
-            key="semantic_key",
-            horizontal=True,
-            help="Pitanja o Positive uopstena",
-        )
+
     with col3:
         st.session_state.direct_hybrid = st.radio(
             "Direktan odgovor - Hybrid",
             [True, False],
+            index=1,
             horizontal=True,
             help="Pitanja o opisu radnih mesta",
         )
-    with col2:
-        st.session_state.direct_self = st.radio(
-            "Direktan odgovor - SelfQuery",
-            [True, False],
-            horizontal=True,
-            help="Pitanja o meta poljima",
-        )
 
-    with col5:
+    with col4:
         st.session_state.alpha = st.slider(
-            "Hybrid keyword/semantic",
+            "Hybrid keyword",
             0.0,
             1.0,
-            0.5,
+            0.1,
             0.1,
             help="Koeficijent koji određuje koliko će biti zastupljena pretraga po ključnim rečima, a koliko po semantičkom značenju. 0-0.4 pretezno Kljucne reci , 0.5 podjednako, 0.6-1 pretezno semanticko znacenje",
         )
+    with col1:
         st.session_state.score = st.slider(
             "Set score",
             0.00,
-            2.00,
-            0.50,
+            1.00,
+            0.10,
             0.01,
             help="Koeficijent koji određuje kolji će biti prag relevantnosti dokumenata uzetih u obzir za odgovore kod semantic i hybrid searcha. 0 je svi dokumenti, veci broj je stroziji kriterijum. Score u hybrid searchu moze biti proizvoljno veliki.",
         )
+    with col2:
         st.session_state.input_prompt = st.radio(
             "Originalni prompt?",
             [True, False],
@@ -181,20 +147,21 @@ def app_setup():
             horizontal=True,
             help="Ako je odgovor False, onda se koristi upit koji formira Agent",
         )
-    with col4:
+    with col1:
         st.session_state.broj_k = st.number_input(
             "Broj dokumenata - svi indexi",
             min_value=1,
-            max_value=5,
-            value=3,
+            max_value=10,
+            value=5,
             step=1,
             key="broj_k_key",
             help="Broj dokumenata koji se vraćaju iz indeksa",
         )
-
+    with col2:
         st.session_state.direct_csv = st.radio(
             "Direktan odgovor - CSV",
             [True, False],
+            index=1,
             help="Pitanja o struktuiranim podacima",
             horizontal=True,
         )
@@ -218,101 +185,6 @@ def read_csv(upit):
 
 
 # semantic search - klasini model
-def rag(upit):
-    # Initialize Pinecone
-    pinecone.init(
-        api_key=os.environ["PINECONE_API_KEY"],
-        environment=os.environ["PINECONE_API_ENV"],
-    )
-    index_name = "embedings1"
-    index = pinecone.Index(index_name)
-    text = "text"
-
-    # verizja sa score-om
-    # za prosledjivanje originalnog prompta alatu alternativa je upit
-    if st.session_state.input_prompt == True:
-        ceo_odgovor = Pinecone(
-            index=index,
-            embedding=OpenAIEmbeddings(),
-            text_key=text,
-            namespace=st.session_state.name_semantic,
-        ).similarity_search_with_score(
-            st.session_state.fix_prompt, k=st.session_state.broj_k
-        )
-    else:
-        ceo_odgovor = Pinecone(
-            index=index,
-            embedding=OpenAIEmbeddings(),
-            text_key=text,
-            namespace=st.session_state.name_semantic,
-        ).similarity_search_with_score(upit, k=st.session_state.broj_k)
-
-    odgovor = ""
-    for item in ceo_odgovor:
-        page_cont = item[0].page_content
-        decimal_number = item[1]
-        if decimal_number >= st.session_state.score:
-            st.info(f"Score: {decimal_number}")
-            odgovor += page_cont + "\n\n"
-
-    return odgovor
-
-
-# selfquery search - pretrazuje po meta poljima
-def selfquery(upit):
-    # Initialize Pinecone
-    pinecone.init(
-        api_key=os.environ["PINECONE_API_KEY"],
-        environment=os.environ["PINECONE_API_ENV"],
-    )
-
-    llm = ChatOpenAI(temperature=0)
-    # Define metadata fields obratiti paznju
-    metadata_field_info = [
-        AttributeInfo(name="title", description="Tema dokumenta", type="string"),
-        AttributeInfo(name="keyword", description="reci za pretragu", type="string"),
-        AttributeInfo(
-            name="text", description="The Content of the document", type="string"
-        ),
-        AttributeInfo(
-            name="source", description="The Source of the document", type="string"
-        ),
-    ]
-
-    # Define document content description
-    document_content_description = "Sistematizacija radnih mesta"
-
-    index_name = "embedings1"
-    text = "text"
-    # Izbor stila i teme
-    index = pinecone.Index(index_name)
-    vector = Pinecone.from_existing_index(
-        index_name=index_name,
-        embedding=OpenAIEmbeddings(),
-        text_key=text,
-        namespace=st.session_state.name_self,
-    )
-    ret = SelfQueryRetriever.from_llm(
-        llm,
-        vector,
-        document_content_description,
-        metadata_field_info,
-        enable_limit=True,
-        verbose=True,
-        search_kwargs={"k": st.session_state.broj_k},
-    )
-
-    # za prosledjivanje originalnog prompta alatu alternativa je upit
-    if st.session_state.input_prompt == True:
-        ceo_odgovor = ret.get_relevant_documents(st.session_state.fix_prompt)
-    else:
-        ceo_odgovor = ret.get_relevant_documents(upit)
-    odgovor = ""
-
-    for member in ceo_odgovor:
-        odgovor += member.page_content + "\n\n"
-
-    return odgovor
 
 
 # hybrid search - kombinacija semantic i selfquery metoda po kljucnoj reci
@@ -427,30 +299,11 @@ def main():
     # definicija alata - vazno definisati kvalitetno description !!! - videti kako da ne koristi nista ako ne mora, mozda je u promptu agenta?
     st.session_state.tools = [
         Tool(
-            name="search",
-            func=search.run,
-            description="Google search tool. Useful when you need to answer questions about recent events or if someone asks for the current time or date.",
-        ),
-        Tool(
-            name="Semantic search",
-            func=rag,
-            verbose=True,
-            description="Useful for when you are asked about topics including Positive doo and their portfolio. Input should contain Positive.",
-            return_direct=st.session_state.direct_semantic,
-        ),
-        Tool(
             name="Hybrid search",
             func=hybrid_query,
             verbose=True,
-            description="Useful for when you are asked about topics that will list items about opis radnih mesta.",
+            description="Useful for when you are asked about topics about sistematizacija radnih mesta.",
             return_direct=st.session_state.direct_hybrid,
-        ),
-        Tool(
-            name="Self search",
-            func=selfquery,
-            verbose=True,
-            description="Useful for when you are asked about topics that will look for keyword.",
-            return_direct=st.session_state.direct_self,
         ),
         Tool(
             name="CSV search",
@@ -546,10 +399,10 @@ def main():
             )
 
             st.caption(
-                f"Originalni prompt: {st.session_state.input_prompt}, Semantic izlaz: {st.session_state.direct_semantic}, SelfQuery izlaz: {st.session_state.direct_self}, Hybrid izlaz: {st.session_state.direct_hybrid}, CSV izlaz: {st.session_state.direct_csv}, Alpha za Hybrid: {st.session_state.alpha} "
+                f"Originalni prompt: {st.session_state.input_prompt}, Hybrid izlaz: {st.session_state.direct_hybrid}, CSV izlaz: {st.session_state.direct_csv}, Alpha za Hybrid: {st.session_state.alpha} "
             )
             st.caption(
-                f"Broj dokumenata: {st.session_state.broj_k}, Namsepace Semantic: {st.session_state.name_semantic}, Namespace SelfQuery: {st.session_state.name_self}, Namespace Hybrid: {st.session_state.name_hybrid}, Score: {st.session_state.score} "
+                f"Broj dokumenata: {st.session_state.broj_k}, Namsepace Hybrid: {st.session_state.name_hybrid}, Score: {st.session_state.score} "
             )
             output = agent_chain.invoke(input=pitanje)
             output_text = output.get("output", "")

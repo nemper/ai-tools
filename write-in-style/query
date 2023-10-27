@@ -1,0 +1,5 @@
+SELECT TOP 10
+    Radno_mesto
+FROM pravilnik1
+WHERE Opis LIKE '%ispostavlja%'
+

@@ -4,7 +4,6 @@
 import os
 import streamlit as st
 import pinecone
-from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import LLMChain
 from langchain.prompts.chat import (
@@ -16,11 +15,10 @@ from html2docx import html2docx
 from myfunc.mojafunkcija import st_style, positive_login, open_file, init_cond_llm
 import markdown
 import pdfkit
-from langchain.retrievers import PineconeHybridSearchRetriever
 from pinecone_text.sparse import BM25Encoder
 import openai
 
-version = "21.10.23. Hybrid - Alpha i Score"
+version = "24.10.23. Hybrid - Alpha i Score"
 
 
 def main():
@@ -51,11 +49,11 @@ def main():
     if "tematika" not in st.session_state:
         st.session_state.tematika = ""
     if "broj_k" not in st.session_state:
-        st.session_state.broj_k = 3
+        st.session_state.broj_k = 10
     if "stil" not in st.session_state:
         st.session_state.stil = ""
     if "score" not in st.session_state:
-        st.session_state.score = 0.9
+        st.session_state.score = 0.1
 
     # Izbor stila i teme
     st.markdown(
@@ -83,14 +81,14 @@ def main():
         st.session_state.broj_k = st.number_input(
             "Set number of returned documents",
             min_value=1,
-            max_value=5,
-            value=3,
+            max_value=10,
+            value=5,
             step=1,
             key="broj_k_key",
             help="Broj dokumenata koji se vraćaju iz indeksa",
         )
         st.session_state.alpha = st.slider(
-            "Set alpha",
+            "Set alpha: 0 - Samo keywords, 1 - Samo semanticko znacenje",
             0.0,
             1.0,
             0.5,
@@ -100,8 +98,8 @@ def main():
         st.session_state.score = st.slider(
             "Set score",
             0.00,
-            2.00,
-            0.90,
+            1.00,
+            0.10,
             0.01,
             help="Koeficijent koji određuje kolji će biti prag relevantnosti dokumenata uzetih u obzir za odgovore. 0 je svi dokumenti, veci broj je stroziji kriterijum. Score u hybrid searchu moze biti proizvoljno veliki.",
         )
@@ -188,6 +186,7 @@ def main():
                     "indices": sparse["indices"],
                     "values": [v * (1 - alpha) for v in sparse["values"]],
                 }
+
                 return [v * alpha for v in dense], hs
 
             def hybrid_query(question, top_k, alpha):
@@ -201,11 +200,13 @@ def main():
                 result = index.query(
                     top_k=top_k,
                     vector=hdense,
+                    alpha=alpha,
                     sparse_vector=hsparse,
                     include_metadata=True,
                     namespace=st.session_state.namespace,
                 )
                 # return search results as dict
+
                 return result.to_dict()
 
             # st.session_state.tematika = vectorstore.get_relevant_documents(zahtev)
