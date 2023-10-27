@@ -129,7 +129,7 @@ def main():
                 st.session_state["odgovor"] = our_custom_agent(zahtev, dict(st.session_state))
                 st.write(st.session_state["odgovor"])
             except Exception as e:
-                st.warning(f"Nisam u mogućnosti da završim tekst. Ovo je opis greške:\n {e}")
+                st.warning(f"Nisam u mogućnosti da završim tekst. Ovo je opis greške:\n\n {e}")
 
 
     if st.session_state["odgovor"] != "":
