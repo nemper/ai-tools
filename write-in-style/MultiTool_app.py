@@ -1,4 +1,5 @@
 from os import environ
+import io
 from html2docx import html2docx
 from pdfkit import from_string
 from markdown import markdown
@@ -23,6 +24,7 @@ def main():
         "broj_k": 3,
         "stil": "",
         "score": 0.9,
+        "uploaded_file": None
         }
     st.session_state = {**default_session_states, **st.session_state}
 
@@ -97,6 +99,12 @@ def main():
                 "bisfull",
                 ),
             )
+        st.session_state["uploaded_file"] = st.file_uploader(
+            label="Choose a CSV file", accept_multiple_files=False, type="csv", key="csv_key",
+            )
+        if st.session_state["uploaded_file"] is not None:
+            with io.open(st.session_state["uploaded_file"]["name"], "wb") as file:
+                file.write(st.session_state["uploaded_file"].getbuffer())
 
     zahtev = ""
     prompt_file = st.file_uploader(

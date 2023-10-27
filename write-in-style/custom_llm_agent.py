@@ -106,19 +106,15 @@ def our_custom_agent(question: str, session_state: dict):
     # Tool #3 CSV search
     def csv_file_search(upit):
         agent = create_csv_agent(
-            ChatOpenAI(temperature=0),
-            session_state["uploaded_file.name"],
+            llm=ChatOpenAI(temperature=0),
+            path=session_state["uploaded_file"]["name"],
             verbose=True,
             agent_type=AgentType.OPENAI_FUNCTIONS,
             handle_parsing_errors=True,
             )
-        if session_state["input_prompt"] == True:
-            odgovor = agent.run(session_state["fix_prompt"])
-        else:
-            odgovor = agent.run(upit)
-        return str(odgovor)
+        return str(agent.run(upit))
 
-    # All Tools #1-3
+    # All Tools
     tools = [
         Tool(
             name="Web search",
