@@ -149,6 +149,7 @@ def our_custom_agent(question: str, session_state: dict):
             description="""
             This tool should be use when you are asked about structured data, e.g: numbers, counts or sums.
             """,
+            direct_output=True,
             ),
         ]
 
