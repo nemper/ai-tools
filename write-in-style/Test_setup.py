@@ -58,7 +58,7 @@ def app_setup():
     if "score" not in st.session_state:
         st.session_state.score = None
     if "uploaded_file" not in st.session_state:
-        st.session_state.uploaded_file = "bnreport.csv"
+        st.session_state.uploaded_file = None
     if "direct_semantic" not in st.session_state:
         st.session_state.direct_semantic = None
     if "direct_hybrid" not in st.session_state:
