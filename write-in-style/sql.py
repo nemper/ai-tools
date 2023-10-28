@@ -13,13 +13,21 @@ db = SQLDatabase.from_uri(
     f"mssql+pyodbc://@DJORDJE-E15\SQLEXPRESS01/sqltest?driver=ODBC+Driver+17+for+SQL+Server&trusted_connection=yes&charset=UTF-8"
 )
 
-toolkit = SQLDatabaseToolkit(db=db, llm=OpenAI(temperature=0))
 
+# cini se da je ovo najbolje resenje za sada. deluje da chat modeli kao sto je klasican turbo ne rade sa ovim alatom.
+# to je sasvim moguce i za CSV tool. Treba i tamo u samom toolu definisati OpenAI a ne chatOpenAI, slicno ovome
+toolkit = SQLDatabaseToolkit(
+    db=db, llm=OpenAI(model="gpt-3.5-turbo-instruct", temperature=0)
+)
+
+
+# ovde moze Chat model, ali treba dodati i handle_parsing_errors=True
 agent_executor = create_sql_agent(
-    llm=OpenAI(temperature=0),
+    llm=llm,
     toolkit=toolkit,
     verbose=True,
     agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+    handle_parsing_errors=True,
 )
 
 st.subheader("Upit u SQL bazu")
@@ -30,6 +38,6 @@ if pitanje:
         "Show only top 5 results for the query. If you can not find the answer, say I don.t know. When using LIKE allways add N in fornt of '%  "
         + pitanje
     )
-    st.write(pitanje)
+
     odgovor = agent_executor.run(pitanje)
     st.write(odgovor)
