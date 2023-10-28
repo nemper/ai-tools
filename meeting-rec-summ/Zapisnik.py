@@ -12,7 +12,9 @@ from langchain.prompts import (
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate,
 )
-from langchain import LLMChain
+from langchain.schema.messages import HumanMessage, SystemMessage
+
+# from langchain import LLMChain
 import streamlit as st
 import os
 from html2docx import html2docx
@@ -27,12 +29,13 @@ from myfunc.mojafunkcija import (
     show_logo,
     def_chunk,
 )
-from random import randint
-from langchain.callbacks.tracers.run_collector import RunCollectorCallbackHandler
-from langchain.schema.runnable import RunnableConfig
-from langsmith import Client
-from streamlit_feedback import streamlit_feedback
-from langchain.callbacks.tracers.langchain import wait_for_all_tracers
+
+# from random import randint
+# from langchain.callbacks.tracers.run_collector import RunCollectorCallbackHandler
+# from langchain.schema.runnable import RunnableConfig
+# from langsmith import Client
+# from streamlit_feedback import streamlit_feedback
+# from langchain.callbacks.tracers.langchain import wait_for_all_tracers
 
 import pdfkit
 import PyPDF2
@@ -40,19 +43,19 @@ import re
 import io
 
 # these are the environment variables that need to be set for LangSmith to work
-os.environ["LANGCHAIN_PROJECT"] = "Zapisnik"
-os.environ["LANGCHAIN_TRACING_V2"] = "true"
-os.environ["LANGCHAIN_ENDPOINT"] = "https://api.langchain.plus"
-os.environ.get("LANGCHAIN_API_KEY")
+# os.environ["LANGCHAIN_PROJECT"] = "Zapisnik"
+# os.environ["LANGCHAIN_TRACING_V2"] = "true"
+# os.environ["LANGCHAIN_ENDPOINT"] = "https://api.langchain.plus"
+# os.environ.get("LANGCHAIN_API_KEY")
 
-version = "05.10.23."
+version = "28.10.23."
 
 st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
 st_style()
 
 
 def main():
-    client = Client()
+    # client = Client()
     side_zapisnik()
     # Read OpenAI API key from envtekst za
     openai.api_key = os.environ.get("OPENAI_API_KEY")
@@ -295,64 +298,114 @@ def main():
                 # Generate the summary by running the chain on the input documents and store it in an AIMessage object
                 st.write(st.session_state.dld)  # Displaying the summary
 
-    if prompt := st.chat_input(placeholder="Unesite komentare na rad programa."):
-        st.session_state["user_feedback"] = prompt
-        st.chat_input(placeholder="Feedback je sačuvan!", disabled=True)
-        st.session_state.feedback = None
-        st.session_state.feedback_update = None
-        run_collector = RunCollectorCallbackHandler()
+    # if prompt := st.chat_input(placeholder="Unesite komentare na rad programa."):
+    #     st.session_state["user_feedback"] = prompt
+    #     st.chat_input(placeholder="Feedback je sačuvan!", disabled=True)
+    #     st.session_state.feedback = None
+    #     st.session_state.feedback_update = None
+    #     run_collector = RunCollectorCallbackHandler()
 
-        prompt = ChatPromptTemplate.from_messages([("system", "Hi"), ("human", "Hi")])
-        llm = ChatOpenAI(temperature=0.7)
-        chain = LLMChain(prompt=prompt, llm=llm)
+    #     prompt = ChatPromptTemplate.from_messages([("system", "Hi"), ("human", "Hi")])
+    #     llm = ChatOpenAI(temperature=0.7)
+    #     chain = LLMChain(prompt=prompt, llm=llm)
 
-        x = chain.invoke(
-            {"input": "Hi."},
-            config=RunnableConfig(
-                callbacks=[run_collector],
-                tags=["Streamlit Chat"],
-            ),
-        )["text"]
+    #     x = chain.invoke(
+    #         {"input": "Hi."},
+    #         config=RunnableConfig(
+    #             callbacks=[run_collector],
+    #             tags=["Streamlit Chat"],
+    #         ),
+    #     )["text"]
 
-        run = run_collector.traced_runs[0]
-        run_collector.traced_runs = []
-        st.session_state.run_id = run.id
-        wait_for_all_tracers()
-        try:
-            client.share_run(run.id)
-        except ValueError:
-            st.write("...")
+    #     run = run_collector.traced_runs[0]
+    #     run_collector.traced_runs = []
+    #     st.session_state.run_id = run.id
+    #     wait_for_all_tracers()
+    #     try:
+    #         client.share_run(run.id)
+    #     except ValueError:
+    #         st.write("...")
 
-    if st.session_state.get("run_id"):
-        with st.chat_message("assistant", avatar="🤖"):
-            message_placeholder = st.empty()
-            message_placeholder.markdown(
-                ":rainbow[Samo još ocenite od 1 do 5 dobijene rezultate.]"
+    # if st.session_state.get("run_id"):
+    #     with st.chat_message("assistant", avatar="🤖"):
+    #         message_placeholder = st.empty()
+    #         message_placeholder.markdown(
+    #             ":rainbow[Samo još ocenite od 1 do 5 dobijene rezultate.]"
+    #         )
+    #     feedback = streamlit_feedback(
+    #         feedback_type="faces", key=f"feedback_{st.session_state.run_id}"
+    #     )
+    #     scores = {"😞": 1, "🙁": 2, "😐": 3, "🙂": 4, "😀": 5}
+    #     if feedback:
+    #         score = scores[feedback["score"]]
+    #         feedback = client.create_feedback(
+    #             st.session_state.run_id,
+    #             "ocena",
+    #             score=score,
+    #             comment=st.session_state["user_feedback"],
+    #         )
+    #         st.session_state.feedback = {
+    #             "feedback_id": str(feedback.id),
+    #             "score": score,
+    #         }
+
+    # if st.session_state.get("feedback"):
+    #     feedback = st.session_state.get("feedback")
+    #     x = ["🎭", "🐯", "👺", "👻", "😸", "🤓", "🤡", "🦄", "🧟‍♀️", "☘️"]
+    #     st.write(
+    #         f"{x[randint(0, len(x) - 1)]} Ova aplikacija NE radi iterativno - mora refresh stranice!"
+    #     )
+    #     st.chat_input(placeholder="To je to - hvala puno!", disabled=True)
+
+
+def korekcija_transkripta():
+    uploaded_file = st.file_uploader("Transkript", type=["txt"])
+    ceo_text = " "
+    if uploaded_file is not None:
+        with st.form(key="ispravi_transkript"):
+            submit_button = st.form_submit_button(
+                label="Ispravi transkript",
+                help="Ispravlja transkript na srpskom jeziku",
             )
-        feedback = streamlit_feedback(
-            feedback_type="faces", key=f"feedback_{st.session_state.run_id}"
-        )
-        scores = {"😞": 1, "🙁": 2, "😐": 3, "🙂": 4, "😀": 5}
-        if feedback:
-            score = scores[feedback["score"]]
-            feedback = client.create_feedback(
-                st.session_state.run_id,
-                "ocena",
-                score=score,
-                comment=st.session_state["user_feedback"],
-            )
-            st.session_state.feedback = {
-                "feedback_id": str(feedback.id),
-                "score": score,
-            }
+            if submit_button:
+                transkript = uploaded_file.getvalue().decode("utf-8")
+                text_splitter = RecursiveCharacterTextSplitter(
+                    # Set a really small chunk size, just to show.
+                    chunk_size=10000,
+                    chunk_overlap=0,
+                    length_function=len,
+                    is_separator_regex=False,
+                )
 
-    if st.session_state.get("feedback"):
-        feedback = st.session_state.get("feedback")
-        x = ["🎭", "🐯", "👺", "👻", "😸", "🤓", "🤡", "🦄", "🧟‍♀️", "☘️"]
-        st.write(
-            f"{x[randint(0, len(x) - 1)]} Ova aplikacija NE radi iterativno - mora refresh stranice!"
-        )
-        st.chat_input(placeholder="To je to - hvala puno!", disabled=True)
+                texts = text_splitter.create_documents([transkript])
+                chat = ChatOpenAI(temperature=0, model="gpt-3.5-turbo-16k")
+                ceo_text = " "
+
+                with st.spinner("Ispravlja se transkript..."):
+                    placeholder = st.empty()
+                    total_texts = len(texts)
+                    for i, text in enumerate(texts, start=1):
+                        with placeholder:
+                            st.info(f"Obradjuje se {i} od {total_texts} strana")
+                        txt = text.page_content
+                        messages = [
+                            SystemMessage(
+                                content="You are the Serbian language expert. you must fix grammar and spelling errors but otherwise keep the text as is, in the Serbian language."
+                            ),
+                            HumanMessage(content=txt),
+                        ]
+                        odgovor = chat.invoke(messages).content
+                        ceo_text = ceo_text + " " + odgovor
+
+                    # na kraju ih sve slepi u jedan dokument i sacuva ga u fajl
+                    with placeholder:
+                        st.success("Zavrsena obrada transkripta")
+        if ceo_text != " ":
+            st.download_button(
+                "Preuzmite ispravljen transkript",
+                ceo_text,
+                file_name=f"korigovan_{uploaded_file.name}",
+            )
 
 
 def korekcija_imena():
@@ -533,11 +586,13 @@ def side_zapisnik():
     with st.sidebar:
         izbor_app = st.selectbox(
             "Izaberite pomoćnu akciju",
-            ("Transkript", "Korekcija imena"),
+            ("Transkript", "Korekcija transkripta", "Korekcija imena"),
             help="Odabir akcije za pripremu zapisnika",
         )
         if izbor_app == "Transkript":
             transkript()
+        elif izbor_app == "Korekcija transkripta":
+            korekcija_transkripta()
         elif izbor_app == "Korekcija imena":
             korekcija_imena()
 
