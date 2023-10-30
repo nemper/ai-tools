@@ -190,7 +190,7 @@ def main():
                 return [v * alpha for v in dense], hs
 
             def hybrid_query(question, top_k, alpha):
-                bm25 = BM25Encoder().default()
+                bm25 = BM25Encoder().fit([question])
                 sparse_vector = bm25.encode_queries(question)
                 dense_vector = get_embedding(question)
                 hdense, hsparse = hybrid_score_norm(
