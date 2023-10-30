@@ -116,7 +116,17 @@ def our_custom_agent(question: str, session_state: dict):
             )
 
         return str(csv_agent.run(dumps({"input": upit})))
-        
+    """
+    Tool(
+    name="CSV search",
+    func=csv_file_analyzer,
+    verbose=True,
+    description="""
+    # This tool should be use when you are asked about structured data, e.g: numbers, counts or sums.
+    """,
+    direct_output=True,
+    ),
+    """
 
     # All Tools
     tools = [
@@ -141,15 +151,6 @@ def our_custom_agent(question: str, session_state: dict):
             It uses machine learning models for semantic understanding and also matches specific keywords in the database. \
             This tool is ideal when you need the flexibility of semantic understanding and the precision of keyword matching.
             """,
-            ),
-        Tool(
-            name="CSV search",
-            func=csv_file_analyzer,
-            verbose=True,
-            description="""
-            This tool should be use when you are asked about structured data, e.g: numbers, counts or sums.
-            """,
-            direct_output=True,
             ),
         ]
 
