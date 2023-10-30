@@ -157,7 +157,8 @@ def our_custom_agent(question: str, session_state: dict):
             The Semantic Search tool is used to understand the intent and contextual meaning of a query. \
             By analyzing the semantics of the query, it can retrieve information that is not just keyword-based but also contextually relevant. \
             This makes it particularly useful when dealing with complex queries or when searching for information in large, unstructured data sets. 
-            Please note that the quality and relevance of results may depend on the specificity of your query. This tool is relevant if the query is about Positive doo.
+            Please note that the quality and relevance of results may depend on the specificity of your query. 
+            This tool is relevant if the query is about Positive doo.
             """,
             ),
         Tool(
@@ -166,6 +167,8 @@ def our_custom_agent(question: str, session_state: dict):
             verbose=True,
             description="""
             This tool should be use when you are asked about structured data, e.g: numbers, counts or sums. This tool is relevant if the query is about Positive doo.
+            Extremely important: when using this tool send it only the python code (with lowercase when searching for matches) that solves the problem. \
+            Do not send any extra text/explanations.
             """,
             direct_output=True,
             ),
@@ -186,8 +189,7 @@ def our_custom_agent(question: str, session_state: dict):
     Thought: I now know the final answer
     Final Answer: the final answer to the original input question; ALWAYS write in Serbian language
 
-    Always apply lowercase when searching for any matches.
-    One very important information: if you get a Python code from the tool, you should invoke that code to the tool to give the results, not the code itself.
+    One very important information: if you get a Python code from the tool, you should invoke that code to the tool to give the results.
     Begin!
 
     Question: {input}
