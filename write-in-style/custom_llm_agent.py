@@ -1,12 +1,3 @@
-"""
-                   _|¯|_            
-                ¯\__(ツ)__/¯   
-                    [  ]
-                     []
-                    / /
-                  _/ /_           
-"""
-
 
 def our_custom_agent(question: str, session_state: dict):
     from langchain.agents import (
@@ -36,7 +27,6 @@ def our_custom_agent(question: str, session_state: dict):
     from json import dumps
     from re import search, DOTALL
     from typing import List, Union
-    import pandas as pd
     from openai import Embedding
     import pinecone
     from pinecone_text.sparse import BM25Encoder
@@ -47,15 +37,22 @@ def our_custom_agent(question: str, session_state: dict):
     # Tool #1 Web search
     web_search = GoogleSerperAPIWrapper(environment=environ["SERPER_API_KEY"])
 
-    # Tool #2 Pinecone Hybrid search
-    def hybrid_search_process(upit):
+
+    # Tools #2 & #3 Pinecone Hybrid search
+    def hybrid_search_process_alpha1(upit):
+        return hybrid_search_process(upit, 0.1)
+
+
+    def hybrid_search_process_alpha2(upit):
+        return hybrid_search_process(upit, 0.9)
+    
+
+    def hybrid_search_process(upit, alpha):
         pinecone.init(
             api_key=environ["PINECONE_API_KEY_POS"],
             environment=environ["PINECONE_ENVIRONMENT_POS"],
         )
         index = pinecone.Index("bis")
-
-        alpha = session_state["alpha"]
 
         def hybrid_query():
             get_embedding = (
@@ -65,7 +62,6 @@ def our_custom_agent(question: str, session_state: dict):
                 )["data"][0]["embedding"]
             )
 
-            # alpha * dense + (1 - alpha) * sparse
             hybrid_score_norm = (
                 lambda dense, sparse, alpha: (
                     [v * alpha for v in dense],
@@ -79,8 +75,8 @@ def our_custom_agent(question: str, session_state: dict):
             )
 
             hdense, hsparse = hybrid_score_norm(
+                sparse = BM25Encoder().fit([upit]).encode_queries(upit),
                 dense=get_embedding(upit),
-                sparse=BM25Encoder().default().encode_queries(upit),
                 alpha=alpha,
             )
 
@@ -90,51 +86,43 @@ def our_custom_agent(question: str, session_state: dict):
                 sparse_vector=hsparse,
                 include_metadata=True,
                 namespace=session_state["namespace"],
-            ).to_dict()
+                ).to_dict()
 
         session_state["tematika"] = hybrid_query()
 
         uk_teme = ""
         for _, item in enumerate(session_state["tematika"]["matches"]):
-            if item["score"] > session_state["score"]:
+            if item["score"] > 0.05:    # session_state["score"]
                 uk_teme += item["metadata"]["context"] + "\n\n"
 
         system_message = SystemMessagePromptTemplate.from_template(
             template=session_state["stil"]
-        ).format()
+            ).format()
 
         human_message = HumanMessagePromptTemplate.from_template(
             template=open_file("prompt_FT.txt")
-        ).format(
-            zahtev=question,
-            uk_teme=uk_teme,
-            ft_model=session_state["model"],
-        )
+            ).format(
+                zahtev=question,
+                uk_teme=uk_teme,
+                ft_model=session_state["model"],
+                )
 
         return ChatPromptTemplate(messages=[system_message, human_message])
 
-    # Tool #3 CSV search
+    # Tool #4 CSV search
     def csv_file_analyzer(upit):
-        csv_agent = create_csv_agent(
-            ChatOpenAI(temperature=0.0, model_name="gpt-4", verbose=True),
-            session_state["uploaded_file"].name,
-            verbose=True,
-            agent_type=AgentType.OPENAI_FUNCTIONS,
-            handle_parsing_errors=True,
-        )
+        if session_state["uploaded_file"]:
+            csv_agent = create_csv_agent(
+                ChatOpenAI(temperature=0.0, model_name="gpt-4", verbose=True),
+                session_state["uploaded_file"].name,
+                verbose=True,
+                agent_type=AgentType.OPENAI_FUNCTIONS,
+                handle_parsing_errors=True,
+            )
+            return str(csv_agent.run(dumps({"input": upit})))
+        else:
+            return "Niste odabrali CSV fajl za pretragu."
 
-        return str(csv_agent.run(dumps({"input": upit})))
-    """
-    Tool(
-    name="CSV search",
-    func=csv_file_analyzer,
-    verbose=True,
-    description="""
-    # This tool should be use when you are asked about structured data, e.g: numbers, counts or sums.
-    """,
-    direct_output=True,
-    ),
-    """
 
     # All Tools
     tools = [
@@ -144,22 +132,42 @@ def our_custom_agent(question: str, session_state: dict):
             verbose=True,
             description="""
             This tool uses Google Search to find the most relevant and up-to-date information on the web. \
-            It accepts a query string as input and returns a list of search results, including web pages, news articles, images, and more. \
-            This tool is particularly useful when you need comprehensive information on a specific topic (that isn't related to the company Positive doo), \
-            want to explore different viewpoints, or are looking for the latest news.
-            Please note that the quality and relevance of results may depend on the specificity of your query. The input must not include the word 'Positive'.
+            This tool is particularly useful when you need comprehensive information on a specific topic, \
+            want to explore different viewpoints, or are looking for the latest news and data.
+            Please note that the quality and relevance of results may depend on the specificity of your query. Never use this tool when asked about Positive doo.
             """,
         ),
         Tool(
-            name="Pinecone Hybrid search",
-            func=hybrid_search_process,
+            name="Pinecone Keyword search",
+            func=hybrid_search_process_alpha1,
             verbose=True,
-            direct_output=True,
             description="""
-            This tool combines the capabilities of Pinecone's semantic and keyword search to provide a comprehensive search solution. \
-            It uses machine learning models for semantic understanding and also matches specific keywords in the database. \
-            This tool is ideal when you need the flexibility of semantic understanding and the precision of keyword matching.
+            The Keyword Search tool is used to find exact matches for the terms in your query. \
+            It scans through the data and retrieves all instances where the keywords appear. \
+            This makes it particularly useful when you are looking for specific information and know the exact terms to search for.
+            However, it may not capture all relevant information if synonyms or related terms are used instead of the exact keywords. \
+            Please note that the quality and relevance of results may depend on the specificity of your query. This tool is relevant if the query is about Positive doo.
             """,
+            ),
+        Tool(
+            name="Pinecone Semantic search",
+            func=hybrid_search_process_alpha2,
+            verbose=True,
+            description="""
+            The Semantic Search tool is used to understand the intent and contextual meaning of a query. \
+            By analyzing the semantics of the query, it can retrieve information that is not just keyword-based but also contextually relevant. \
+            This makes it particularly useful when dealing with complex queries or when searching for information in large, unstructured data sets. 
+            Please note that the quality and relevance of results may depend on the specificity of your query. This tool is relevant if the query is about Positive doo.
+            """,
+            ),
+        Tool(
+            name="CSV search",
+            func=csv_file_analyzer,
+            verbose=True,
+            description="""
+            This tool should be use when you are asked about structured data, e.g: numbers, counts or sums. This tool is relevant if the query is about Positive doo.
+            """,
+            direct_output=True,
             ),
         ]
 
@@ -174,10 +182,12 @@ def our_custom_agent(question: str, session_state: dict):
     Action: the action to take, should be one of [{tool_names}]
     Action Input: the input to the action
     Observation: the result of the action
-    ... (this Thought/Action/Action Input/Observation can repeat up to 3 times, if necessary)
+    ... (this Thought/Action/Action Input/Observation can repeat multiple times, if necessary)
     Thought: I now know the final answer
-    Final Answer: the final answer to the original input question
+    Final Answer: the final answer to the original input question; ALWAYS write in Serbian language
 
+    Always apply lowercase when searching for any matches.
+    One very important information: if you get a Python code from the tool, you should invoke that code to the tool to give the results, not the code itself.
     Begin!
 
     Question: {input}
