@@ -7,15 +7,16 @@
                   _/ /_           
 """
 
+
 def our_custom_agent(question: str, session_state: dict):
     from langchain.agents import (
-        Tool, 
+        Tool,
         AgentType,
-        AgentExecutor, 
-        LLMSingleActionAgent, 
+        AgentExecutor,
+        LLMSingleActionAgent,
         AgentOutputParser,
-        create_csv_agent
-        )
+        create_csv_agent,
+    )
     from langchain.chains import LLMChain
     from langchain.chat_models import ChatOpenAI
     from langchain.prompts.chat import (
@@ -23,12 +24,12 @@ def our_custom_agent(question: str, session_state: dict):
         HumanMessagePromptTemplate,
         ChatPromptTemplate,
         StringPromptTemplate,
-        )
+    )
     from langchain.schema import (
-        AgentAction, 
-        AgentFinish, 
+        AgentAction,
+        AgentFinish,
         OutputParserException,
-        )
+    )
     from langchain.utilities import GoogleSerperAPIWrapper
 
     from os import environ
@@ -41,7 +42,6 @@ def our_custom_agent(question: str, session_state: dict):
     from pinecone_text.sparse import BM25Encoder
     from myfunc.mojafunkcija import open_file
 
-
     environ.get("OPENAI_API_KEY")
 
     # Tool #1 Web search
@@ -52,68 +52,76 @@ def our_custom_agent(question: str, session_state: dict):
         pinecone.init(
             api_key=environ["PINECONE_API_KEY_POS"],
             environment=environ["PINECONE_ENVIRONMENT_POS"],
-            )
+        )
         index = pinecone.Index("bis")
 
-        alpha=session_state["alpha"]
+        alpha = session_state["alpha"]
+
         def hybrid_query():
-            get_embedding = lambda text, model="text-embedding-ada-002": Embedding.create(
-                input=[text.replace("\n", " ")], 
-                model=model,
+            get_embedding = (
+                lambda text, model="text-embedding-ada-002": Embedding.create(
+                    input=[text.replace("\n", " ")],
+                    model=model,
                 )["data"][0]["embedding"]
+            )
 
             # alpha * dense + (1 - alpha) * sparse
-            hybrid_score_norm = lambda dense, sparse, alpha: (
-                [v * alpha for v in dense], 
-                {"indices": sparse["indices"], 
-                "values": [v * (1 - alpha) for v in sparse["values"]],
-                }
-                ) if 0 <= alpha <= 1 else ValueError("Alpha must be between 0 and 1")
+            hybrid_score_norm = (
+                lambda dense, sparse, alpha: (
+                    [v * alpha for v in dense],
+                    {
+                        "indices": sparse["indices"],
+                        "values": [v * (1 - alpha) for v in sparse["values"]],
+                    },
+                )
+                if 0 <= alpha <= 1
+                else ValueError("Alpha must be between 0 and 1")
+            )
 
             hdense, hsparse = hybrid_score_norm(
-                dense=get_embedding(upit), 
-                sparse=BM25Encoder().default().encode_queries(upit), 
-                alpha=alpha
-                )
-            
-            return index.query(top_k=session_state["broj_k"], 
-                            vector=hdense,
-                            sparse_vector=hsparse,
-                            include_metadata=True,
-                            namespace=session_state["namespace"],
-                            ).to_dict()
+                dense=get_embedding(upit),
+                sparse=BM25Encoder().default().encode_queries(upit),
+                alpha=alpha,
+            )
+
+            return index.query(
+                top_k=session_state["broj_k"],
+                vector=hdense,
+                sparse_vector=hsparse,
+                include_metadata=True,
+                namespace=session_state["namespace"],
+            ).to_dict()
 
         session_state["tematika"] = hybrid_query()
-        
+
         uk_teme = ""
         for _, item in enumerate(session_state["tematika"]["matches"]):
             if item["score"] > session_state["score"]:
                 uk_teme += item["metadata"]["context"] + "\n\n"
 
-
         system_message = SystemMessagePromptTemplate.from_template(
             template=session_state["stil"]
-            ).format()
-        
+        ).format()
+
         human_message = HumanMessagePromptTemplate.from_template(
             template=open_file("prompt_FT.txt")
-            ).format(zahtev=question, 
-                    uk_teme=uk_teme, 
-                    ft_model=session_state["model"],
-                    )
-        
+        ).format(
+            zahtev=question,
+            uk_teme=uk_teme,
+            ft_model=session_state["model"],
+        )
+
         return ChatPromptTemplate(messages=[system_message, human_message])
 
     # Tool #3 CSV search
     def csv_file_analyzer(upit):
-
         csv_agent = create_csv_agent(
             ChatOpenAI(temperature=0.0, model_name="gpt-4", verbose=True),
             session_state["uploaded_file"].name,
             verbose=True,
             agent_type=AgentType.OPENAI_FUNCTIONS,
             handle_parsing_errors=True,
-            )
+        )
 
         return str(csv_agent.run(dumps({"input": upit})))
     """
@@ -141,11 +149,12 @@ def our_custom_agent(question: str, session_state: dict):
             want to explore different viewpoints, or are looking for the latest news.
             Please note that the quality and relevance of results may depend on the specificity of your query. The input must not include the word 'Positive'.
             """,
-            ),
+        ),
         Tool(
             name="Pinecone Hybrid search",
             func=hybrid_search_process,
             verbose=True,
+            direct_output=True,
             description="""
             This tool combines the capabilities of Pinecone's semantic and keyword search to provide a comprehensive search solution. \
             It uses machine learning models for semantic understanding and also matches specific keywords in the database. \
@@ -153,7 +162,6 @@ def our_custom_agent(question: str, session_state: dict):
             """,
             ),
         ]
-
 
     template = """Answer the following questions as best you can. You have access to the following tools:
     {tools}
@@ -175,60 +183,71 @@ def our_custom_agent(question: str, session_state: dict):
     Question: {input}
     {agent_scratchpad}"""
 
-
     class CustomPromptTemplate(StringPromptTemplate):
         template: str
         tools: List[Tool]
 
         def format(self, **kwargs) -> str:
-            intermediate_steps = kwargs.pop("intermediate_steps")   # Get the intermediate steps (AgentAction, Observation tuples)
+            intermediate_steps = kwargs.pop(
+                "intermediate_steps"
+            )  # Get the intermediate steps (AgentAction, Observation tuples)
 
-            kwargs["agent_scratchpad"] = "".join([f"{action.log}\nObservation: {observation}\nThought: " for action, observation in intermediate_steps])
-            kwargs["tools"] = "\n".join([f"{tool.name}: {tool.description}" for tool in self.tools])
+            kwargs["agent_scratchpad"] = "".join(
+                [
+                    f"{action.log}\nObservation: {observation}\nThought: "
+                    for action, observation in intermediate_steps
+                ]
+            )
+            kwargs["tools"] = "\n".join(
+                [f"{tool.name}: {tool.description}" for tool in self.tools]
+            )
             kwargs["tool_names"] = ", ".join([tool.name for tool in self.tools])
 
             return self.template.format(**kwargs)
 
-
     class CustomOutputParser(AgentOutputParser):
-
         def parse(self, llm_output: str) -> Union[AgentAction, AgentFinish]:
             if "Final Answer:" in llm_output:
                 return AgentFinish(
                     # Return values is a dictionary with a single `output` key
-                    return_values={"output": llm_output.split("Final Answer:")[-1].strip()},
+                    return_values={
+                        "output": llm_output.split("Final Answer:")[-1].strip()
+                    },
                     log=llm_output,
-                    )
-            match = search(
-                pattern=r"Action\s*\d*\s*:(.*?)\nAction\s*\d*\s*Input\s*\d*\s*:[\s]*(.*)", 
-                string=llm_output, 
-                flags=DOTALL,
                 )
+            match = search(
+                pattern=r"Action\s*\d*\s*:(.*?)\nAction\s*\d*\s*Input\s*\d*\s*:[\s]*(.*)",
+                string=llm_output,
+                flags=DOTALL,
+            )
             if not match:
-                raise OutputParserException(f"Could not parse LLM output: `{llm_output}`")
-            
+                raise OutputParserException(
+                    f"Could not parse LLM output: `{llm_output}`"
+                )
+
             # action, action input and logs
             return AgentAction(
-                tool=match.group(1).strip(), 
-                tool_input=match.group(2).strip(" ").strip('"'), 
+                tool=match.group(1).strip(),
+                tool_input=match.group(2).strip(" ").strip('"'),
                 log=llm_output,
-                )
-
+            )
 
     llm_chain = LLMChain(
-        llm=ChatOpenAI(temperature=0, model_name="gpt-4", verbose=True), 
+        llm=ChatOpenAI(temperature=0, model_name="gpt-4", verbose=True),
         prompt=CustomPromptTemplate(
             template=template,
             tools=tools,
             input_variables=["input", "intermediate_steps"],
-            )
-        )
-    
+        ),
+    )
+
     agent = LLMSingleActionAgent(
         llm_chain=llm_chain,
         output_parser=CustomOutputParser(),
         stop=["\nObservation:"],
         allowed_tools=[tool.name for tool in tools],
-        )
-    
-    return AgentExecutor.from_agent_and_tools(agent=agent, tools=tools, verbose=True).run(question)
+    )
+
+    return AgentExecutor.from_agent_and_tools(
+        agent=agent, tools=tools, verbose=True
+    ).run(question)
