@@ -523,7 +523,8 @@ def korekcija_imena():
 
 def transkript():
     # Read OpenAI API key from env
-
+    from openai import OpenAI
+    client = OpenAI()
     with st.sidebar:  # App start
         st.info("Konvertujte MP3 u TXT")
         audio_file = st.file_uploader(
@@ -564,8 +565,8 @@ def transkript():
 
                 if submit_button:
                     with st.spinner("Sačekajte trenutak..."):
-                        transcript = openai.Audio.transcribe(
-                            "whisper-1", audio_file, language=jezik
+                        transcript = client.audio.transcriptions.create(
+                            model="whisper-1", file=audio_file, language=jezik
                         )
                         # transcript_dict = {"text": transcript.text}
                         transcritpt_text = transcript.text

@@ -35,7 +35,7 @@ jsonpatch==1.33
 jsonpointer==2.4
 jsonschema==4.19.2
 jsonschema-specifications==2023.7.1
-langchain==0.0.330
+langchain==0.0.332
 langsmith==0.0.57
 loguru==0.7.2
 lxml==4.9.3
@@ -50,7 +50,7 @@ myfunc @ git+https://github.com/djordjethai/myfunc.git
 mypy-extensions==1.0.0
 nltk==3.8.1
 numpy==1.26.1
-openai==0.28.1
+openai==1.2.3
 packaging==23.2
 pandas==2.1.2
 pdfkit==1.0.0
@@ -83,6 +83,7 @@ soupsieve==2.5
 SQLAlchemy==2.0.23
 streamlit==1.28.1
 streamlit-authenticator==0.2.3
+streamlit-superapp==1.1.0
 streamlit-javascript==0.1.5
 streamlit_feedback==0.1.2
 tenacity==8.2.3
