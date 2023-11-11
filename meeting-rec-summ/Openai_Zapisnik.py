@@ -56,7 +56,7 @@ Dobrodošli na alat za sažimanje teksta i transkribovanje zvučnih zapisa! Ovaj
 
 2. **Unos Promptova**
    - Unesite instrukcije za sažimanje u polje "Unesite instrukcije za sumarizaciju". Ovo vam omogućava da precizirate želje za sažimanje.
-   - Opciono mozete učitati prethodno sačuvani .txt fajl sa promptovima u opciji "Izaberite prompt koji možete editovati ili pišite prompt od pocetka".
+   - Opciono mozete učitati prethodno sačuvani .txt fajl sa promptovima u opciji "Izaberite prompt koji možete editovati, prihvatite default tekst ili pišite prompt od početka".
  
 **Generisanje Sažetka**
    - Pritisnite dugme "Submit" kako biste pokrenuli proces sažimanja. Sažetak će se prikazati u prozoru "Sažetak". Takođe, imate opciju preuzimanja sažetka kao .txt, .docx i .pdf.
@@ -112,7 +112,7 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
         )
 
         prva_file = st.file_uploader(
-            "Izaberite prompt koji možete editovati ili pišite prompt od pocetka",
+            "Izaberite prompt koji možete editovati, prihvatite default tekst ili pišite prompt od početka",
             key="upload_prva",
             type="txt",
             help = "Odabir dokumenta",
@@ -120,7 +120,9 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
         if prva_file is not None:
             prva = prva_file.getvalue().decode("utf-8")  # Loading text from the file
         else:
-            prva = " "
+            prva = """Write a one page summary. Be sure to describe every topic and the name used in the text. \
+Write it as a newspaper article. Write only in Serbian language. Give it a Title and subtitles where appropriate \
+and use markdown such is H1, H2, etc."""
 
         with io.open(uploaded_file.name, "wb") as file:
             file.write(uploaded_file.getbuffer())
