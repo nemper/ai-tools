@@ -161,7 +161,7 @@ def our_custom_agent(question: str, session_state: dict):
             + upit)
         return agent_executor.run(upit)
     
-    tools = load_tools(["Web search", "Pinecone Keyword search", "Pinecone Semantic search", "SQL search"], llm=OpenAI(model="gpt-3.5-turbo-instruct", temperature=0))
+    tools = load_tools(tool_names=["Web search", "Pinecone Keyword search", "Pinecone Semantic search", "SQL search"])
 
     template = """Answer the following questions as best you can. You have access to the following tools:
     {tools}
