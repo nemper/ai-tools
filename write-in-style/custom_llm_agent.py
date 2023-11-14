@@ -25,6 +25,7 @@ def our_custom_agent(question: str, session_state: dict):
     from langchain.sql_database import SQLDatabase
     from langchain.utilities import GoogleSerperAPIWrapper
     from langchain.llms.openai import OpenAI
+    from langchain.tools import tool
 
     from os import environ
     from json import dumps
@@ -38,7 +39,9 @@ def our_custom_agent(question: str, session_state: dict):
     environ.get("OPENAI_API_KEY")
 
     # Tool #1 Web search
-    web_search = GoogleSerperAPIWrapper(environment=environ["SERPER_API_KEY"])
+    @tool
+    def web_search():
+        return GoogleSerperAPIWrapper(environment=environ["SERPER_API_KEY"])
 
 
     # Tools #2 & #3 Pinecone Hybrid search
@@ -49,7 +52,7 @@ def our_custom_agent(question: str, session_state: dict):
     def hybrid_search_process_alpha2(upit):
         return hybrid_search_process(upit, 0.9)
     
-
+    @tool
     def hybrid_search_process(upit, alpha):
         pinecone.init(
             api_key=environ["PINECONE_API_KEY_POS"],
@@ -113,24 +116,22 @@ def our_custom_agent(question: str, session_state: dict):
         return ChatPromptTemplate(messages=[system_message, human_message])
 
     # Tool #4 CSV search
+    @tool
     def sql_file_analyzer(upit):
-        if session_state["uploaded_file"]:
-            db = SQLDatabase.from_uri(f"mysql+pymysql://root:CrimsonRed_1@localhost:3306/test1")
-            toolkit = SQLDatabaseToolkit(db=db, llm=OpenAI(model="gpt-3.5-turbo-instruct", temperature=0))
-            # ovde moze Chat model, ali treba dodati i handle_parsing_errors=True
-            agent_executor = create_sql_agent(
-                llm=ChatOpenAI(temperature=0),
-                toolkit=toolkit,
-                verbose=True,
-                agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-                handle_parsing_errors=True,
-            )
-            upit = (
-                "Show only top 5 results for the query. If you can not find the answer, say I don.t know. When using LIKE allways add N in fornt of '%  " 
-                + upit)
-            return agent_executor.run(upit)
-        else:
-            return "Niste odabrali CSV fajl za pretragu."
+        db = SQLDatabase.from_uri(f"mysql+pymysql://root:CrimsonRed_1@localhost:3306/test1")
+        toolkit = SQLDatabaseToolkit(db=db, llm=OpenAI(model="gpt-3.5-turbo-instruct", temperature=0))
+        # ovde moze Chat model, ali treba dodati i handle_parsing_errors=True
+        agent_executor = create_sql_agent(
+            llm=ChatOpenAI(temperature=0),
+            toolkit=toolkit,
+            verbose=True,
+            agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+            handle_parsing_errors=True,
+        )
+        upit = (
+            "Show only top 5 results for the query. If you can not find the answer, say I don.t know. When using LIKE allways add N in fornt of '%  " 
+            + upit)
+        return agent_executor.run(upit)
 
 
     # All Tools
