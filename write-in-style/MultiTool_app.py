@@ -61,15 +61,6 @@ def main():
             key="broj_k_key",
             help="Broj dokumenata koji se vraćaju iz indeksa",
             )
-        st.session_state["alpha"] = st.slider(
-            label="Set alpha",
-            min_value=0.0, 
-            max_value=1.0, 
-            value=0.5, 
-            step=0.1,
-            help="Koeficijent koji određuje koliko će biti zastupljena pretraga po ključnim rečima, \
-                a koliko po semantičkom značenju. 0-0.4 pretezno Kljucne reci , 0.5 podjednako, 0.6-1 pretezno semanticko znacenje",
-            )
         st.session_state["score"] = st.slider(
             label="Set score",
             min_value=0.00, 
@@ -100,12 +91,8 @@ def main():
                 "bisfull",
                 ),
             )
-        st.session_state["uploaded_file"] = st.file_uploader(
-            label="Choose a CSV file", accept_multiple_files=False, type="csv", key="csv_key",
-            )
-        if st.session_state["uploaded_file"] is not None:
-            with io.open(st.session_state["uploaded_file"].name, "wb") as file:
-                file.write(st.session_state["uploaded_file"].getbuffer())
+        st.session_state["uploaded_file"] = st.text_input(
+            label="Unesite naziv SQL baze", value="test1", key="sql_baza")
 
     zahtev = ""
     prompt_file = st.file_uploader(
