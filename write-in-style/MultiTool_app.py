@@ -24,8 +24,8 @@ def main():
         "tematika": "",
         "broj_k": 3,
         "stil": "",
-        "score": 0.9,
-        "uploaded_file": None
+        "score": 0.1,
+        "sql_base_name": "test1"
         }
     st.session_state = {**default_session_states, **st.session_state}
 
@@ -65,7 +65,7 @@ def main():
             label="Set score",
             min_value=0.00, 
             max_value=2.00, 
-            value=0.90, 
+            value=0.10, 
             step=0.01,
             help="Koeficijent koji određuje kolji će biti prag relevantnosti dokumenata uzetih u obzir za odgovore. \
                 0 je svi dokumenti, veci broj je stroziji kriterijum. Score u hybrid searchu moze biti proizvoljno veliki.",
@@ -91,7 +91,7 @@ def main():
                 "bisfull",
                 ),
             )
-        st.session_state["uploaded_file"] = st.text_input(
+        st.session_state["sql_base_name"] = st.text_input(
             label="Unesite naziv SQL baze", value="test1", key="sql_baza")
 
     zahtev = ""
