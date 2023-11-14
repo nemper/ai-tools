@@ -38,7 +38,7 @@ def our_custom_agent(question: str, session_state: dict):
     environ.get("OPENAI_API_KEY")
 
     # Tool #1 Web search
-    @tool("Web search", verbose=True)
+    @tool("Web search")
     def web_search():
         """
         This tool uses Google Search to find the most relevant and up-to-date information on the web. \
@@ -50,7 +50,7 @@ def our_custom_agent(question: str, session_state: dict):
 
 
     # Tools #2 & #3 Pinecone Hybrid search
-    @tool("Pinecone Keyword search", verbose=True)
+    @tool("Pinecone Keyword search")
     def hybrid_search_process_alpha1(upit):
         """
         The Keyword Search tool is used to find exact matches for the terms in your query. \
@@ -62,7 +62,7 @@ def our_custom_agent(question: str, session_state: dict):
         return hybrid_search_process(upit, 0.1)
 
 
-    @tool("Pinecone Semantic search", verbose=True)
+    @tool("Pinecone Semantic search")
     def hybrid_search_process_alpha2(upit):
         """
         The Semantic Search tool is used to understand the intent and contextual meaning of a query. \
@@ -138,7 +138,7 @@ def our_custom_agent(question: str, session_state: dict):
 
 
     # Tool #4 CSV search
-    @tool("SQL search", verbose=True, direct_output=True)
+    @tool("SQL search", return_direct=True)
     def sql_file_analyzer(upit):
         """
         This tool should be use when you are asked about structured data, e.g: numbers, counts or sums. This tool is relevant if the query is about Positive doo.
