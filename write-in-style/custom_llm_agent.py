@@ -39,7 +39,7 @@ def our_custom_agent(question: str, session_state: dict):
     environ.get("OPENAI_API_KEY")
 
     # Tool #1 Web search
-    @tool(name="Web search")
+    @tool("Web search")
     def web_search():
         """
         This tool uses Google Search to find the most relevant and up-to-date information on the web. \
