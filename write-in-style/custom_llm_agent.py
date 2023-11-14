@@ -40,14 +40,7 @@ def our_custom_agent(question: str, session_state: dict):
 
     # Tool #1 Web search
     # @tool("Web search")
-    def web_search():
-        """
-        This tool uses Google Search to find the most relevant and up-to-date information on the web. \
-        This tool is particularly useful when you need comprehensive information on a specific topic, \
-        want to explore different viewpoints, or are looking for the latest news and data.
-        Please note that the quality and relevance of results may depend on the specificity of your query. Never use this tool when asked about Positive doo.
-        """
-        return GoogleSerperAPIWrapper(environment=environ["SERPER_API_KEY"])
+    web_search = GoogleSerperAPIWrapper(environment=environ["SERPER_API_KEY"])
 
 
     # Tools #2 & #3 Pinecone Hybrid search
