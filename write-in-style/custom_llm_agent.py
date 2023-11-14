@@ -6,8 +6,9 @@ def our_custom_agent(question: str, session_state: dict):
         AgentExecutor,
         LLMSingleActionAgent,
         AgentOutputParser,
-        create_csv_agent,
+        create_sql_agent,
     )
+    from langchain.agents.agent_toolkits import SQLDatabaseToolkit
     from langchain.chains import LLMChain
     from langchain.chat_models import ChatOpenAI
     from langchain.prompts.chat import (
@@ -21,7 +22,9 @@ def our_custom_agent(question: str, session_state: dict):
         AgentFinish,
         OutputParserException,
     )
+    from langchain.sql_database import SQLDatabase
     from langchain.utilities import GoogleSerperAPIWrapper
+    from langchain.llms.openai import OpenAI
 
     from os import environ
     from json import dumps
@@ -110,16 +113,22 @@ def our_custom_agent(question: str, session_state: dict):
         return ChatPromptTemplate(messages=[system_message, human_message])
 
     # Tool #4 CSV search
-    def csv_file_analyzer(upit):
+    def sql_file_analyzer(upit):
         if session_state["uploaded_file"]:
-            csv_agent = create_csv_agent(
-                ChatOpenAI(temperature=0.0, model_name="gpt-4", verbose=True),
-                session_state["uploaded_file"].name,
+            db = SQLDatabase.from_uri(f"mysql+pymysql://root:CrimsonRed_1@localhost:3306/test1")
+            toolkit = SQLDatabaseToolkit(db=db, llm=OpenAI(model="gpt-3.5-turbo-instruct", temperature=0))
+            # ovde moze Chat model, ali treba dodati i handle_parsing_errors=True
+            agent_executor = create_sql_agent(
+                llm=ChatOpenAI(temperature=0),
+                toolkit=toolkit,
                 verbose=True,
-                agent_type=AgentType.OPENAI_FUNCTIONS,
+                agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
                 handle_parsing_errors=True,
             )
-            return str(csv_agent.run(dumps({"input": upit})))
+            upit = (
+                "Show only top 5 results for the query. If you can not find the answer, say I don.t know. When using LIKE allways add N in fornt of '%  " 
+                + upit)
+            return agent_executor.run(upit)
         else:
             return "Niste odabrali CSV fajl za pretragu."
 
@@ -162,8 +171,8 @@ def our_custom_agent(question: str, session_state: dict):
             """,
             ),
         Tool(
-            name="CSV search",
-            func=csv_file_analyzer,
+            name="SQL search",
+            func=sql_file_analyzer,
             verbose=True,
             description="""
             This tool should be use when you are asked about structured data, e.g: numbers, counts or sums. This tool is relevant if the query is about Positive doo.

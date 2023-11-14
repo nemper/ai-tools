@@ -113,7 +113,7 @@ def main():
         key="upload_prompt",
         type="txt",
         )
-    
+     
     with st.form(key="stilovi", clear_on_submit=False):
         zahtev = st.text_area(
             label="Opišite temu, iz oblasti Positive, ili opšte teme. Objasnite i formu željenog teksta: ",
