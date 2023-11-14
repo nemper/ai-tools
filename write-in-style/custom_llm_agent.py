@@ -38,7 +38,7 @@ def our_custom_agent(question: str, session_state: dict):
     environ.get("OPENAI_API_KEY")
 
     # Tool #1 Web search
-    @tool
+    @tool("Web search", verbose=True)
     def web_search():
         """
         This tool uses Google Search to find the most relevant and up-to-date information on the web. \
@@ -50,7 +50,7 @@ def our_custom_agent(question: str, session_state: dict):
 
 
     # Tools #2 & #3 Pinecone Hybrid search
-    @tool
+    @tool("Pinecone Keyword search", verbose=True)
     def hybrid_search_process_alpha1(upit):
         """
         The Keyword Search tool is used to find exact matches for the terms in your query. \
@@ -62,7 +62,7 @@ def our_custom_agent(question: str, session_state: dict):
         return hybrid_search_process(upit, 0.1)
 
 
-    @tool
+    @tool("Pinecone Semantic search", verbose=True)
     def hybrid_search_process_alpha2(upit):
         """
         The Semantic Search tool is used to understand the intent and contextual meaning of a query. \
@@ -138,7 +138,7 @@ def our_custom_agent(question: str, session_state: dict):
 
 
     # Tool #4 CSV search
-    @tool
+    @tool("SQL search", verbose=True, direct_output=True)
     def sql_file_analyzer(upit):
         """
         This tool should be use when you are asked about structured data, e.g: numbers, counts or sums. This tool is relevant if the query is about Positive doo.
@@ -159,32 +159,8 @@ def our_custom_agent(question: str, session_state: dict):
             "Show only top 5 results for the query. If you can not find the answer, say I don.t know. When using LIKE allways add N in fornt of '%  " 
             + upit)
         return agent_executor.run(upit)
-
-
-    # All Tools
-    tools = [
-        Tool(
-            name="Web search",
-            func=web_search.run,
-            verbose=True,
-        ),
-        Tool(
-            name="Pinecone Keyword search",
-            func=hybrid_search_process_alpha1,
-            verbose=True,
-            ),
-        Tool(
-            name="Pinecone Semantic search",
-            func=hybrid_search_process_alpha2,
-            verbose=True,
-            ),
-        Tool(
-            name="SQL search",
-            func=sql_file_analyzer,
-            verbose=True,
-            direct_output=True,
-            ),
-        ]
+    
+    tools = [web_search, hybrid_search_process_alpha1, hybrid_search_process_alpha2, sql_file_analyzer]
 
     template = """Answer the following questions as best you can. You have access to the following tools:
     {tools}
@@ -269,7 +245,7 @@ def our_custom_agent(question: str, session_state: dict):
         llm_chain=llm_chain,
         output_parser=CustomOutputParser(),
         stop=["\nObservation:"],
-        allowed_tools=[tool.name for tool in tools],
+        allowed_tools=tools,
     )
 
     return AgentExecutor.from_agent_and_tools(
