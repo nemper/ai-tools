@@ -5,6 +5,7 @@ def our_custom_agent(question: str, session_state: dict):
         AgentType,
         AgentExecutor,
         LLMSingleActionAgent,
+        load_tools,
         AgentOutputParser,
         create_sql_agent,
     )
@@ -160,7 +161,7 @@ def our_custom_agent(question: str, session_state: dict):
             + upit)
         return agent_executor.run(upit)
     
-    tools = [web_search, hybrid_search_process_alpha1, hybrid_search_process_alpha2, sql_file_analyzer]
+    tools = load_tools(["Web search", "Pinecone Keyword search", "Pinecone Semantic search", "SQL search"], llm=OpenAI(model="gpt-3.5-turbo-instruct", temperature=0))
 
     template = """Answer the following questions as best you can. You have access to the following tools:
     {tools}
