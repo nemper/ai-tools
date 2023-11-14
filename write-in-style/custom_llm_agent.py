@@ -217,7 +217,7 @@ def our_custom_agent(question: str, session_state: dict):
     Observation: the result of the action
     ... (this Thought/Action/Action Input/Observation can repeat multiple times, if necessary)
     Thought: I now know the final answer
-    Final Answer: the final answer to the original input question; ALWAYS write in Serbian language
+    Final Answer: the final answer to the original input question; ALWAYS write in Serbian language AND ALWAYS try to give a detailed answer
 
     One very important information: if you get a Python code from the tool, you should invoke that code to the tool to give the results.
     Begin!
