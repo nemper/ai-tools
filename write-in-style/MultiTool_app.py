@@ -22,7 +22,7 @@ def main():
         "namespace": "pravnik",
         "odgovor": "",
         "tematika": "",
-        "broj_k": 3,
+        "broj_k": 5,
         "stil": "",
         "score": 0.1,
         "sql_base_name": "test1"
@@ -55,8 +55,8 @@ def main():
         st.session_state["broj_k"] = st.number_input(
             label="Set number of returned documents",
             min_value=1, 
-            max_value=5,
-            value=3, 
+            max_value=10,
+            value=5, 
             step=1,
             key="broj_k_key",
             help="Broj dokumenata koji se vraćaju iz indeksa",
