@@ -16,7 +16,9 @@ from myfunc.mojafunkcija import st_style, positive_login, open_file, init_cond_l
 import markdown
 import pdfkit
 from pinecone_text.sparse import BM25Encoder
-import openai
+from openai import OpenAI
+
+client = OpenAI()
 
 version = "24.10.23. Hybrid - Alpha i Score"
 
@@ -166,7 +168,7 @@ def main():
 
             def get_embedding(text, model="text-embedding-ada-002"):
                 text = text.replace("\n", " ")
-                return openai.Embedding.create(input=[text], model=model)["data"][0][
+                return client.embeddings.create(input=[text], model=model)["data"][0][
                     "embedding"
                 ]
 

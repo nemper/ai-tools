@@ -1,7 +1,9 @@
 import os
 import sys
 import io
-import openai
+from openai import OpenAI
+
+client = OpenAI()
 import pinecone
 import streamlit as st
 from langchain.embeddings.openai import OpenAIEmbeddings
@@ -207,7 +209,7 @@ def hybrid_query(upit):
 
     def get_embedding(text, model="text-embedding-ada-002"):
         text = text.replace("\n", " ")
-        return openai.Embedding.create(input=[text], model=model)["data"][0][
+        return client.embeddings.create(input=[text], model=model)["data"][0][
             "embedding"
         ]
 
