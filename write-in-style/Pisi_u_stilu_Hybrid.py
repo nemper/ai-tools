@@ -20,7 +20,7 @@ from openai import OpenAI
 
 client = OpenAI()
 
-version = "24.10.23. Hybrid - Alpha i Score"
+version = "16.11.23. Hybrid - OpenAI"
 
 
 def main():
@@ -43,9 +43,9 @@ def main():
     if "text" not in st.session_state:
         st.session_state.text = "text"
     if "index_name" not in st.session_state:
-        st.session_state.index_name = "bis"
+        st.session_state.index_name = "positive"
     if "namespace" not in st.session_state:
-        st.session_state.namespace = "pravnikprazan"
+        st.session_state.namespace = "pravnik"
     if "odgovor" not in st.session_state:
         st.session_state.odgovor = ""
     if "tematika" not in st.session_state:
@@ -108,28 +108,15 @@ def main():
     # define model, vestorstore and retriever
     # vazno ako ne stavimo u session state, jako usporava jer inicijalizacija dugo traje!
 
-    index = pinecone.Index("bis")
+    index = pinecone.Index("positive")
 
     with st.sidebar:
         st.session_state.namespace = st.selectbox(
             "Odaberite oblast",
             (
-                "pravnikkraciprazan",
-                "pravnikkraciprefix",
-                "pravnikkracischema",
-                "pravnikkracifull",
-                "bishybridprazan",
-                "bishybridprefix",
-                "bishybridschema",
-                "bishybridfull",
-                "pravnikprazan",
-                "pravnikprefix",
-                "pravnikschema",
-                "pravnikfull",
-                "bisprazan",
-                "bisprefix",
-                "bisschema",
-                "bisfull",
+                "pravnik",
+                
+                "zapisnici",
             ),
         )
     zahtev = ""
@@ -168,9 +155,7 @@ def main():
 
             def get_embedding(text, model="text-embedding-ada-002"):
                 text = text.replace("\n", " ")
-                return client.embeddings.create(input=[text], model=model)["data"][0][
-                    "embedding"
-                ]
+                return client.embeddings.create(input=[text], model=model).data[0].embedding
 
             def hybrid_score_norm(dense, sparse, alpha: float):
                 """Hybrid score using a convex combination

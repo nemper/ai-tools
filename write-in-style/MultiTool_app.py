@@ -8,7 +8,7 @@ import streamlit as st
 from myfunc.mojafunkcija import st_style, positive_login, init_cond_llm
 from custom_llm_agent import our_custom_agent
 
-version = "27.10.23. Nemanja"
+version = "16.11.23. Dj OpenAI"
 
 st_style()
 
@@ -18,8 +18,8 @@ def main():
         "temp": 1.0,
         "alpha": 0.5,
         "text": "text",
-        "index_name": "bis",
-        "namespace": "pravnikprazan",
+        "index_name": "positive",
+        "namespace": "pravnik",
         "odgovor": "",
         "tematika": "",
         "broj_k": 3,
@@ -73,22 +73,9 @@ def main():
         st.session_state["namespace"] = st.selectbox(
             label="Odaberite oblast",
             options=(
-                "pravnikkraciprazan",
-                "pravnikkraciprefix",
-                "pravnikkracischema",
-                "pravnikkracifull",
-                "bishybridprazan",
-                "bishybridprefix",
-                "bishybridschema",
-                "bishybridfull",
-                "pravnikprazan",
-                "pravnikprefix",
-                "pravnikschema",
-                "pravnikfull",
-                "bisprazan",
-                "bisprefix",
-                "bisschema",
-                "bisfull",
+                "pravnik",
+                
+                "zapisnici",
                 ),
             )
         st.session_state["sql_base_name"] = st.text_input(

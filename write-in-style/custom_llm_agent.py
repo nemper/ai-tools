@@ -75,7 +75,7 @@ def our_custom_agent(question: str, session_state: dict):
             api_key=environ["PINECONE_API_KEY_POS"],
             environment=environ["PINECONE_ENVIRONMENT_POS"],
         )
-        index = pinecone.Index("Positive")
+        index = pinecone.Index("positive")
 
         def hybrid_query():
             def get_embedding(text, model="text-embedding-ada-002"):
