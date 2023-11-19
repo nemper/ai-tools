@@ -59,7 +59,7 @@ def main():
             value=5, 
             step=1,
             key="broj_k_key",
-            help="Broj dokumenata koji se vraćaju iz indeksa",
+            help="Broj dokumenata koji se vraćaju iz indeksa", 
             )
         st.session_state["score"] = st.slider(
             label="Set score",
@@ -74,7 +74,7 @@ def main():
             label="Odaberite oblast",
             options=(
                 "pravnik",
-                
+                "positive",
                 "zapisnici",
                 ),
             )

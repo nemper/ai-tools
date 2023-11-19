@@ -112,11 +112,12 @@ def main():
 
     with st.sidebar:
         st.session_state.namespace = st.selectbox(
-            "Odaberite oblast",
+            "Odaberite AI asitenta za oblast",
             (
                 "pravnik",
-                
+                "positive",
                 "zapisnici",
+                "bis",
             ),
         )
     zahtev = ""
