@@ -19,8 +19,9 @@ from openai import OpenAI
 from myfunc.mojafunkcija import (
     st_style,
     positive_login,
-    open_file,
-)
+    open_file,)
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.chains.summarize import load_summarize_chain
 
 # Setting the title for Streamlit application
 st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
@@ -143,11 +144,20 @@ and use markdown such is H1, H2, etc."""
             loader = UnstructuredFileLoader("temp.txt", encoding="utf-8")
         else:
             # Creating a file loader object
-            loader = UnstructuredFileLoader(uploaded_file.name, encoding="utf-8")
+            loader = UnstructuredFileLoader(file_path=uploaded_file.name, encoding="utf-8")
 
         result = loader.load()
                 
         out_name = "Zapisnik"
+
+        ye_old_way = False
+        if len(result[0].page_content) > 270000:
+            ye_old_way = True
+            st.warning("Vaš dokument je duži od 270000 karaktera. Koristiće se map reduce document chain (radi sporije).")
+
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=75000, chunk_overlap=5000,)
+        texts = text_splitter.split_documents(result)
 
         with st.form(key="my_form", clear_on_submit=False):
             opis = st.text_area(
@@ -162,19 +172,34 @@ and use markdown such is H1, H2, etc."""
             
             if submit_button:
                 with st.spinner("Sačekajte trenutak..."):
-                    prompt_template = """ "{additional_variable}"
-                    "{text}"
-                    SUMMARY:"""
-                    prompt = PromptTemplate.from_template(prompt_template)
-                    prompt.input_variables = ["text", "additional_variable"] 
-                    # Define LLM chain
-                    llm_chain = LLMChain(llm=llm, prompt=prompt)
-                    # Define StuffDocumentsChain
-                    stuff_chain = StuffDocumentsChain(llm_chain=llm_chain, document_variable_name="text")       
+                    if ye_old_way:
+                        opis_kraj = opis
+                        opis = "Summarize comprehensively the content of the document."
+                        chain = load_summarize_chain(
+                            llm,
+                            chain_type="map_reduce",
+                            verbose=True,
+                            map_prompt=PromptTemplate(template=open_file("prompt_summarizer.txt"), input_variables=["text", "opis"]),
+                            combine_prompt=PromptTemplate(template=open_file("prompt_pam.txt"), input_variables=["text", "opis_kraj"]),
+                            token_max=4000,)
 
-                    suma = AIMessage(
-                        content=stuff_chain.run(input_documents=result, additional_variable=opis)
-                    )
+                        suma = AIMessage(
+                            content=chain.run(
+                                input_documents=texts, opis=opis, opis_kraj=opis_kraj))
+                    else:
+                        prompt_template = """ "{additional_variable}"
+                        "{text}"
+                        SUMMARY:"""
+                        prompt = PromptTemplate.from_template(prompt_template)
+                        prompt.input_variables = ["text", "additional_variable"] 
+                        # Define LLM chain
+                        llm_chain = LLMChain(llm=llm, prompt=prompt)
+                        # Define StuffDocumentsChain
+                        stuff_chain = StuffDocumentsChain(llm_chain=llm_chain, document_variable_name="text")       
+
+                        suma = AIMessage(
+                            content=stuff_chain.run(input_documents=result, additional_variable=opis)
+                        )
 
                     st.session_state.dld = suma.content
                     html = markdown.markdown(st.session_state.dld)
