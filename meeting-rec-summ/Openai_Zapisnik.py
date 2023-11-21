@@ -27,7 +27,7 @@ from langchain.chains.summarize import load_summarize_chain
 st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
 st_style()
 client = OpenAI()
-version = "11.11.23."
+version = "21.11.23."
 
 # this function does summarization of the text 
 def main():
@@ -151,9 +151,9 @@ and use markdown such is H1, H2, etc."""
         out_name = "Zapisnik"
 
         ye_old_way = False
-        if len(result[0].page_content) > 270000:
+        if len(result[0].page_content) > 275000:
             ye_old_way = True
-            st.warning("Vaš dokument je duži od 270000 karaktera. Koristiće se map reduce document chain (radi sporije).")
+            st.warning("Vaš dokument je duži od 275000 karaktera. Koristiće se map reduce document chain (radi sporije, a daje drugačije rezultate) - ovo je temporary rešenje.")
 
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=75000, chunk_overlap=5000,)
