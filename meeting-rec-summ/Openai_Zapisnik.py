@@ -27,13 +27,13 @@ from langchain.chains.summarize import load_summarize_chain
 st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
 st_style()
 client = OpenAI()
-version = "21.11.23."
+version = "26.11.23."
 
 # this function does summarization of the text 
 def main():
     
     with st.sidebar:
-         transkript()
+         priprema()
     # Read OpenAI API key from envtekst za
     # openai.api_key = os.environ.get("OPENAI_API_KEY")
     # initial prompt
@@ -65,7 +65,8 @@ Dobrodošli na alat za sažimanje teksta i transkribovanje zvučnih zapisa! Ovaj
 #### Transkribovanje Zvučnih Zapisa
 
 1. **Učitavanje Zvučnog Zapisa**
-   - U bočnoj traci, kliknite na opciju "Konvertujte MP3 u TXT". Učitajte zvučni zapis (.mp3) koji želite transkribovati.
+   - U bočnoj traci, kliknite na opciju "Transkribovanje zvučnih zapisa" u padajućem meniju. Učitajte zvučni zapis (.mp3) koji želite transkribovati. \
+   Možete poslušati sadržaj fajla po potrebi. **Napomena:** Zvučni zapis ne sme biti veći od 25Mb. 
 
 2. **Odabir Jezika**
    - Izaberite jezik izvornog teksta zvučnog zapisa u padajućem meniju "Odaberite jezik izvornog teksta".
@@ -73,9 +74,20 @@ Dobrodošli na alat za sažimanje teksta i transkribovanje zvučnih zapisa! Ovaj
 3. **Generisanje Transkripta**
    - Pritisnite dugme "Submit" kako biste pokrenuli proces transkribovanja. Transkript će se prikazati u prozoru "Transkript". Takođe, možete preuzeti transkript kao .txt.
 
+   #### Čitanje slika iz fajla i sa URL-a
+
+1. **Učitavanje slike**
+   - U bočnoj traci, kliknite na opciju "Čitanje sa slike iz fajla" ili "Čitanje sa slike sa URL-a" u padajućem meniju. Učitajte sliku (.jpg) koji želite da bude opisana. Prikazaće se preview slike.
+
+2. **Uputstvo**
+   - Korigujte uputsvo po potrebi.
+
+3. **Generisanje opisa**
+   - Pritisnite dugme "Submit" kako biste pokrenuli proces opisivanja. Opis će se prikazati u prozoru "Opis slike". Takođe, možete preuzeti opis kao .txt.
+
 **Napomena:**
 - Za transkribovanje zvučnih zapisa koristi se OpenAI Whisper model. Zvučni zapis mora biti u .MP3 formatu i ne veći od 25Mb.
-- Za sažimanje teksta koristi se OpenAI GPT-4 model.
+- Za sažimanje teksta i citanje sa slika koristi se odgovarajući OpenAI GPT-4 model.
 - Sve generisane datoteke možete preuzeti pomoću odgovarajućih dugmadi za preuzimanje u bočnoj traci.
 
 Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀 
@@ -240,6 +252,169 @@ and use markdown such is H1, H2, etc."""
                 # Generate the summary by running the chain on the input documents and store it in an AIMessage object
                 st.write(st.session_state.dld)  # Displaying the summary
 
+
+def priprema():
+    
+    izbor_radnji = st.selectbox("Odaberite pripremne radnje", 
+                    ("Transkribovanje Zvučnih Zapisa", "Čitanje sa slike iz fajla", "Čitanje sa slike sa URL-a"),
+                    help = "Odabir pripremnih radnji"
+                    )
+    if izbor_radnji == "Transkribovanje Zvučnih Zapisa":
+        transkript()
+    elif izbor_radnji == "Čitanje sa slike iz fajla":
+        read_local_image()
+    elif izbor_radnji == "Čitanje sa slike sa URL-a":
+        read_url_image()
+       
+
+
+def read_url_image():
+    # version url
+    from openai import OpenAI
+
+    client = OpenAI()
+    st.info("Čita sa slike sa URL")
+    content = ""
+    
+    # st.session_state["question"] = ""
+    #with placeholder.form(key="my_image_url_name", clear_on_submit=False):
+    img_url = st.text_input("Unesite URL slike ")
+    #submit_btt = st.form_submit_button(label="Submit")
+    image_f = os.path.basename(img_url)   
+    if img_url !="":
+        st.image(img_url, width=150)
+        placeholder = st.empty()    
+    #if submit_btt:        
+        with placeholder.form(key="my_image_url", clear_on_submit=False):
+            default_text = "What is in this image? Please read and reproduce the text. Read the text as is, do not correct any spelling and grammar errors. "
+        
+            upit = st.text_area("Unesite uputstvo ", default_text)
+            submit_button = st.form_submit_button(label="Submit")
+            if submit_button:
+                with st.spinner("Sačekajte trenutak..."):         
+                    response = client.chat.completions.create(
+                      model="gpt-4-vision-preview",
+                      messages=[
+                        {
+                          "role": "user",
+                          "content": [
+                            {"type": "text", "text": upit},
+                            {
+                              "type": "image_url",
+                              "image_url": {
+                                "url": img_url,
+                              },
+                            },
+                          ],
+                        }
+                      ],
+                      max_tokens=300,
+                    )
+                    content = response.choices[0].message.content
+                    with st.expander("Opis slike"):
+                                st.info(content)
+                            
+    if content !="":
+        st.download_button(
+            "Download opis slike",
+            content,
+            file_name=f"{image_f}.txt",
+            help="Čuvanje dokumenta",
+        )
+    
+
+def read_local_image():
+    # version local file
+    import base64
+    import requests
+    from openai import OpenAI
+    import os
+    import streamlit as st
+    from PIL import Image
+    import io
+   
+
+
+
+    client = OpenAI()
+
+    st.info("Čita sa slike")
+    image_f = st.file_uploader(
+        "Odaberite sliku",
+        type="jpg",
+        key="slika_",
+        help="Odabir dokumenta",
+    )
+    content = ""
+  
+    
+    if image_f is not None:
+        base64_image = base64.b64encode(image_f.getvalue()).decode('utf-8')
+        # Decode the base64 image
+        image_bytes = base64.b64decode(base64_image)
+        # Create a PIL Image object
+        image = Image.open(io.BytesIO(image_bytes))
+        # Display the image using st.image
+        st.image(image, width=150)
+        placeholder = st.empty()
+        # st.session_state["question"] = ""
+
+        with placeholder.form(key="my_image", clear_on_submit=False):
+            default_text = "What is in this image? Please read and reproduce the text. Read the text as is, do not correct any spelling and grammar errors. "
+            upit = st.text_area("Unesite uputstvo ", default_text)  
+            submit_button = st.form_submit_button(label="Submit")
+            
+            if submit_button:
+                with st.spinner("Sačekajte trenutak..."):            
+            
+            # Path to your image
+                    
+                    api_key = os.getenv("OPENAI_API_KEY")
+                    # Getting the base64 string
+                    
+
+                    headers = {
+                      "Content-Type": "application/json",
+                      "Authorization": f"Bearer {api_key}"
+                    }
+
+                    payload = {
+                      "model": "gpt-4-vision-preview",
+                      "messages": [
+                        {
+                          "role": "user",
+                          "content": [
+                            {
+                              "type": "text",
+                              "text": upit
+                            },
+                            {
+                              "type": "image_url",
+                              "image_url": {
+                                "url": f"data:image/jpeg;base64,{base64_image}"
+                              }
+                            }
+                          ]
+                        }
+                      ],
+                      "max_tokens": 300
+                    }
+
+                    response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
+
+                    json_data = response.json()
+                    content = json_data['choices'][0]['message']['content']
+                    with st.expander("Opis slike"):
+                            st.info(content)
+                            
+        if content !="":
+            st.download_button(
+                "Download opis slike",
+                content,
+                file_name=f"{image_f.name}.txt",
+                help="Čuvanje dokumenta",
+            )
+                 
 # This function does transcription of the audio file and then corrects the transcript. 
 # It calls the function transcribe and generate_corrected_transcript
 def transkript():
@@ -255,6 +430,7 @@ def transkript():
         transcript = ""
         
         if audio_file is not None:
+            st.audio(audio_file.getvalue(), format="audio/mp3")
             placeholder = st.empty()
             st.session_state["question"] = ""
 
