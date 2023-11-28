@@ -29,7 +29,11 @@ credentials:
       email: positive@positive.rs
       name: Positive
       password: $2b$12$WxxiIXrW8lYfXcfIs2GPb.GlXqDVcCj2TdcLKR6s4dgkRdbEtuQlK
+    sesns:
+      access_level: top
+      email: sesns@sesns.rs
+      name: Sesns
+      password: $2b$12$OUpCr73dh.DyfRwg2kErTOXE7K.hV2vJPP6VZPOrUZXQ/lP.OHv6S
 preauthorized:
   emails:
   - djordje.thai@gmail.com
-
