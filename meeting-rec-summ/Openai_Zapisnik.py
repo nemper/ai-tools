@@ -22,12 +22,14 @@ from myfunc.mojafunkcija import (
     open_file,)
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains.summarize import load_summarize_chain
+from pydub import AudioSegment
+import requests
 
 # Setting the title for Streamlit application
 st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
 st_style()
 client = OpenAI()
-version = "26.11.23."
+version = "29.11.23.- Glasovna naracija"
 
 # this function does summarization of the text 
 def main():
@@ -179,7 +181,7 @@ and use markdown such is H1, H2, etc."""
                 height=150,
                 help = "Unos prompta koji opisuje fokus sumiranja, željenu dužinu sažetka, formatiranje, ton, jezik, itd."
             )
-            
+            audio_i = st.checkbox("Glasovna naracija")
             submit_button = st.form_submit_button(label="Submit")
             
             if submit_button:
@@ -248,10 +250,41 @@ and use markdown such is H1, H2, etc."""
                     mime="application/octet-stream",
                     help= "Čuvanje sažetka",
                 )
+            if audio_i == True:
+                            st.write("Glasovna naracija")    
+                            audio_izlaz(st.session_state.dld)    
             with st.expander("Sažetak", True):
                 # Generate the summary by running the chain on the input documents and store it in an AIMessage object
                 st.write(st.session_state.dld)  # Displaying the summary
 
+def audio_izlaz(content):
+    response = requests.post(
+        "https://api.openai.com/v1/audio/speech",
+        headers={
+            "Authorization": f"Bearer {os.environ['OPENAI_API_KEY']}",
+        },
+        json={
+            "model" : "tts-1-hd",
+            "voice" : "alloy",
+            "input": content,
+        
+        },
+    )    
+    audio = b""
+    for chunk in response.iter_content(chunk_size=1024 * 1024):
+        audio += chunk
+
+    # Convert the byte array to AudioSegment
+    audio_segment = AudioSegment.from_file(io.BytesIO(audio))
+
+    # Save AudioSegment as MP3 file
+    mp3_data = io.BytesIO()
+    audio_segment.export(mp3_data, format="mp3")
+    mp3_data.seek(0)
+
+    # Display the audio using st.audio
+    st.caption("mp3 fajl možete download-ovati odabirom tri tačke ne desoj strani audio plejera")
+    st.audio(mp3_data.read(), format="audio/mp3")    
 
 def priprema():
     
