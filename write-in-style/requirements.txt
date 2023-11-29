@@ -135,7 +135,7 @@ pyasn1-modules==0.3.0
 pycairo==1.25.1
 pycparser==2.21
 pydantic==2.5.0
-pydantic_core==2.14.3
+pydantic_core
 pydeck==0.8.0
 pyee==8.2.2
 Pygments==2.16.1
