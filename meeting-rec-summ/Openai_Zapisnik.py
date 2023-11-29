@@ -275,11 +275,11 @@ def audio_izlaz(content):
         audio += chunk
 
     # Convert the byte array to AudioSegment
-    audio_segment = AudioSegment.from_file(io.BytesIO(audio))
+    #audio_segment = AudioSegment.from_file(io.BytesIO(audio))
 
     # Save AudioSegment as MP3 file
-    mp3_data = io.BytesIO()
-    audio_segment.export(mp3_data, format="mp3")
+    mp3_data = io.BytesIO(audio)
+    #audio_segment.export(mp3_data, format="mp3")
     mp3_data.seek(0)
 
     # Display the audio using st.audio
