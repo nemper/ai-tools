@@ -487,7 +487,8 @@ def transkript():
                         You are the Serbian language expert. You must fix grammar and spelling errors but otherwise keep the text as is, in the Serbian language. \
                         Your task is to correct any spelling discrepancies in the transcribed text. \
                         Make sure that the names of the participants are spelled correctly: Miljan, Goran, Darko, Nemanja, Đorđe, Šiška, Zlatko, BIS, Urbanizam. \
-                        Only add necessary punctuation such as periods, commas, and capitalization, and use only the context provided. 
+                        Only add necessary punctuation such as periods, commas, and capitalization, and use only the context provided. If you could not transcribe the whole text for any reason, \
+                        just say so. If you are not sure about the spelling of a word, just write it as you hear it. \
                         """
                         # does transcription of the audio file and then corrects the transcript
                         transcript = generate_corrected_transcript(system_prompt, audio_file, jezik)
@@ -513,11 +514,12 @@ def transcribe(audio_file, jezik):
     )
     return transcript
 
-# this function corrects the transcript
+# this function corrects the transcriptmora 3.5 turbo 16 k zbog duzine completition (gpt4 max 4k tokena za sada)
+# opcija da se prvo izbroje tokeni pa ili radi segmentacija ili se koristi gpt4 za krace a gpt3.5 turbo za duze
 def generate_corrected_transcript(system_prompt, audio_file, jezik):
         
     response = client.chat.completions.create(
-        model="gpt-4-1106-preview",
+        model="gpt-3.5-turbo-16k",
         temperature=0,
         messages=[
             {
