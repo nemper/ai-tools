@@ -13,3 +13,4 @@
 *.xlsx
 slnx.sqlite
 *.JSONL
+*.vs

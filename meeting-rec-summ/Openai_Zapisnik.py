@@ -29,7 +29,7 @@ import requests
 st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
 st_style()
 client = OpenAI()
-version = "29.11.23.- Glasovna naracija"
+version = "06.12.23.- transkripcija sa korekcijom"
 
 # this function does summarization of the text 
 def main():
@@ -491,7 +491,7 @@ def transkript():
                         just say so. If you are not sure about the spelling of a word, just write it as you hear it. \
                         """
                         # does transcription of the audio file and then corrects the transcript
-                        transcript = generate_corrected_transcript(system_prompt, audio_file, jezik)
+                        transcript = generate_corrected_transcript(client, system_prompt, audio_file, jezik)
                                                 
                         with st.expander("Transkript"):
                             st.info(transcript)
@@ -505,7 +505,7 @@ def transkript():
                 )
 
 # this function does transcription of the audio file
-def transcribe(audio_file, jezik):
+def transcribe(client, audio_file, jezik):
     transcript = client.audio.transcriptions.create(
                             model="whisper-1", 
                             file=audio_file, 
@@ -516,25 +516,73 @@ def transcribe(audio_file, jezik):
 
 # this function corrects the transcriptmora 3.5 turbo 16 k zbog duzine completition (gpt4 max 4k tokena za sada)
 # opcija da se prvo izbroje tokeni pa ili radi segmentacija ili se koristi gpt4 za krace a gpt3.5 turbo za duze
-def generate_corrected_transcript(system_prompt, audio_file, jezik):
+# def generate_corrected_transcript(system_prompt, audio_file, jezik):
         
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo-16k",
-        temperature=0,
-        messages=[
-            {
-                "role": "system",
-                "content": system_prompt
-            },
-            {
-                "role": "user",
-                "content": transcribe(audio_file, jezik) # does transcription of the audio file
-            }
-        ]
-    )
+#     response = client.chat.completions.create(
+#         model="gpt-3.5-turbo-16k",
+#         temperature=0,
+#         messages=[
+#             {
+#                 "role": "system",
+#                 "content": system_prompt
+#             },
+#             {
+#                 "role": "user",
+#                 "content": transcribe(audio_file, jezik) # does transcription of the audio file
+#             }
+#         ]
+#     )
 
-    return response.choices[0].message.content
+#     return response.choices[0].message.content
 
+def generate_corrected_transcript(client, system_prompt, audio_file, jezik):
+    transcript = transcribe(client, audio_file, jezik)
+    st.caption("delim u delove po 1000 reci")
+    chunks = chunk_transcript(transcript, 1000)
+    broj_delova = len(chunks)
+    st.caption (f"Broj delova je: {broj_delova}")
+    corrected_transcript = ""
+
+    # Loop through the token chunks
+    for i, chunk in enumerate(chunks):
+        
+        st.caption(f"Obradjujem {i + 1}. deo...")
+    
+        response = client.chat.completions.create(
+            model="gpt-4-1106-preview",
+            temperature=0,
+            messages=[
+                {
+                    "role": "system",
+                    "content": system_prompt
+                },
+                {
+                    "role": "user",
+                    "content": chunk
+                }
+            ]
+        )
+    
+        corrected_transcript += " " + response.choices[0].message.content.strip()
+    return corrected_transcript
+
+
+
+def chunk_transcript(transcript, token_limit):
+    words = transcript.split()
+    chunks = []
+    current_chunk = ""
+
+    for word in words:
+        if len((current_chunk + " " + word).split()) > token_limit:
+            chunks.append(current_chunk.strip())
+            current_chunk = word
+        else:
+            current_chunk += " " + word
+
+    chunks.append(current_chunk.strip())
+
+    return chunks
 
 # Deployment on Stremalit Login functionality
 deployment_environment = os.environ.get("DEPLOYMENT_ENVIRONMENT")
