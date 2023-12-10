@@ -25,6 +25,9 @@ from langchain.chains.summarize import load_summarize_chain
 from pydub import AudioSegment
 import requests
 
+from docx import Document
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+
 # Setting the title for Streamlit application
 st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
 st_style()
@@ -33,7 +36,7 @@ version = "06.12.23.- transkripcija sa korekcijom"
 
 # this function does summarization of the text 
 def main():
-    
+    doc_io = ""
     with st.sidebar:
          priprema()
     # Read OpenAI API key from envtekst za
@@ -135,7 +138,7 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
         if prva_file is not None:
             prva = prva_file.getvalue().decode("utf-8")  # Loading text from the file
         else:
-            prva = """Write a one page summary. Be sure to describe every topic and the name used in the text. \
+            prva = """Write a detailed summary. Be sure to describe every topic and the name used in the text. \
 Write it as a newspaper article. Write only in Serbian language. Give it a Title and subtitles where appropriate \
 and use markdown such is H1, H2, etc."""
 
@@ -218,6 +221,16 @@ and use markdown such is H1, H2, etc."""
                     st.session_state.dld = suma.content
                     html = markdown.markdown(st.session_state.dld)
                     buf = html2docx(html, title="Zapisnik")
+                    # Creating a document object
+                    doc = Document(io.BytesIO(buf.getvalue()))
+                    # Iterate over the paragraphs and set them to justified
+                    for paragraph in doc.paragraphs:
+                        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+                    # Creating a byte buffer object
+                    doc_io = io.BytesIO()
+                    doc.save(doc_io)
+                    doc_io.seek(0)  # Rewind the buffer to the beginning
+
 
                     pdf_data = pdfkit.from_string(html, False, options=options)
 
@@ -237,7 +250,7 @@ and use markdown such is H1, H2, etc."""
             
                 st.download_button(
                     label="Download Zapisnik as .docx",
-                    data=buf.getvalue(),
+                    data=doc_io,
                     file_name=out_name + ".docx",
                     mime="docx",
                     help= "Čuvanje sažetka",
