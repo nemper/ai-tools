@@ -208,7 +208,7 @@ and use markdown such is H1, H2, etc."""
                         suma = AIMessage(
                             content=chain.run(
                                 input_documents=texts, opis=opis, opis_kraj=opis_kraj))
-                    elif koristi_dugacak:
+                    elif not koristi_dugacak:
                         prompt_template = """ "{additional_variable}"
                         "{text}"
                         SUMMARY:"""
