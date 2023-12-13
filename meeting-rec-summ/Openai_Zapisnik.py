@@ -28,6 +28,9 @@ import requests
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
+from izdvojeno import dugacki_iz_kratkih
+
+
 # Setting the title for Streamlit application
 st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
 st_style()
@@ -104,6 +107,8 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
         type=["txt", "pdf", "docx"],
         help = "Odabir dokumenta",
     )
+
+    koristi_dugacak = st.sidebar.checkbox("Koristi dugacki sazetak", value=False, key="show_prompt")
 
     if "dld" not in st.session_state:
         st.session_state.dld = "Zapisnik"
@@ -203,7 +208,7 @@ and use markdown such is H1, H2, etc."""
                         suma = AIMessage(
                             content=chain.run(
                                 input_documents=texts, opis=opis, opis_kraj=opis_kraj))
-                    else:
+                    elif koristi_dugacak:
                         prompt_template = """ "{additional_variable}"
                         "{text}"
                         SUMMARY:"""
@@ -217,6 +222,10 @@ and use markdown such is H1, H2, etc."""
                         suma = AIMessage(
                             content=stuff_chain.run(input_documents=result, additional_variable=opis)
                         )
+                    else:
+                        suma = dugacki_iz_kratkih(uploaded_file, opis)
+
+
 
                     st.session_state.dld = suma.content
                     html = markdown.markdown(st.session_state.dld)
