@@ -225,7 +225,6 @@ and use markdown such is H1, H2, etc."""
                     else:
                         suma = AIMessage(content=dugacki_iz_kratkih(uploaded_file))
 
-
                     st.session_state.dld = suma.content
                     html = markdown.markdown(st.session_state.dld)
                     buf = html2docx(html, title="Zapisnik")
