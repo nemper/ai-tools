@@ -223,7 +223,7 @@ and use markdown such is H1, H2, etc."""
                             content=stuff_chain.run(input_documents=result, additional_variable=opis)
                         )
                     else:
-                        suma = AIMessage(content=dugacki_iz_kratkih(uploaded_file))
+                        suma = AIMessage(content=dugacki_iz_kratkih(uploaded_file, opis))
 
                     st.session_state.dld = suma.content
                     html = markdown.markdown(st.session_state.dld)
