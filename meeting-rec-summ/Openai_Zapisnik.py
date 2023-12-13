@@ -35,7 +35,7 @@ from izdvojeno import dugacki_iz_kratkih
 st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
 st_style()
 client = OpenAI()
-version = "13.12.23."
+version = "13.12.23. - dodat radio"
 
 # this function does summarization of the text 
 def main():
@@ -107,8 +107,6 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
         type=["txt", "pdf", "docx"],
         help = "Odabir dokumenta",
     )
-
-    koristi_dugacak = st.sidebar.checkbox("Koristi dugacki sazetak", value=False, key="show_prompt")
 
     if "dld" not in st.session_state:
         st.session_state.dld = "Zapisnik"
@@ -190,6 +188,11 @@ and use markdown such is H1, H2, etc."""
                 help = "Unos prompta koji opisuje fokus sumiranja, željenu dužinu sažetka, formatiranje, ton, jezik, itd."
             )
             audio_i = st.checkbox("Glasovna naracija")
+
+
+
+            koristi_dugacak = st.radio(label="Kakav sazetak:", options=["Dugacak", "Kratak"], horizontal=True, label_visibility="collapsed")
+
             submit_button = st.form_submit_button(label="Submit")
             
             if submit_button:
