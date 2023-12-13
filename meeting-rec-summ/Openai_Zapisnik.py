@@ -211,7 +211,7 @@ and use markdown such is H1, H2, etc."""
                         suma = AIMessage(
                             content=chain.run(
                                 input_documents=texts, opis=opis, opis_kraj=opis_kraj))
-                    elif not koristi_dugacak:
+                    elif koristi_dugacak == "Kratak":
                         prompt_template = """ "{additional_variable}"
                         "{text}"
                         SUMMARY:"""
@@ -225,7 +225,7 @@ and use markdown such is H1, H2, etc."""
                         suma = AIMessage(
                             content=stuff_chain.run(input_documents=result, additional_variable=opis)
                         )
-                    else:
+                    elif koristi_dugacak == "Dugacak":
                         suma = AIMessage(content=dugacki_iz_kratkih(uploaded_file, opis))
 
                     st.session_state.dld = suma.content
