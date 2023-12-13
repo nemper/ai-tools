@@ -35,7 +35,7 @@ from izdvojeno import dugacki_iz_kratkih
 st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
 st_style()
 client = OpenAI()
-version = "06.12.23.- transkripcija sa korekcijom"
+version = "13.12.23."
 
 # this function does summarization of the text 
 def main():
@@ -223,11 +223,13 @@ and use markdown such is H1, H2, etc."""
                             content=stuff_chain.run(input_documents=result, additional_variable=opis)
                         )
                     else:
-                        suma = dugacki_iz_kratkih(uploaded_file, opis)
+                        suma = dugacki_iz_kratkih(uploaded_file)
 
 
-
-                    st.session_state.dld = suma.content
+                    if koristi_dugacak:
+                        st.session_state.dld = suma["content"]
+                    else:
+                        st.session_state.dld = suma.content
                     html = markdown.markdown(st.session_state.dld)
                     buf = html2docx(html, title="Zapisnik")
                     # Creating a document object
