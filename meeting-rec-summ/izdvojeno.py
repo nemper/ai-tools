@@ -68,4 +68,4 @@ def dugacki_iz_kratkih(uploaded_file, entered_prompt):
 
             final_summary += f"{summary}\n\n"
         
-        return {"content": final_summary}
+        return final_summary

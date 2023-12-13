@@ -223,13 +223,10 @@ and use markdown such is H1, H2, etc."""
                             content=stuff_chain.run(input_documents=result, additional_variable=opis)
                         )
                     else:
-                        suma = dugacki_iz_kratkih(uploaded_file)
+                        suma = AIMessage(content=dugacki_iz_kratkih(uploaded_file))
 
 
-                    if koristi_dugacak:
-                        st.session_state.dld = suma["content"]
-                    else:
-                        st.session_state.dld = suma.content
+                    st.session_state.dld = suma.content
                     html = markdown.markdown(st.session_state.dld)
                     buf = html2docx(html, title="Zapisnik")
                     # Creating a document object
