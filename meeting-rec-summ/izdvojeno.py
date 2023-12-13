@@ -5,7 +5,7 @@ import os
 def dugacki_iz_kratkih(uploaded_file, entered_prompt):
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-    
+
 
     if uploaded_file is not None:
         all_prompts = {
@@ -19,10 +19,9 @@ def dugacki_iz_kratkih(uploaded_file, entered_prompt):
                     If there are any mistakes, please correct them; e.g. if there is a short intro before the topic list or similar. \
                         If there are no mistakes, just send the text back.",
             "p_system_3": "You are a helpful assistant that summarizes only parts of the provided text that are related to the requested topic.",
-            "p_user_3": f"Please summarize the above text focusing only on the topic: {topic}. \
+            "p_user_3": "Please summarize the above text focusing only on the topic: {topic}. \
                 Add a simple title (don't write hashes or similar) and 2 empty lines before and after the summary. \
-                    Be sure to always write in Serbian. \
-                        {entered_prompt}"
+                    Be sure to always write in Serbian." + f"{entered_prompt}"\
         }
         file_content = uploaded_file.read().decode(encoding="utf-8-sig")
         
