@@ -193,7 +193,7 @@ and use markdown such is H1, H2, etc."""
 
 
 
-            koristi_dugacak = st.radio(label="Kakav sazetak:", options=["Dugacak", "Kratak"], horizontal=True, label_visibility="collapsed")
+            koristi_dugacak = st.radio(label="Kakav sazetak:", options=["Kratak", "Dugacak"], horizontal=True, label_visibility="collapsed")
 
             submit_button = st.form_submit_button(label="Submit")
             
