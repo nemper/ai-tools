@@ -36,7 +36,7 @@ from myfunc.mojafunkcija import (audio_izlaz,
 st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
 st_style()
 client = OpenAI()
-version = "13.12.23. - dodat radio"
+version = "14.12.23. - Opisi"
 
 # this function does summarization of the text 
 def main():
@@ -69,7 +69,9 @@ Dobrodošli na alat za sažimanje teksta i transkribovanje zvučnih zapisa! Ovaj
    - Opciono mozete učitati prethodno sačuvani .txt fajl sa promptovima u opciji "Izaberite prompt koji možete editovati, prihvatite default tekst ili pišite prompt od početka".
  
 **Generisanje Sažetka**
+   - Mozete odabrati opcij eKratki i Dugacki Summary. Kratki summary kao izlaz daje jednu stranicu A4. Dugacki summary daje otprilike jednu stranicu A4 po temi, ali traje duze i koristi mnogo vise tokena. 
    - Pritisnite dugme "Submit" kako biste pokrenuli proces sažimanja. Sažetak će se prikazati u prozoru "Sažetak". Takođe, imate opciju preuzimanja sažetka kao .txt, .docx i .pdf.
+   - Ukoliko je dokument duzi od 275000 karaktera, bice primenjen drugi, sporiji nacim rada, zbog trenutog ogranicenja GPT-4 modela na 4000 tokena za izlaz. U ovom slucaju dugacki summary nije dostupan.
 
 #### Transkribovanje Zvučnih Zapisa
 
@@ -174,7 +176,7 @@ and use markdown such is H1, H2, etc."""
         ye_old_way = False
         if len(result[0].page_content) > 275000:
             ye_old_way = True
-            st.warning("Vaš dokument je duži od 275000 karaktera. Koristiće se map reduce document chain (radi sporije, a daje drugačije rezultate) - ovo je temporary rešenje.")
+            st.warning("Vaš dokument je duži od 275000 karaktera. Koristiće se map reduce document chain (radi sporije, a daje drugačije rezultate) - ovo je temporary rešenje. Za ovu opciju dugacki summary nije dostupan.")
 
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=75000, chunk_overlap=5000,)
@@ -192,7 +194,7 @@ and use markdown such is H1, H2, etc."""
 
 
 
-            koristi_dugacak = st.radio(label="Kakav sazetak:", options=["Dugacak", "Kratak"], horizontal=True, label_visibility="collapsed")
+            koristi_dugacak = st.radio(label="Kakav sazetak:", options=["Kratak", "Dugacak"], horizontal=True, label_visibility="collapsed")
 
             submit_button = st.form_submit_button(label="Submit")
             
