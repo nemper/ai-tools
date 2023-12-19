@@ -144,9 +144,11 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
 
 
     # markdown to html
-    html = markdown.markdown(st.session_state.dld)
-    # html to docx
-    buf = html2docx(html, title="Zapisnik")
+    try:
+        html = markdown.markdown(st.session_state.dld)
+        buf = html2docx(html, title="Zapisnik")
+    except:
+        pass
 
     options = {
         "encoding": "UTF-8",  # Set the encoding to UTF-8
