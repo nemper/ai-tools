@@ -21,22 +21,21 @@ from myfunc.mojafunkcija import (
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains.summarize import load_summarize_chain
-from pydub import AudioSegment
 
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 from myfunc.mojafunkcija import (audio_izlaz, 
                                  priprema, 
-                                 generate_corrected_transcript, 
-                                 dugacki_iz_kratkih)
+                                 dugacki_iz_kratkih,
+                                 sacuvaj_dokument)
 
 
 # Setting the title for Streamlit application
 st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
 st_style()
 client = OpenAI()
-version = "14.12.23. - Opisi"
+version = "19.12.23."
 
 # this function does summarization of the text 
 def main():
@@ -253,59 +252,15 @@ and use markdown such is H1, H2, etc."""
                 st.download_button(
                     "Download prompt as .txt", opis, file_name="prompt1.txt", help = "Čuvanje zadatog prompta"
                 )
-                                       
-                st.download_button(
-                    "Download Zapisnik as .txt",
-                    st.session_state.dld,
-                    file_name=out_name + ".txt",
-                    help= "Čuvanje sažetka",
-                )
-            
-                st.download_button(
-                    label="Download Zapisnik as .docx",
-                    data=doc_io,
-                    file_name=out_name + ".docx",
-                    mime="docx",
-                    help= "Čuvanje sažetka",
-                )
-            
-                st.download_button(
-                    label="Download Zapisnik as .pdf",
-                    data=pdf_data,
-                    file_name=out_name + ".pdf",
-                    mime="application/octet-stream",
-                    help= "Čuvanje sažetka",
-                )
+                
+                sacuvaj_dokument(st.session_state.dld, out_name)
+                
             if audio_i == True:
                             st.write("Glasovna naracija")    
                             audio_izlaz(st.session_state.dld)    
             with st.expander("Sažetak", True):
                 # Generate the summary by running the chain on the input documents and store it in an AIMessage object
                 st.write(st.session_state.dld)  # Displaying the summary
-
-
-# this function corrects the transcriptmora 3.5 turbo 16 k zbog duzine completition (gpt4 max 4k tokena za sada)
-# opcija da se prvo izbroje tokeni pa ili radi segmentacija ili se koristi gpt4 za krace a gpt3.5 turbo za duze
-# def generate_corrected_transcript(system_prompt, audio_file, jezik):
-        
-#     response = client.chat.completions.create(
-#         model="gpt-3.5-turbo-16k",
-#         temperature=0,
-#         messages=[
-#             {
-#                 "role": "system",
-#                 "content": system_prompt
-#             },
-#             {
-#                 "role": "user",
-#                 "content": transcribe(audio_file, jezik) # does transcription of the audio file
-#             }
-#         ]
-#     )
-
-#     return response.choices[0].message.content
-                
-
 
 # Deployment on Stremalit Login functionality
 deployment_environment = os.environ.get("DEPLOYMENT_ENVIRONMENT")
