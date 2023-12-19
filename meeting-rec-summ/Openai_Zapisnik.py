@@ -21,16 +21,16 @@ from myfunc.mojafunkcija import (
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains.summarize import load_summarize_chain
-from pydub import AudioSegment
+# from pydub import AudioSegment
 
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 from myfunc.mojafunkcija import (audio_izlaz, 
                                  priprema, 
-                                 generate_corrected_transcript, 
-                                 dugacki_iz_kratkih)
+                                 generate_corrected_transcript)
 
+from testd import dugacki_iz_kratkih
 
 # Setting the title for Streamlit application
 st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
@@ -40,6 +40,21 @@ version = "14.12.23. - Opisi"
 
 # this function does summarization of the text 
 def main():
+
+    def read_pdf(file):
+        pdfReader = PyPDF2.PdfFileReader(file)
+        count = pdfReader.numPages
+        text = ""
+        for i in range(count):
+            page = pdfReader.getPage(i)
+            text += page.extractText()
+        return text
+
+    def read_docx(file):
+        doc = Document(file)
+        text = " ".join([paragraph.text for paragraph in doc.paragraphs])
+        return text
+
     doc_io = ""
     with st.sidebar:
         priprema()
@@ -114,6 +129,19 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
     if "dld" not in st.session_state:
         st.session_state.dld = "Zapisnik"
 
+    _ = """
+    if uploaded_file is not None:
+        if uploaded_file.type == "application/pdf":
+            text = read_pdf(uploaded_file)
+        elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+            text = read_docx(uploaded_file)
+        else:  # assuming it's a txt file
+            text = uploaded_file.read().decode()
+    """
+
+
+
+
     # markdown to html
     html = markdown.markdown(st.session_state.dld)
     # html to docx
@@ -170,7 +198,7 @@ and use markdown such is H1, H2, etc."""
             loader = UnstructuredFileLoader(file_path=uploaded_file.name, encoding="utf-8")
 
         result = loader.load()
-                
+
         out_name = "Zapisnik"
 
         ye_old_way = False
@@ -228,8 +256,10 @@ and use markdown such is H1, H2, etc."""
                         suma = AIMessage(
                             content=stuff_chain.run(input_documents=result, additional_variable=opis)
                         )
+                        st.write(suma.content)
+
                     elif koristi_dugacak == "Dugacak":
-                        suma = AIMessage(content=dugacki_iz_kratkih(uploaded_file, opis))
+                        suma = AIMessage(content=dugacki_iz_kratkih(result, opis))
 
                     st.session_state.dld = suma.content
                     html = markdown.markdown(st.session_state.dld)
