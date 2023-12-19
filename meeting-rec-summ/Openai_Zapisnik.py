@@ -144,19 +144,16 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
 
 
     # markdown to html
-    try:
-        html = markdown.markdown(st.session_state.dld)
-        buf = html2docx(html, title="Zapisnik")
-    except:
-        pass
+    
+    #html = markdown.markdown(st.session_state.dld)
+    #buf = html2docx(html, title="Zapisnik")
+    #pdf_data = pdfkit.from_string(html, cover_first=False, options=options)
 
     options = {
         "encoding": "UTF-8",  # Set the encoding to UTF-8
         "no-outline": None,
         "quiet": "",
     }
-
-    pdf_data = pdfkit.from_string(html, cover_first=False, options=options)
 
     # summarize chosen file
     if uploaded_file is not None:
