@@ -21,22 +21,14 @@ from myfunc.mojafunkcija import (
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains.summarize import load_summarize_chain
-<<<<<<< HEAD
 # from pydub import AudioSegment
-=======
->>>>>>> 2f92ccabad3c94902b8d42cc768bd00abba7db1e
 
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 from myfunc.mojafunkcija import (audio_izlaz, 
                                  priprema, 
-<<<<<<< HEAD
                                  generate_corrected_transcript)
-=======
-                                 dugacki_iz_kratkih,
-                                 sacuvaj_dokument)
->>>>>>> 2f92ccabad3c94902b8d42cc768bd00abba7db1e
 
 from testd import dugacki_iz_kratkih
 
