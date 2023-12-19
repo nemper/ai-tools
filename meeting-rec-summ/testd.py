@@ -46,7 +46,7 @@ def dugacki_iz_kratkih(uploaded_text, entered_prompt):
         topics = [item for item in response if item != ""]  # just in case - triple check
 
         final_summary = ""
-        i = 1
+        i = 0
         imax = len(topics)
 
         pocetak_summary = "At the begining of the text write the date (dd.mm.yy), topics that vere discussed and participants."
