@@ -231,21 +231,7 @@ and use markdown such is H1, H2, etc."""
                         suma = AIMessage(content=dugacki_iz_kratkih(uploaded_file, opis))
 
                     st.session_state.dld = suma.content
-                    html = markdown.markdown(st.session_state.dld)
-                    buf = html2docx(html, title="Zapisnik")
-                    # Creating a document object
-                    doc = Document(io.BytesIO(buf.getvalue()))
-                    # Iterate over the paragraphs and set them to justified
-                    for paragraph in doc.paragraphs:
-                        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-                    # Creating a byte buffer object
-                    doc_io = io.BytesIO()
-                    doc.save(doc_io)
-                    doc_io.seek(0)  # Rewind the buffer to the beginning
-
-
-                    pdf_data = pdfkit.from_string(html, False, options=options)
-
+                    
         if st.session_state.dld != "Zapisnik":
             with st.sidebar:
                             
