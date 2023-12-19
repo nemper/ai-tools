@@ -6,7 +6,7 @@ import streamlit as st
 def dugacki_iz_kratkih(uploaded_text, entered_prompt):
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     uploaded_text = uploaded_text[0].page_content
-    st.write(uploaded_text)
+
     if uploaded_text is not None:
         all_prompts = {
             "p_system_1": "You are a helpful assistant that identifies topics in a provided text.",
@@ -63,7 +63,7 @@ def dugacki_iz_kratkih(uploaded_text, entered_prompt):
             final_summary += f"{summary}\n\n"
 
         final_summary += f"{get_response('p_system_4', all_prompts['p_user_4'])}"
-
+        st.write(final_summary)
         return final_summary
     
     else:

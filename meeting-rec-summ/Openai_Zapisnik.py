@@ -264,7 +264,7 @@ and use markdown such is H1, H2, etc."""
                         st.write(suma)
                         # suma = AIMessage(content=dugacki_iz_kratkih(result, opis))
 
-                    st.session_state.dld = suma.content
+                    st.session_state.dld = suma
                     
         if st.session_state.dld != "Zapisnik":
             with st.sidebar:
