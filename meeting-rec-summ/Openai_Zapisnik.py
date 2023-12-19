@@ -7,9 +7,6 @@ from langchain.chains.llm import LLMChain
 
 import streamlit as st
 import os
-from html2docx import html2docx
-import markdown
-import pdfkit
 import PyPDF2
 import re
 import io
@@ -24,7 +21,6 @@ from langchain.chains.summarize import load_summarize_chain
 # from pydub import AudioSegment
 
 from docx import Document
-from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 from myfunc.mojafunkcija import (audio_izlaz, 
                                  priprema, 
@@ -230,7 +226,7 @@ and use markdown such is H1, H2, etc."""
 
                         suma = AIMessage(
                             content=stuff_chain.run(input_documents=result, additional_variable=opis)
-                        )
+                        ).content
                         # st.write(type(suma.content))
                     elif koristi_dugacak == "Dugacak":
 

@@ -52,7 +52,7 @@ def dugacki_iz_kratkih(uploaded_text, entered_prompt):
         pocetak_summary = "At the begining of the text write the date (dd.mm.yy), topics that vere discussed and participants."
 
         for topic in topics:
-            if i == 1:
+            if i == 0:
                 summary = get_response("p_system_3", f"{(pocetak_summary + all_prompts['p_user_3']).format(topic=topic)}")
                 i += 1
             else:
