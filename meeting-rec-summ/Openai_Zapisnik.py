@@ -260,17 +260,6 @@ and use markdown such is H1, H2, etc."""
                         # st.write(type(suma.content))
                     elif koristi_dugacak == "Dugacak":
 
-
-                        prompt_template = """ "{additional_variable}"
-                        "{text}"
-                        SUMMARY:"""
-                        prompt = PromptTemplate.from_template(prompt_template)
-                        prompt.input_variables = ["text", "additional_variable"] 
-                        # Define LLM chain
-                        llm_chain = LLMChain(llm=llm, prompt=prompt)
-                        # Define StuffDocumentsChain
-                        stuff_chain = StuffDocumentsChain(llm_chain=llm_chain, document_variable_name="text")  
-
                         suma = dugacki_iz_kratkih(result, opis)
                         st.write(suma)
                         # suma = AIMessage(content=dugacki_iz_kratkih(result, opis))
