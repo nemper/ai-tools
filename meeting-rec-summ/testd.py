@@ -39,7 +39,7 @@ def dugacki_iz_kratkih(uploaded_text, entered_prompt):
 
 
         response = get_response("p_system_1", all_prompts["p_user_1"])
-
+        st.write(response)
         # ovaj double check je veoma moguce bespotreban, no sto reskirati
         response = get_response("p_system_2", all_prompts["p_user_2"]).split('\n')
         topics = [item for item in response if item != ""]  # just in case - triple check

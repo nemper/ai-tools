@@ -257,7 +257,7 @@ and use markdown such is H1, H2, etc."""
                         suma = AIMessage(
                             content=stuff_chain.run(input_documents=result, additional_variable=opis)
                         )
-                        st.write(type(suma.content))
+                        # st.write(type(suma.content))
                     elif koristi_dugacak == "Dugacak":
 
 
