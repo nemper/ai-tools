@@ -28,7 +28,8 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 from myfunc.mojafunkcija import (audio_izlaz, 
                                  priprema, 
-                                 generate_corrected_transcript)
+                                 generate_corrected_transcript,
+                                 sacuvaj_dokument)
 
 from testd import dugacki_iz_kratkih
 
@@ -256,10 +257,23 @@ and use markdown such is H1, H2, etc."""
                         suma = AIMessage(
                             content=stuff_chain.run(input_documents=result, additional_variable=opis)
                         )
-                        st.write(suma.content)
-
+                        st.write(type(suma.content))
                     elif koristi_dugacak == "Dugacak":
-                        suma = AIMessage(content=dugacki_iz_kratkih(result, opis))
+
+
+                        prompt_template = """ "{additional_variable}"
+                        "{text}"
+                        SUMMARY:"""
+                        prompt = PromptTemplate.from_template(prompt_template)
+                        prompt.input_variables = ["text", "additional_variable"] 
+                        # Define LLM chain
+                        llm_chain = LLMChain(llm=llm, prompt=prompt)
+                        # Define StuffDocumentsChain
+                        stuff_chain = StuffDocumentsChain(llm_chain=llm_chain, document_variable_name="text")  
+
+                        suma = dugacki_iz_kratkih(result, opis)
+                        st.write(suma)
+                        # suma = AIMessage(content=dugacki_iz_kratkih(result, opis))
 
                     st.session_state.dld = suma.content
                     
