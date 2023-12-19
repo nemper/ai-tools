@@ -130,31 +130,6 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
     if "dld" not in st.session_state:
         st.session_state.dld = "Zapisnik"
 
-    _ = """
-    if uploaded_file is not None:
-        if uploaded_file.type == "application/pdf":
-            text = read_pdf(uploaded_file)
-        elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-            text = read_docx(uploaded_file)
-        else:  # assuming it's a txt file
-            text = uploaded_file.read().decode()
-    """
-
-
-
-
-    # markdown to html
-    
-    #html = markdown.markdown(st.session_state.dld)
-    #buf = html2docx(html, title="Zapisnik")
-    #pdf_data = pdfkit.from_string(html, cover_first=False, options=options)
-
-    options = {
-        "encoding": "UTF-8",  # Set the encoding to UTF-8
-        "no-outline": None,
-        "quiet": "",
-    }
-
     # summarize chosen file
     if uploaded_file is not None:
         
@@ -260,7 +235,7 @@ and use markdown such is H1, H2, etc."""
                     elif koristi_dugacak == "Dugacak":
 
                         suma = dugacki_iz_kratkih(result, opis)
-                        st.write(suma)
+
                         # suma = AIMessage(content=dugacki_iz_kratkih(result, opis))
                     try:
                         st.session_state.dld = suma.contect
