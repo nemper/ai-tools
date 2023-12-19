@@ -25,9 +25,8 @@ from docx import Document
 from myfunc.mojafunkcija import (audio_izlaz, 
                                  priprema, 
                                  generate_corrected_transcript,
-                                 sacuvaj_dokument)
-
-from testd import dugacki_iz_kratkih
+                                 sacuvaj_dokument,
+                                 dugacki_iz_kratkih)
 
 # Setting the title for Streamlit application
 st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
@@ -212,7 +211,7 @@ and use markdown such is H1, H2, etc."""
 
                         suma = AIMessage(
                             content=chain.run(
-                                input_documents=texts, opis=opis, opis_kraj=opis_kraj))
+                                input_documents=texts, opis=opis, opis_kraj=opis_kraj)).content
                     elif koristi_dugacak == "Kratak":
                         prompt_template = """ "{additional_variable}"
                         "{text}"
