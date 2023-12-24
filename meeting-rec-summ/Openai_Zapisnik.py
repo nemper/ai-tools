@@ -22,12 +22,10 @@ from langchain.chains.summarize import load_summarize_chain
 
 from docx import Document
 
-from myfunc.mojafunkcija import (audio_izlaz, 
-                                 priprema, 
-                                 generate_corrected_transcript,
-                                 sacuvaj_dokument,
-                                 dugacki_iz_kratkih)
-
+from myfunc.mojafunkcija import sacuvaj_dokument
+from myfunc.asistenti import (audio_izlaz, 
+                              priprema, 
+                              dugacki_iz_kratkih)
 # Setting the title for Streamlit application
 st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
 st_style()
