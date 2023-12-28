@@ -10,7 +10,7 @@ import os
 import PyPDF2
 import re
 import io
-from openai import OpenAI
+import openai 
 from myfunc.mojafunkcija import (
     st_style,
     positive_login,
@@ -26,11 +26,15 @@ from myfunc.mojafunkcija import sacuvaj_dokument
 from myfunc.asistenti import (audio_izlaz, 
                               priprema, 
                               dugacki_iz_kratkih)
+import nltk
+
+nltk.download('punkt')
+
 # Setting the title for Streamlit application
 st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
 st_style()
-client = OpenAI()
-version = "19.12.23."
+client = openai
+version = "28.12.23."
 
 # this function does summarization of the text 
 def main():
