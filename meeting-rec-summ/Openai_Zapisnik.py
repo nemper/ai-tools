@@ -28,13 +28,18 @@ from myfunc.asistenti import (audio_izlaz,
                               dugacki_iz_kratkih)
 import nltk
 
-nltk.download('punkt')
 
 # Setting the title for Streamlit application
 st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
 st_style()
 client = openai
 version = "29.12.23."
+
+# download and install punkt only once
+if "samo_jednom" not in st.session_state:
+    st.sesion_state.samo_jednom = True
+    nltk.download('punkt')
+
 
 # this function does summarization of the text 
 def main():
