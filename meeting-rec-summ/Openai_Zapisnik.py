@@ -34,7 +34,7 @@ nltk.download('punkt')
 st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
 st_style()
 client = openai
-version = "28.12.23."
+version = "29.12.23."
 
 # this function does summarization of the text 
 def main():
@@ -82,7 +82,8 @@ Dobrodošli na alat za sažimanje teksta i transkribovanje zvučnih zapisa! Ovaj
    - Opciono mozete učitati prethodno sačuvani .txt fajl sa promptovima u opciji "Izaberite prompt koji možete editovati, prihvatite default tekst ili pišite prompt od početka".
  
 **Generisanje Sažetka**
-   - Mozete odabrati opcij eKratki i Dugacki Summary. Kratki summary kao izlaz daje jednu stranicu A4. Dugacki summary daje otprilike jednu stranicu A4 po temi, ali traje duze i koristi mnogo vise tokena. 
+   - Mozete odabrati opcije Kratki i Dugacki Summary. Kratki summary kao izlaz daje jednu stranicu A4. 
+        - Dugacki summary daje otprilike jednu stranicu A4 po temi, ali traje duze i koristi mnogo vise tokena. Za sada sa Dugacki summary nije moguce kroistiti User prompt. 
    - Pritisnite dugme "Submit" kako biste pokrenuli proces sažimanja. Sažetak će se prikazati u prozoru "Sažetak". Takođe, imate opciju preuzimanja sažetka kao .txt, .docx i .pdf.
    - Ukoliko je dokument duzi od 275000 karaktera, bice primenjen drugi, sporiji nacim rada, zbog trenutog ogranicenja GPT-4 modela na 4000 tokena za izlaz. U ovom slucaju dugacki summary nije dostupan.
 
