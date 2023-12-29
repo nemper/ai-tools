@@ -37,7 +37,7 @@ version = "29.12.23."
 samo_jednom = False
 # download and install punkt only once
 if "samo_jednom" not in st.session_state:
-    st.sesion_state.samo_jednom = True
+    st.session_state.samo_jednom = True
     nltk.download('punkt')
 
 
