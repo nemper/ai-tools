@@ -1,9 +1,9 @@
 # This code is used to create a code based on LangChain Library using streamlit for web interface
 
 # Import necessary libraries
-from langchain.vectorstores import Pinecone
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.chat_models import ChatOpenAI
+from langchain_community.vectorstores import Pinecone
+from langchain_openai import OpenAIEmbeddings
+from langchain_openai.chat_models import ChatOpenAI
 from langchain.chains import RetrievalQA
 import pinecone
 import streamlit as st
