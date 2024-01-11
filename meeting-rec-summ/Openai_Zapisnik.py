@@ -1,5 +1,5 @@
-from langchain.document_loaders import UnstructuredFileLoader
-from langchain.chat_models import ChatOpenAI
+from langchain_community.document_loaders import UnstructuredFileLoader
+from langchain_openai.chat_models import ChatOpenAI
 from langchain.schema import AIMessage
 from langchain.prompts import PromptTemplate
 from langchain.chains.combine_documents.stuff import StuffDocumentsChain
