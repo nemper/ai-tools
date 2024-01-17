@@ -218,8 +218,9 @@ and use markdown such is H1, H2, etc."""
                             token_max=4000,)
 
                         suma = AIMessage(
-                            content=chain.run(
-                                input_documents=texts, opis=opis, opis_kraj=opis_kraj)).content
+                            content=chain.invoke(
+                                {"input_documents": texts, "opis": opis, "opis_kraj": opis_kraj})["output_text"]
+                                ).content
                     elif koristi_dugacak == "Kratak":
                         prompt_template = """ "{additional_variable}"
                         "{text}"
@@ -232,7 +233,7 @@ and use markdown such is H1, H2, etc."""
                         stuff_chain = StuffDocumentsChain(llm_chain=llm_chain, document_variable_name="text")       
 
                         suma = AIMessage(
-                            content=stuff_chain.run(input_documents=result, additional_variable=opis)
+                            content=stuff_chain.invoke({"input_documents": result, "additional_variable": opis})["output_text"]
                         ).content
                         # st.write(type(suma.content))
                     elif koristi_dugacak == "Dugacak":
