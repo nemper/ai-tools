@@ -32,7 +32,9 @@ import nltk
 # Setting the title for Streamlit application
 st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
 st_style()
+
 client = openai
+
 version = "29.12.23."
 samo_jednom = False
 # download and install punkt only once
@@ -138,7 +140,7 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
         
         # Initializing ChatOpenAI model
         llm = ChatOpenAI(
-            model_name="gpt-4-1106-preview", temperature=0
+            model_name="gpt-4-turbo-preview", temperature=0
         )
 
         prva_file = st.file_uploader(
