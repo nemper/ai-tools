@@ -25,7 +25,7 @@ from docx import Document
 from myfunc.mojafunkcija import sacuvaj_dokument
 from myfunc.asistenti import (audio_izlaz, 
                               priprema, 
-                              dugacki_iz_kratkih)
+                            )
 import nltk
 
 
@@ -48,6 +48,93 @@ version = "29.12.23."
 #if "samo_jednom" not in st.session_state:
 #    st.session_state.samo_jednom = True
 #    nltk.download('punkt')
+def dugacki_iz_kratkih(uploaded_text, entered_prompt):
+    """ Generate a summary of a long text. 
+        Parameters: 
+            uploaded_text (str): The long text.
+            entered_prompt (str): The prompt.
+        """    
+   
+    uploaded_text = uploaded_text[0].page_content
+
+    if uploaded_text is not None:
+        all_prompts = {
+                 "p_system_0" : (
+                    "You are helpful assistant."
+                ),
+                 "p_user_0" : ( 
+                     "[In Serbian, using markdown formatting] At the begining of the text write the Title [formatted as H1] for the whole text, the date (dd.mm.yy), topics that vere discussed in the numbered list. After that list the participants in a numbered list. "
+                ),
+                "p_system_1": (
+                    "You are a helpful assistant that identifies the main topics in a provided text. Please ensure clarity and focus in your identification."
+                ),
+                "p_user_1": (
+                    "Please provide a numerated list of up to 10 main topics described in the text - one topic per line. Avoid including any additional text or commentary."
+                ),
+                "p_system_2": (
+                    "You are a helpful assistant that corrects structural mistakes in a provided text, ensuring the response follows the specified format. Address any deviations from the request."
+                ),
+                "p_user_2": (
+                    "Please check if the previous assistant's response adheres to this request: 'Provide a numerated list of topics - one topic per line, without additional text.' Correct any deviations or structural mistakes. If the response is correct, re-send it as is."
+                ),
+                "p_system_3": (
+                    "You are a helpful assistant that summarizes parts of the provided text related to a specific topic. Ask for clarification if the context or topic is unclear."
+                ),
+                "p_user_3": (
+                    "[In Serbian, using markdown formatting, use H2 as a top level] Please summarize the above text, focusing only on the topic {topic}. Start with a simple title, followed by 2 empty lines before and after the summary. "
+                ),
+                "p_system_4": (
+                    "You are a helpful assistant that creates a conclusion of the provided text. Ensure the conclusion is concise and reflects the main points of the text."
+                ),
+                "p_user_4": (
+                    "[In Serbian, using markdown formatting, use H2 as a top level ] Please create a conclusion of the above text. The conclusion should be succinct and capture the essence of the text."
+                )
+            }
+
+        
+
+        def get_response(p_system, p_user_ext):
+            client = openai
+            
+            response = client.chat.completions.create(
+                model="gpt-4-turbo-preview",
+                temperature=0,
+                messages=[
+                    {"role": "system", "content": all_prompts[p_system]},
+                    {"role": "user", "content": uploaded_text},
+                    {"role": "user", "content": p_user_ext}
+                ]
+            )
+            return response.choices[0].message.content.strip()
+
+
+        response = get_response("p_system_1", all_prompts["p_user_1"])
+        
+        # ovaj double check je veoma moguce bespotreban, no sto reskirati
+        response = get_response("p_system_2", all_prompts["p_user_2"]).split('\n')
+        topics = [item for item in response if item != ""]  # just in case - triple check
+
+        # Prvi deo teksta sa naslovom, datumom, temama i ucesnicima
+        formatted_pocetak_summary = f"{get_response('p_system_0', all_prompts['p_user_0'])}"
+        
+        # Start the final summary with the formatted 'pocetak_summary'
+        final_summary = formatted_pocetak_summary + "\n\n"
+        i = 0
+        imax = len(topics)
+
+        for topic in topics:
+            summary = get_response("p_system_3", f"{all_prompts['p_user_3'].format(topic=topic)}")
+            st.info(f"Summarizing topic: {topic} - {i}/{imax}")
+            final_summary += f"{summary}\n\n"
+            i += 1
+
+        final_summary += f"{get_response('p_system_4', all_prompts['p_user_4'])}"
+        
+        return final_summary
+    
+    else:
+        return "Please upload a text file."
+
 
 
 # this function does summarization of the text 
