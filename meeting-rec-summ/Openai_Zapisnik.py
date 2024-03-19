@@ -33,8 +33,8 @@ if "init_prompts" not in st.session_state:
     from myfunc.retrievers import PromptDatabase
     with PromptDatabase() as db:
         prompt_map = db.get_prompts_by_names(["result1", "result2"],["SUM_PAM", "SUM_SUMARIZATOR"])
-        result1 = prompt_map.get("result1", "You are helpful assistant that always writes in Sebian.")
-        result2 = prompt_map.get("result2", "You are helpful assistant that always writes in Sebian.")
+        st.session_state.result1 = prompt_map.get("result1", "You are helpful assistant that always writes in Sebian.")
+        st.session_state.result2 = prompt_map.get("result2", "You are helpful assistant that always writes in Sebian.")
 
 # Setting the title for Streamlit application
 st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
@@ -229,8 +229,8 @@ and use markdown such is H1, H2, etc."""
                             llm,
                             chain_type="map_reduce",
                             verbose=True,
-                            map_prompt=PromptTemplate(template=result2.format(text="text", opis="opis"), input_variables=["text", "opis"]),
-                            combine_prompt=PromptTemplate(template=result1.format(text="text", opis_kraj="opis_kraj"), input_variables=["text", "opis_kraj"]),
+                            map_prompt=PromptTemplate(template=st.session_state.result2.format(text="text", opis="opis"), input_variables=["text", "opis"]),
+                            combine_prompt=PromptTemplate(template=st.session_state.result1.format(text="text", opis_kraj="opis_kraj"), input_variables=["text", "opis_kraj"]),
                             token_max=4000,)
 
                         suma = AIMessage(
