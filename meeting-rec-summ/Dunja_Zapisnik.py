@@ -10,7 +10,6 @@ import os
 import PyPDF2
 import re
 import io
-import openai 
 from myfunc.mojafunkcija import (
     st_style,
     positive_login,
@@ -179,8 +178,6 @@ def dugacki_iz_kratkih(uploaded_text, entered_prompt):
         
 
         def get_response(p_system, p_user_ext):
-            client = openai
-            
             response = client.chat.completions.create(
                 model="gpt-4-turbo-preview",
                 temperature=0,
@@ -191,7 +188,6 @@ def dugacki_iz_kratkih(uploaded_text, entered_prompt):
                 ]
             )
             return response.choices[0].message.content.strip()
-
 
         response = get_response("p_system_1", all_prompts["p_user_1"])
         
