@@ -37,98 +37,75 @@ st_style()
 # os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
 client=OpenAI()
 
-# The variables `story` and `uputstvo` in the `DocumentAnalyzer` class play distinct roles in the context of processing and analyzing a document:
-
-# ### `story`
-# - **Purpose:** This variable accumulates the ongoing analysis of the document. It is used to build the entire narrative or analytical output as the process iterates through the document. Each time the loop runs and generates a new part of the analysis, it is appended to `story`, gradually constructing the complete analysis.
-# - **Usage:** Initially, `story` is an empty string. In each iteration of the loop, a part of the analysis (`story_part`) is added to `story`. This incremental approach allows the function to handle and accumulate large amounts of text that might exceed the single response limit of the API.
-
-# ### `uputstvo`
-# - **Purpose:** The variable `uputstvo` (Serbian for "instructions") contains the instructions or prompts that guide the AI in analyzing the document. It sets the context and requests for the AI, outlining what is expected from the analysis.
-# - **Usage and Changes in Code:**
-#     - Initially, `uputstvo` is set to a detailed instruction for starting the analysis, guiding the AI to summarize key points and delve into an in-depth analysis.
-#     - As the loop continues (after the first iteration), `uputstvo` changes to prompt the AI to continue its analysis based on what has already been written. This new prompt includes a directive to continue from where the last analysis left off, providing the AI with the context of the `story` so far. This helps in maintaining the continuity and coherence of the analysis, ensuring that the AI's output is a seamless continuation of the previous parts.
-
-# The change in `uputstvo` from initial instructions to a continuation prompt is crucial for managing the flow of the document analysis. It ensures that each new piece of generated content is logically and contextually connected to the existing analysis, creating a coherent and comprehensive final output.
 
 
-class DocumentAnalyzer:
+# novi dugacki zapisnik
+def summarize_meeting_transcript(transcript):
     """
-    A class for analyzing documents using the GPT-4 model from OpenAI.
+    Summarize a meeting transcript by first extracting the date, participants, and topics,
+    and then summarizing each topic individually while excluding the introductory information
+    from the summaries.
 
-    Attributes:
-        model (str): The model identifier for the OpenAI API.
-        temperature (float): Controls randomness in the output generation.
-        max_tokens (int): The maximum number of tokens to generate in each request.
-
-    Methods:
-        analyze_document(document_text): Analyzes the provided document and returns a detailed analysis.
+    Parameters: 
+        transcript (str): The transcript of the meeting.
     """
+
+    def get_response(prompt, text):
+        """
+        Generate a response from the model based on the given prompt and text.
+        
+        Parameters:
+            prompt (str): The prompt to send to the model.
+            text (str): The text to summarize or extract information from.
+        """
+        response = client.chat.completions.create(
+            model="gpt-4-turbo-preview",
+            temperature=0.7,  # A bit of creativity might help in identifying topics and summarizing
+            messages=[
+                {"role": "system", "content": prompt},
+                {"role": "user", "content": text}
+            ]
+        )
+        
+        st.info(f"Potroseno prompt tokena: {response.usage.prompt_tokens}")
+        st.info(f"Potroseno completion tokena: {response.usage.completion_tokens}")
+        
+
+        return response.choices[0].message.content
+
+    # Extract introductory details like date, participants, and a brief overview
+    intro_prompt = "Extract the meeting date and the participants"
+    introduction = get_response(intro_prompt, transcript)
+
+    # Identify the main topics in the transcript
+    topic_identification_prompt = "List up to five main topics discussed in the transcript excluding the introductory details and explanation of the topics. All remaining topics summarize in the single topic Razno."
+    topics = get_response(topic_identification_prompt, transcript).split('\n')
     
-    def __init__(self, model="gpt-4-turbo-preview", temperature=0, max_tokens=1024):
-        """
-        Initializes the DocumentAnalyzer with the specified model parameters.
+    for topic in topics:
+        st.success(topic)
+    
 
-        Args:
-            model (str): The model identifier for the OpenAI API. Default is "gpt-4-turbo-preview".
-            temperature (float): Controls randomness in the output generation. Default is 0.
-            max_tokens (int): The maximum number of tokens to generate in each request. Default is 1024.
-        """
-        
-        self.model = model
-        self.temperature = temperature
-        self.max_tokens = max_tokens
+    # Summarize each identified topic
+    summaries = []
+    for topic in topics:
+        summary_prompt = f"Summarize the discussion on the topic: {topic}, excluding the introductory details. Use only the Serbian Language"
+        summary = get_response(summary_prompt, transcript)
+        summaries.append(f"## Tema: {topic} \n{summary}")
+        st.info(topic)
+    # Optional: Generate a conclusion from the whole transcript
+    conclusion_prompt = "Generate a conclusion from the whole meeting. Use only the Serbian Language"
+    conclusion = get_response(conclusion_prompt, transcript)
+    
+    # Compile the full text
+    full_text = (
+    f"## Sastanak koordinacije AI Tima\n\n{introduction}\n\n"
+    f"## Teme sastanka\n\n" + "\n".join([f"{topic}" for topic in topics]) + "\n\n"
+    + "\n\n".join(summaries) 
+    + f"\n\n## Zaključak\n\n{conclusion}"
+)
 
-    def analyze_document(self, document_text):
-        """
-        Analyzes the provided document text, generating a detailed analysis by summarizing key points, themes, 
-        and findings, and providing in-depth insights on the implications and context.
-
-        The analysis continues iteratively until all relevant parts of the document are covered, 
-        ensuring a comprehensive and self-contained output.
-
-        Args:
-            document_text (str): The text of the document to be analyzed.
-
-        Returns:
-            str: A detailed analysis of the document.
-        """
-        
-        start=True
-        total_prompt_tokens = 0
-        total_completion_tokens = 0
-        story = ""
-        uputstvo = f"""I have a document that I need a detailed analysis of. 
-        Please start by summarizing the key points, themes, or findings in each document. 
-        After summarizing each document, provide an in-depth analysis focusing on the implications, context, and any critical insights. 
-        Begin with the firsttopic in the document and continue until you reach the end of your output limit. 
-        I will then instruct you to continue with the analysis, moving on to the next topic of the document or further elaborating on the points already discussed. 
-        Ensure that each part of the analysis is comprehensive and self-contained to the extent possible, 
-        allowing for a seamless continuation in the follow-up responses. """
-
-        while True:
-            if not start:
-                uputstvo=f"""Continue the analysis with the next section or provide further details on the last discussed points. 
-                    Here is what you wrote so far: {story}"""
-        
-            completion = client.chat.completions.create(
-                model="gpt-4-turbo-preview",
-                temperature=0,
-                max_tokens=1024,
-                stop=None,
-                messages=[
-                    {"role": "system", "content": f"[Use only the Serbian language.] Here is the document >>> {document_text}."},
-                    {"role": "user", "content": uputstvo}
-                ]
-            )
-            start=False
-            story_part = completion.choices[0].message.content
-            story += story_part + " "
-            finish_reason = completion.choices[0].finish_reason
-            if finish_reason != "length":
-                break
-        return story
-
+   
+    return full_text
 
 if "init_prompts" not in st.session_state:
     st.session_state.init_prompts = True
@@ -139,7 +116,7 @@ if "init_prompts" not in st.session_state:
         st.session_state.result2 = prompt_map.get("result2", "You are helpful assistant that always writes in Sebian.")
 
 
-version = "29.12.23."
+version = "23.03.24."
 # this function does summarization of the text 
 def main():
 
@@ -168,7 +145,7 @@ def main():
         f"<p style='font-size: 10px; color: grey;'>{version}</p>",
         unsafe_allow_html=True,
     )
-    st.subheader("Zapisnik OpenAI ✍️")  # Setting the title for Streamlit application
+    st.subheader("Zapisnik OpenAI NEW ✍️")  # Setting the title for Streamlit application
     with st.expander("Pročitajte uputstvo 🧜"):
         st.caption(
             """
@@ -336,8 +313,8 @@ and use markdown such is H1, H2, etc."""
                         ).content
                         # st.write(type(suma.content))
                     elif koristi_dugacak == "Dugacak":
-                        analyzer = DocumentAnalyzer()
-                        suma = analyzer.analyze_document(result)
+                        ulaz= result[0].page_content
+                        suma = summarize_meeting_transcript(ulaz)
                     try:
                         st.session_state.dld = suma.contect
                     except:

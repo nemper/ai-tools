@@ -94,16 +94,21 @@ class DocumentAnalyzer:
         total_completion = 0
         start=True
         story = ""
-        uputstvo = f"""Based on this instructions: >> {prompt} << process this document >>> {document_text} """
+        uputstvo = f"""Based on this instructions: >> 
+                        {prompt} << process this document >>> 
+                        {document_text} """
         while True:
             if not start:
-                uputstvo=f"""{opis_nastavak} {prompt}  
-                Here is what you wrote so far: {story}"""
+                uputstvo=f"""{opis_nastavak} Based on this instructions: >> 
+                            {prompt} << process this document >>> 
+                            {document_text}  << Here is what you wrote so far: >> 
+                            {story}"""
         
             completion = client.chat.completions.create(
                 model=self.model,
                 temperature=self.temperature,
                 max_tokens=self.max_tokens,
+                seed=1,
                 stop=None,
                 messages=[
                     {"role": "system", "content": opis_sistem},
@@ -113,9 +118,15 @@ class DocumentAnalyzer:
             start=False
             total_prompt +=  completion.usage.prompt_tokens
             total_completion+= completion.usage.completion_tokens
+            dolara_za_sada = round((total_prompt/1000*0.01)+(total_completion/1000*0.03),3)
             dolara += (total_prompt/1000*0.01)+(total_completion/1000*0.03)
             story_part = completion.choices[0].message.content
-            story += story_part + " "
+            st.success(f"Prompt this part: ")
+            st.write(uputstvo)
+            st.success(f"Story this part: ")
+            st.write(story_part)
+            st.info(f"Tokens this part:{completion.usage.prompt_tokens} tokena za prompt i {completion.usage.completion_tokens} tokena za odgovor. ukupno je utroseno {dolara_za_sada} dolara")
+            story += story_part 
             finish_reason = completion.choices[0].finish_reason
             st.info(f" Razlog zavrsetka je {completion.choices[0].finish_reason}")
             if finish_reason != "length":
@@ -159,13 +170,24 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
     # summarize chosen file
     if uploaded_file is not None:
         
-        prva = """I have a document that I need a detailed analysis of. 
-        Please start by summarizing the key points, themes, or findings in each document. 
-        After summarizing each document, provide an in-depth analysis focusing on the implications, context, and any critical insights. 
-        Begin with the firsttopic in the document and continue until you reach the end of your output limit. 
-        I will then instruct you to continue with the analysis, moving on to the next topic of the document or further elaborating on the points already discussed. 
-        Ensure that each part of the analysis is comprehensive and self-contained to the extent possible, 
-        allowing for a seamless continuation in the follow-up responses. """
+        prva = """To perform a detailed analysis of your document, follow a structured and systematic approach as outlined below. This will ensure a thorough examination of the content, capturing all pertinent information and insights. Here’s how to proceed:
+
+1. **"Datum"**: Begin by identifying the date specified in the document. This is crucial for contextualizing the information. Format this date in the day-month-year (dd.mm.yyyy) format. If the document does not clearly state the date, record it as 00.00.0000. This notation acknowledges that the date is either unspecified or not a focal point in the document. The correct identification of the date will set the temporal context for the analysis, providing a timeline for the events or information presented.
+
+2. **"Akteri i spomenute persone"**: Compile a comprehensive list of all individuals, organizations, and entities mentioned within the document. Number each entry to keep track of the various participants and mentioned persons. This list will serve as a reference point for understanding the key players involved and their roles or significance within the context of the document. It is important to capture every name mentioned to ensure a full understanding of the interactions, relationships, or dynamics presented.
+
+3. **"Ključne tačke"**: Identify and list the key points, themes, or findings detailed in the document. Present these in a summarised form, akin to headlines or topic titles, which you will later elaborate on. This section should act as a scaffold for the detailed analysis, highlighting the primary subjects and arguments that the document addresses. Each key point serves as a gateway to deeper exploration and understanding of the document's content.
+
+4. **"Izjave učesnika"**: Carefully extract and quote the relevant statements made by the participants in relation to each theme or key point. These quotes are vital for supporting the analysis, providing direct insights or perspectives from the involved parties. The accuracy and relevance of these quotations are paramount, as they will be used to bolster the interpretation and understanding of the document's themes.
+
+5. **"Detaljna analiza"**: Delve into a detailed examination of each previously listed key point or theme. Discuss each in a separate, well-structured paragraph. This section is the core of your analysis, where each topic is to be explored comprehensively. Leave no stone unturned; every aspect of the topic should be covered, ensuring a complete and thorough understanding. This in-depth analysis requires a critical approach, assessing the implications, nuances, and subtleties of each point.
+
+6. **"Zaključak"**: Conclude the analysis with a concise yet comprehensive summary that encapsulates the main findings, themes, and insights derived from the document. This conclusion should tie together all the threads of analysis, providing a coherent and integrated overview of the document's content and significance.
+
+7. **"Dalji koraci i preporuke"**: Finally, identify any further steps and recommendations that emerge from the analysis. This section should go beyond the content already discussed, proposing actions, considerations, or strategies based on the insights gained. Provide a deep analysis of these steps and recommendations, focusing on their implications, the context surrounding them, and any critical insights that they offer.
+
+Ensure that each segment of the analysis, from the initial identification of the date and participants to the detailed exploration of key points and the concluding recommendations, is comprehensive and self-contained. This approach allows for a seamless continuation of the analysis, whether in further discussions, subsequent analyses, or practical applications of the findings.
+"""
         
         sistem = "[Use only the Serbian language.] Use markdown and create the Title and Subtitles"
         
