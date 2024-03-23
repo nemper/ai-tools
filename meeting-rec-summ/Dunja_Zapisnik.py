@@ -1,4 +1,10 @@
 from langchain_community.document_loaders import UnstructuredFileLoader
+from langchain_openai.chat_models import ChatOpenAI
+from langchain.schema import AIMessage
+from langchain.prompts import PromptTemplate
+from langchain.chains.combine_documents.stuff import StuffDocumentsChain
+from langchain.chains.llm import LLMChain
+
 import streamlit as st
 import os
 import PyPDF2
@@ -7,153 +13,189 @@ import io
 from myfunc.mojafunkcija import (
     st_style,
     positive_login,
-    )
+    open_file,)
+
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.chains.summarize import load_summarize_chain
+# from pydub import AudioSegment
+
+from docx import Document
 
 from myfunc.mojafunkcija import sacuvaj_dokument
 from myfunc.asistenti import (audio_izlaz, 
                               priprema, 
-                            )
+                              dugacki_iz_kratkih)
 import nltk
+
 from openai import OpenAI
 
 # Setting the title for Streamlit application
 st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
 st_style()
-
-temp=0
-tokens=0
 # os.environ["LANGCHAIN_TRACING_V2"] = "true"
 # os.environ["LANGCHAIN_PROJECT"] = f"Dugacki Zapisnik"
 # os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
-
 client=OpenAI()
 
-############
-# The variables `story` and `uputstvo` in the `DocumentAnalyzer` class play distinct roles in the context of processing and analyzing a document:
-#
-# ### `story`
-# - **Purpose:** This variable accumulates the ongoing analysis of the document. It is used to build the entire narrative or analytical output as the process iterates through the document. Each time the loop runs and generates a new part of the analysis, it is appended to `story`, gradually constructing the complete analysis.
-# - **Usage:** Initially, `story` is an empty string. In each iteration of the loop, a part of the analysis (`story_part`) is added to `story`. This incremental approach allows the function to handle and accumulate large amounts of text that might exceed the single response limit of the API.
-#
-# ### `uputstvo`
-# - **Purpose:** The variable `uputstvo` (Serbian for "instructions") contains the instructions or prompts that guide the AI in analyzing the document. It sets the context and requests for the AI, outlining what is expected from the analysis.
-# - **Usage and Changes in Code:**
-#     - Initially, `uputstvo` is set to a detailed instruction for starting the analysis, guiding the AI to summarize key points and delve into an in-depth analysis.
-#     - As the loop continues (after the first iteration), `uputstvo` changes to prompt the AI to continue its analysis based on what has already been written. This new prompt includes a directive to continue from where the last analysis left off, providing the AI with the context of the `story` so far. This helps in maintaining the continuity and coherence of the analysis, ensuring that the AI's output is a seamless continuation of the previous parts.
-#
-# The change in `uputstvo` from initial instructions to a continuation prompt is crucial for managing the flow of the document analysis. It ensures that each new piece of generated content is logically and contextually connected to the existing analysis, creating a coherent and comprehensive final output.
-############
 
 
-class DocumentAnalyzer:
+# novi dugacki zapisnik
+def summarize_meeting_transcript(transcript):
     """
-    A class for analyzing documents using the GPT-4 model from OpenAI.
+    Summarize a meeting transcript by first extracting the date, participants, and topics,
+    and then summarizing each topic individually while excluding the introductory information
+    from the summaries.
 
-    Attributes:
-        model (str): The model identifier for the OpenAI API.
-        temperature (float): Controls randomness in the output generation.
-        max_tokens (int): The maximum number of tokens to generate in each request.
-
-    Methods:
-        analyze_document(document_text): Analyzes the provided document and returns a detailed analysis.
+    Parameters: 
+        transcript (str): The transcript of the meeting.
     """
+
+    def get_response(prompt, text):
+        """
+        Generate a response from the model based on the given prompt and text.
+        
+        Parameters:
+            prompt (str): The prompt to send to the model.
+            text (str): The text to summarize or extract information from.
+        """
+        response = client.chat.completions.create(
+            model="gpt-4-turbo-preview",
+            temperature=0.7,  # A bit of creativity might help in identifying topics and summarizing
+            messages=[
+                {"role": "system", "content": prompt},
+                {"role": "user", "content": text}
+            ]
+        )
+        
+        st.info(f"Potroseno prompt tokena: {response.usage.prompt_tokens}")
+        st.info(f"Potroseno completion tokena: {response.usage.completion_tokens}")
+        
+
+        return response.choices[0].message.content
+
+    # Extract introductory details like date, participants, and a brief overview
+    intro_prompt = "Extract the meeting date and the participants"
+    introduction = get_response(intro_prompt, transcript)
+
+    # Identify the main topics in the transcript
+    topic_identification_prompt = "List up to five main topics discussed in the transcript excluding the introductory details and explanation of the topics. All remaining topics summarize in the single topic Razno."
+    topics = get_response(topic_identification_prompt, transcript).split('\n')
     
-    def __init__(self, model="gpt-4-turbo-preview", temperature=temp, max_tokens=tokens):
-        """
-        Initializes the DocumentAnalyzer with the specified model parameters.
+    for topic in topics:
+        st.success(topic)
+    
 
-        Args:
-            model (str): The model identifier for the OpenAI API. Default is "gpt-4-turbo-preview".
-            temperature (float): Controls randomness in the output generation. Default is 0.
-            max_tokens (int): The maximum number of tokens to generate in each request. Default is 4096.
-        """
-        
-        self.model = model
-        self.temperature = temperature
-        self.max_tokens = max_tokens
-        
+    # Summarize each identified topic
+    summaries = []
+    for topic in topics:
+        summary_prompt = f"Summarize the discussion on the topic: {topic}, excluding the introductory details. Use only the Serbian Language"
+        summary = get_response(summary_prompt, transcript)
+        summaries.append(f"## Tema: {topic} \n{summary}")
+        st.info(topic)
+    # Optional: Generate a conclusion from the whole transcript
+    conclusion_prompt = "Generate a conclusion from the whole meeting. Use only the Serbian Language"
+    conclusion = get_response(conclusion_prompt, transcript)
+    
+    # Compile the full text
+    full_text = (
+    f"## Sastanak koordinacije AI Tima\n\n{introduction}\n\n"
+    f"## Teme sastanka\n\n" + "\n".join([f"{topic}" for topic in topics]) + "\n\n"
+    + "\n\n".join(summaries) 
+    + f"\n\n## Zaključak\n\n{conclusion}"
+)
 
-    def analyze_document(self, document_text, prompt, opis_sistem, opis_nastavak):
-        """
-        Analyzes the provided document text, generating a detailed analysis by summarizing key points, themes, 
-        and findings, and providing in-depth insights on the implications and context.
+   
+    return full_text
 
-        The analysis continues iteratively until all relevant parts of the document are covered, 
-        ensuring a comprehensive and self-contained output.
-
-        Args:
-            document_text (str): The text of the document to be analyzed.
-
-        Returns:
-            str: A detailed analysis of the document.
-        """
-        st.info(f"Temperatura je {self.temperature}")
-        st.info(f"Broj tokena je {self.max_tokens}")    
-        dolara = 0
-        total_prompt = 0
-        total_completion = 0
-        start=True
-        story = ""
-        uputstvo = f"""Based on this instructions: >> 
-                        {prompt} << process this document >>> 
-                        {document_text} """
-        while True:
-            if not start:
-                uputstvo=f"""{opis_nastavak} Based on this instructions: >> 
-                            {prompt} << process this document >>> 
-                            {document_text}  << Here is what you wrote so far: >> 
-                            {story}"""
-        
-            completion = client.chat.completions.create(
-                model=self.model,
-                temperature=self.temperature,
-                max_tokens=self.max_tokens,
-                seed=1,
-                stop=None,
-                messages=[
-                    {"role": "system", "content": opis_sistem},
-                    {"role": "user", "content": uputstvo}
-                ]
-            )
-            start=False
-            total_prompt +=  completion.usage.prompt_tokens
-            total_completion+= completion.usage.completion_tokens
-            dolara_za_sada = round((total_prompt/1000*0.01)+(total_completion/1000*0.03),3)
-            dolara += (total_prompt/1000*0.01)+(total_completion/1000*0.03)
-            story_part = completion.choices[0].message.content
-            st.success(f"Prompt this part: ")
-            st.write(uputstvo)
-            st.success(f"Story this part: ")
-            st.write(story_part)
-            st.info(f"Tokens this part:{completion.usage.prompt_tokens} tokena za prompt i {completion.usage.completion_tokens} tokena za odgovor. ukupno je utroseno {dolara_za_sada} dolara")
-            story += story_part 
-            finish_reason = completion.choices[0].finish_reason
-            st.info(f" Razlog zavrsetka je {completion.choices[0].finish_reason}")
-            if finish_reason != "length":
-                dolara = round(dolara,3)
-                st.info(f"Utroseno je {total_prompt} tokena za prompt i {total_completion} tokena za odgovor. ukupno je utroseno {dolara} dolara")
-                break
-        return story
+if "init_prompts" not in st.session_state:
+    st.session_state.init_prompts = True
+    from myfunc.retrievers import PromptDatabase
+    with PromptDatabase() as db:
+        prompt_map = db.get_prompts_by_names(["result1", "result2"],["SUM_PAM", "SUM_SUMARIZATOR"])
+        st.session_state.result1 = prompt_map.get("result1", "You are helpful assistant that always writes in Sebian.")
+        st.session_state.result2 = prompt_map.get("result2", "You are helpful assistant that always writes in Sebian.")
 
 
-version = "22.03.24."
-
-
+version = "23.03.24."
 # this function does summarization of the text 
 def main():
+
+    def read_pdf(file):
+        pdfReader = PyPDF2.PdfFileReader(file)
+        count = pdfReader.numPages
+        text = ""
+        for i in range(count):
+            page = pdfReader.getPage(i)
+            text += page.extractText()
+        return text
+
+    def read_docx(file):
+        doc = Document(file)
+        text = " ".join([paragraph.text for paragraph in doc.paragraphs])
+        return text
+
+    doc_io = ""
     with st.sidebar:
         priprema()
+    # Read OpenAI API key from envtekst za
+    # openai.api_key = os.environ.get("OPENAI_API_KEY")
     # initial prompt
     opis = "opis"
     st.markdown(
         f"<p style='font-size: 10px; color: grey;'>{version}</p>",
         unsafe_allow_html=True,
     )
-    st.subheader("Zapisnik OpenAI - DUNJA ✍️")  # Setting the title for Streamlit application
+    st.subheader("Zapisnik OpenAI NEW ✍️")  # Setting the title for Streamlit application
     with st.expander("Pročitajte uputstvo 🧜"):
         st.caption(
             """
                    ### Korisničko Uputstvo za Sažimanje Teksta i Transkribovanje 🧜
+
+Dobrodošli na alat za sažimanje teksta i transkribovanje zvučnih zapisa! Ovaj alat vam pruža mogućnost generisanja sažetaka tekstova sastanaka, kao i transkribovanja zvučnih zapisa. Evo kako možete koristiti ovaj alat:
+
+#### Sažimanje Teksta
+
+1. **Učitavanje Teksta**
+   - U prozoru "Izaberite tekst za sumarizaciju" učitajte tekstualni dokument koji želite sažeti. Podržani formati su .txt, .pdf i .docx.
+
+2. **Unos Promptova**
+   - Unesite instrukcije za sažimanje u polje "Unesite instrukcije za sumarizaciju". Ovo vam omogućava da precizirate želje za sažimanje.
+   - Opciono mozete učitati prethodno sačuvani .txt fajl sa promptovima u opciji "Izaberite prompt koji možete editovati, prihvatite default tekst ili pišite prompt od početka".
+ 
+**Generisanje Sažetka**
+   - Mozete odabrati opcije Kratki i Dugacki Summary. Kratki summary kao izlaz daje jednu stranicu A4. 
+        - Dugacki summary daje otprilike jednu stranicu A4 po temi, ali traje duze i koristi mnogo vise tokena. Za sada sa Dugacki summary nije moguce kroistiti User prompt. 
+   - Pritisnite dugme "Submit" kako biste pokrenuli proces sažimanja. Sažetak će se prikazati u prozoru "Sažetak". Takođe, imate opciju preuzimanja sažetka kao .txt, .docx i .pdf.
+   - Ukoliko je dokument duzi od 275000 karaktera, bice primenjen drugi, sporiji nacim rada, zbog trenutog ogranicenja GPT-4 modela na 4000 tokena za izlaz. U ovom slucaju dugacki summary nije dostupan.
+
+#### Transkribovanje Zvučnih Zapisa
+
+1. **Učitavanje Zvučnog Zapisa**
+   - U bočnoj traci, kliknite na opciju "Transkribovanje zvučnih zapisa" u padajućem meniju. Učitajte zvučni zapis (.mp3) koji želite transkribovati. \
+   Možete poslušati sadržaj fajla po potrebi. **Napomena:** Zvučni zapis ne sme biti veći od 25Mb. 
+
+2. **Odabir Jezika**
+   - Izaberite jezik izvornog teksta zvučnog zapisa u padajućem meniju "Odaberite jezik izvornog teksta".
+
+3. **Generisanje Transkripta**
+   - Pritisnite dugme "Submit" kako biste pokrenuli proces transkribovanja. Transkript će se prikazati u prozoru "Transkript". Takođe, možete preuzeti transkript kao .txt.
+
+   #### Čitanje slika iz fajla i sa URL-a
+
+1. **Učitavanje slike**
+   - U bočnoj traci, kliknite na opciju "Čitanje sa slike iz fajla" ili "Čitanje sa slike sa URL-a" u padajućem meniju. Učitajte sliku (.jpg) koji želite da bude opisana. Prikazaće se preview slike.
+
+2. **Uputstvo**
+   - Korigujte uputsvo po potrebi.
+
+3. **Generisanje opisa**
+   - Pritisnite dugme "Submit" kako biste pokrenuli proces opisivanja. Opis će se prikazati u prozoru "Opis slike". Takođe, možete preuzeti opis kao .txt.
+
+**Napomena:**
+- Za transkribovanje zvučnih zapisa koristi se OpenAI Whisper model. Zvučni zapis mora biti u .MP3 formatu i ne veći od 25Mb.
+- Za sažimanje teksta i citanje sa slika koristi se odgovarajući OpenAI GPT-4 model.
+- Sve generisane datoteke možete preuzeti pomoću odgovarajućih dugmadi za preuzimanje u bočnoj traci.
+
 Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀 
                    """
         )
@@ -170,29 +212,24 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
     # summarize chosen file
     if uploaded_file is not None:
         
-        prva = """To perform a detailed analysis of your document, follow a structured and systematic approach as outlined below. This will ensure a thorough examination of the content, capturing all pertinent information and insights. Here’s how to proceed:
+        # Initializing ChatOpenAI model
+        llm = ChatOpenAI(
+            model_name="gpt-4-turbo-preview", temperature=0
+        )
 
-1. **"Datum"**: Begin by identifying the date specified in the document. This is crucial for contextualizing the information. Format this date in the day-month-year (dd.mm.yyyy) format. If the document does not clearly state the date, record it as 00.00.0000. This notation acknowledges that the date is either unspecified or not a focal point in the document. The correct identification of the date will set the temporal context for the analysis, providing a timeline for the events or information presented.
+        prva_file = st.file_uploader(
+            "Izaberite prompt koji možete editovati, prihvatite default tekst ili pišite prompt od početka",
+            key="upload_prva",
+            type="txt",
+            help = "Odabir dokumenta",
+        )
+        if prva_file is not None:
+            prva = prva_file.getvalue().decode("utf-8")  # Loading text from the file
+        else:
+            prva = """Write a detailed summary. Be sure to describe every topic and the name used in the text. \
+Write it as a newspaper article. Write only in Serbian language. Give it a Title and subtitles where appropriate \
+and use markdown such is H1, H2, etc."""
 
-2. **"Akteri i spomenute persone"**: Compile a comprehensive list of all individuals, organizations, and entities mentioned within the document. Number each entry to keep track of the various participants and mentioned persons. This list will serve as a reference point for understanding the key players involved and their roles or significance within the context of the document. It is important to capture every name mentioned to ensure a full understanding of the interactions, relationships, or dynamics presented.
-
-3. **"Ključne tačke"**: Identify and list the key points, themes, or findings detailed in the document. Present these in a summarised form, akin to headlines or topic titles, which you will later elaborate on. This section should act as a scaffold for the detailed analysis, highlighting the primary subjects and arguments that the document addresses. Each key point serves as a gateway to deeper exploration and understanding of the document's content.
-
-4. **"Izjave učesnika"**: Carefully extract and quote the relevant statements made by the participants in relation to each theme or key point. These quotes are vital for supporting the analysis, providing direct insights or perspectives from the involved parties. The accuracy and relevance of these quotations are paramount, as they will be used to bolster the interpretation and understanding of the document's themes.
-
-5. **"Detaljna analiza"**: Delve into a detailed examination of each previously listed key point or theme. Discuss each in a separate, well-structured paragraph. This section is the core of your analysis, where each topic is to be explored comprehensively. Leave no stone unturned; every aspect of the topic should be covered, ensuring a complete and thorough understanding. This in-depth analysis requires a critical approach, assessing the implications, nuances, and subtleties of each point.
-
-6. **"Zaključak"**: Conclude the analysis with a concise yet comprehensive summary that encapsulates the main findings, themes, and insights derived from the document. This conclusion should tie together all the threads of analysis, providing a coherent and integrated overview of the document's content and significance.
-
-7. **"Dalji koraci i preporuke"**: Finally, identify any further steps and recommendations that emerge from the analysis. This section should go beyond the content already discussed, proposing actions, considerations, or strategies based on the insights gained. Provide a deep analysis of these steps and recommendations, focusing on their implications, the context surrounding them, and any critical insights that they offer.
-
-Ensure that each segment of the analysis, from the initial identification of the date and participants to the detailed exploration of key points and the concluding recommendations, is comprehensive and self-contained. This approach allows for a seamless continuation of the analysis, whether in further discussions, subsequent analyses, or practical applications of the findings.
-"""
-        
-        sistem = "[Use only the Serbian language.] Use markdown and create the Title and Subtitles"
-        
-        nastavak = "Continue rewriting from where you stopped the last time. Do not repeat yourself." 
-        
         with io.open(uploaded_file.name, "wb") as file:
             file.write(uploaded_file.getbuffer())
 
@@ -217,15 +254,17 @@ Ensure that each segment of the analysis, from the initial identification of the
         result = loader.load()
 
         out_name = "Zapisnik"
-       
+
+        ye_old_way = False
+        if len(result[0].page_content) > 275000:
+            ye_old_way = True
+            st.warning("Vaš dokument je duži od 275000 karaktera. Koristiće se map reduce document chain (radi sporije, a daje drugačije rezultate) - ovo je temporary rešenje. Za ovu opciju dugacki summary nije dostupan.")
+
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=75000, chunk_overlap=5000,)
+        texts = text_splitter.split_documents(result)
+
         with st.form(key="my_form", clear_on_submit=False):
-            opis_sistem = st.text_area(
-                "Unesite sistemske instrukcije : ",
-                sistem,
-                key="prompt_sistem",
-                height=150,
-                help = "Unos prompta koji opisuje fokus sumiranja, željenu dužinu sažetka, formatiranje, ton, jezik, itd."
-            )
             opis = st.text_area(
                 "Unesite instrukcije za sumarizaciju : ",
                 prva,
@@ -233,29 +272,54 @@ Ensure that each segment of the analysis, from the initial identification of the
                 height=150,
                 help = "Unos prompta koji opisuje fokus sumiranja, željenu dužinu sažetka, formatiranje, ton, jezik, itd."
             )
-            opis_nastavak = st.text_area(
-                "Unesite instrukcije za nastavak sumarizacije : ",
-                nastavak,
-                key="prompt_nastavak",
-                height=150,
-                help = "Unos prompta koji opisuje fokus sumiranja, željenu dužinu sažetka, formatiranje, ton, jezik, itd."
-            )
             audio_i = st.checkbox("Glasovna naracija")
-            temp=st.slider("Temperatura", min_value = 0.0, max_value = 2.0, value = 0.0, step = 0.1)
-            tokens=st.slider("Tokena", min_value = 256, max_value = 4096, value = 1024, step = 128)
+
+
+
+            koristi_dugacak = st.radio(label="Kakav sazetak:", options=["Kratak", "Dugacak"], horizontal=True, label_visibility="collapsed")
 
             submit_button = st.form_submit_button(label="Submit")
             
             if submit_button:
-          
                 with st.spinner("Sačekajte trenutak..."):
-                    analyzer = DocumentAnalyzer(temperature = temp, max_tokens = tokens)
+                    if ye_old_way:
+                        opis_kraj = opis
+                        opis = "Summarize comprehensively the content of the document."
+                        chain = load_summarize_chain(
+                            llm,
+                            chain_type="map_reduce",
+                            verbose=True,
+                            map_prompt=PromptTemplate(template=st.session_state.result2.format(text="text", opis="opis"), input_variables=["text", "opis"]),
+                            combine_prompt=PromptTemplate(template=st.session_state.result1.format(text="text", opis_kraj="opis_kraj"), input_variables=["text", "opis_kraj"]),
+                            token_max=4000,)
+
+                        suma = AIMessage(
+                            content=chain.invoke(
+                                {"input_documents": texts, "opis": opis, "opis_kraj": opis_kraj})["output_text"]
+                                ).content
+                    elif koristi_dugacak == "Kratak":
+                        prompt_template = """ "{additional_variable}"
+                        "{text}"
+                        SUMMARY:"""
+                        prompt = PromptTemplate.from_template(prompt_template)
+                        prompt.input_variables = ["text", "additional_variable"] 
+                        # Define LLM chain
+                        llm_chain = LLMChain(llm=llm, prompt=prompt)
+                        # Define StuffDocumentsChain
+                        stuff_chain = StuffDocumentsChain(llm_chain=llm_chain, document_variable_name="text")       
+
+                        suma = AIMessage(
+                            content=stuff_chain.invoke({"input_documents": result, "additional_variable": opis})["output_text"]
+                        ).content
+                        # st.write(type(suma.content))
+                    elif koristi_dugacak == "Dugacak":
+                        ulaz= result[0].page_content
+                        suma = summarize_meeting_transcript(ulaz)
                     try:
-                        suma = analyzer.analyze_document(result, opis, opis_sistem, opis_nastavak)
+                        st.session_state.dld = suma.contect
+                    except:
                         st.session_state.dld = suma
-                    except Exception as e:
-                        st.error(f"Nisam u mogucnosati da ispunim zahtev {e}")
-                            
+                    
         if st.session_state.dld != "Zapisnik":
             with st.sidebar:
                             
