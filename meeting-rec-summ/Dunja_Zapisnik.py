@@ -13,7 +13,7 @@ import io
 from myfunc.mojafunkcija import (
     st_style,
     positive_login,
-    open_file,)
+   )
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains.summarize import load_summarize_chain
@@ -24,7 +24,7 @@ from docx import Document
 from myfunc.mojafunkcija import sacuvaj_dokument
 from myfunc.asistenti import (audio_izlaz, 
                               priprema, 
-                              dugacki_iz_kratkih)
+                              )
 import nltk
 
 from openai import OpenAI
@@ -40,7 +40,7 @@ client=OpenAI()
 
 
 # novi dugacki zapisnik
-def summarize_meeting_transcript(transcript):
+def summarize_meeting_transcript(transcript, temp, broj_tema):
     """
     Summarize a meeting transcript by first extracting the date, participants, and topics,
     and then summarizing each topic individually while excluding the introductory information
@@ -50,7 +50,7 @@ def summarize_meeting_transcript(transcript):
         transcript (str): The transcript of the meeting.
     """
 
-    def get_response(prompt, text):
+    def get_response(prompt, text, temp):
         """
         Generate a response from the model based on the given prompt and text.
         
@@ -58,43 +58,41 @@ def summarize_meeting_transcript(transcript):
             prompt (str): The prompt to send to the model.
             text (str): The text to summarize or extract information from.
         """
+        
         response = client.chat.completions.create(
             model="gpt-4-turbo-preview",
-            temperature=0.7,  # A bit of creativity might help in identifying topics and summarizing
+            temperature=temp,  
             messages=[
-                {"role": "system", "content": prompt},
+                {"role": "system", "content": prompt + "Use only the Serbian Language"},
                 {"role": "user", "content": text}
             ]
         )
         
-        st.info(f"Potroseno prompt tokena: {response.usage.prompt_tokens}")
-        st.info(f"Potroseno completion tokena: {response.usage.completion_tokens}")
-        
-
         return response.choices[0].message.content
 
     # Extract introductory details like date, participants, and a brief overview
-    intro_prompt = "Extract the meeting date and the participants"
-    introduction = get_response(intro_prompt, transcript)
+    intro_prompt = "Extract the meeting date and the participants."
+    introduction = get_response(intro_prompt, transcript, temp)
 
     # Identify the main topics in the transcript
-    topic_identification_prompt = "List up to five main topics discussed in the transcript excluding the introductory details and explanation of the topics. All remaining topics summarize in the single topic Razno."
-    topics = get_response(topic_identification_prompt, transcript).split('\n')
+    topic_identification_prompt = f"List up to {broj_tema} main topics discussed in the transcript excluding the introductory details and explanation of the topics. All remaining topics summarize in the single topic Razno."
+    topics = get_response(topic_identification_prompt, transcript, temp).split('\n')
     
+    st.success("Identifikovane su teme:")
     for topic in topics:
         st.success(topic)
-    
 
     # Summarize each identified topic
     summaries = []
     for topic in topics:
-        summary_prompt = f"Summarize the discussion on the topic: {topic}, excluding the introductory details. Use only the Serbian Language"
-        summary = get_response(summary_prompt, transcript)
+        summary_prompt = f"Summarize the discussion on the topic: {topic}, excluding the introductory details."
+        summary = get_response(summary_prompt, transcript, temp)
         summaries.append(f"## Tema: {topic} \n{summary}")
-        st.info(topic)
+        st.info(f"Obradjujem temu: {topic}")
+        
     # Optional: Generate a conclusion from the whole transcript
-    conclusion_prompt = "Generate a conclusion from the whole meeting. Use only the Serbian Language"
-    conclusion = get_response(conclusion_prompt, transcript)
+    conclusion_prompt = "Generate a conclusion from the whole meeting."
+    conclusion = get_response(conclusion_prompt, transcript, temp)
     
     # Compile the full text
     full_text = (
@@ -103,8 +101,6 @@ def summarize_meeting_transcript(transcript):
     + "\n\n".join(summaries) 
     + f"\n\n## Zaključak\n\n{conclusion}"
 )
-
-   
     return full_text
 
 if "init_prompts" not in st.session_state:
@@ -116,29 +112,13 @@ if "init_prompts" not in st.session_state:
         st.session_state.result2 = prompt_map.get("result2", "You are helpful assistant that always writes in Sebian.")
 
 
-version = "23.03.24."
+version = "24.03.24."
 # this function does summarization of the text 
 def main():
 
-    def read_pdf(file):
-        pdfReader = PyPDF2.PdfFileReader(file)
-        count = pdfReader.numPages
-        text = ""
-        for i in range(count):
-            page = pdfReader.getPage(i)
-            text += page.extractText()
-        return text
-
-    def read_docx(file):
-        doc = Document(file)
-        text = " ".join([paragraph.text for paragraph in doc.paragraphs])
-        return text
-
-    doc_io = ""
     with st.sidebar:
         priprema()
-    # Read OpenAI API key from envtekst za
-    # openai.api_key = os.environ.get("OPENAI_API_KEY")
+
     # initial prompt
     opis = "opis"
     st.markdown(
@@ -158,13 +138,11 @@ Dobrodošli na alat za sažimanje teksta i transkribovanje zvučnih zapisa! Ovaj
 1. **Učitavanje Teksta**
    - U prozoru "Izaberite tekst za sumarizaciju" učitajte tekstualni dokument koji želite sažeti. Podržani formati su .txt, .pdf i .docx.
 
-2. **Unos Promptova**
-   - Unesite instrukcije za sažimanje u polje "Unesite instrukcije za sumarizaciju". Ovo vam omogućava da precizirate želje za sažimanje.
-   - Opciono mozete učitati prethodno sačuvani .txt fajl sa promptovima u opciji "Izaberite prompt koji možete editovati, prihvatite default tekst ili pišite prompt od početka".
- 
 **Generisanje Sažetka**
    - Mozete odabrati opcije Kratki i Dugacki Summary. Kratki summary kao izlaz daje jednu stranicu A4. 
-        - Dugacki summary daje otprilike jednu stranicu A4 po temi, ali traje duze i koristi mnogo vise tokena. Za sada sa Dugacki summary nije moguce kroistiti User prompt. 
+   - Mozete odabrati temperaturu. Visa tempratura daje manje detrministicki odgovor.
+   - Omogucavanje glasovne naracije moze povecati troskove i trajanje procesa. U zavisnosti od duzine dugackog sazetka moze biti izvan mogucnosti ovog alata da uradi glasovnu naraciju.
+   - Dugacki summary daje otprilike 2-3 teme po jednoj stranici A4, ali traje duze i koristi mnogo vise tokena. Za dugacki summary mozete odrediti i maksimalni broj glavnih tema. Ostale identifikovane teme bice obradjene pod tackom Razno 
    - Pritisnite dugme "Submit" kako biste pokrenuli proces sažimanja. Sažetak će se prikazati u prozoru "Sažetak". Takođe, imate opciju preuzimanja sažetka kao .txt, .docx i .pdf.
    - Ukoliko je dokument duzi od 275000 karaktera, bice primenjen drugi, sporiji nacim rada, zbog trenutog ogranicenja GPT-4 modela na 4000 tokena za izlaz. U ovom slucaju dugacki summary nije dostupan.
 
@@ -212,21 +190,7 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
     # summarize chosen file
     if uploaded_file is not None:
         
-        # Initializing ChatOpenAI model
-        llm = ChatOpenAI(
-            model_name="gpt-4-turbo-preview", temperature=0
-        )
-
-        prva_file = st.file_uploader(
-            "Izaberite prompt koji možete editovati, prihvatite default tekst ili pišite prompt od početka",
-            key="upload_prva",
-            type="txt",
-            help = "Odabir dokumenta",
-        )
-        if prva_file is not None:
-            prva = prva_file.getvalue().decode("utf-8")  # Loading text from the file
-        else:
-            prva = """Write a detailed summary. Be sure to describe every topic and the name used in the text. \
+        prva = """Write a detailed summary. Be sure to describe every topic and the name used in the text. \
 Write it as a newspaper article. Write only in Serbian language. Give it a Title and subtitles where appropriate \
 and use markdown such is H1, H2, etc."""
 
@@ -265,22 +229,26 @@ and use markdown such is H1, H2, etc."""
         texts = text_splitter.split_documents(result)
 
         with st.form(key="my_form", clear_on_submit=False):
-            opis = st.text_area(
-                "Unesite instrukcije za sumarizaciju : ",
-                prva,
-                key="prompt_prva",
-                height=150,
-                help = "Unos prompta koji opisuje fokus sumiranja, željenu dužinu sažetka, formatiranje, ton, jezik, itd."
-            )
-            audio_i = st.checkbox("Glasovna naracija")
-
-
-
-            koristi_dugacak = st.radio(label="Kakav sazetak:", options=["Kratak", "Dugacak"], horizontal=True, label_visibility="collapsed")
+            opis = prva
+            col1, col2, col3, col4 = st.columns(4)
+            with col4:
+                audio_i = st.checkbox("Glasovna naracija", help='Omogucavanje glasovne naracije moze povecati troskove i trajanje procesa. U zavisnosti od duzine dugackog sazetka moze biti izvan mogucnosti ovog alata da uradi glasovnu naraciju.')
+            with col2:
+                temp = st.slider("Temperatura:", min_value=0.0, max_value=1.0, value=0.0, step=0.1, help="Manja temperatura je precizniji odgovor. Max temperatura modela je 2, ali nije omogucena u ovom slucaju")
+            with col3:
+                broj_tema= st.number_input("Broj glavnih tema za duzi sazetak max:", min_value=3, max_value=10, value=5, step=1, help="Max broj glavnih tema. Model moze odabrati i manji broj tema, a ostale ce biti obradjene pod tackom Razno")
+            with col1:    
+                koristi_dugacak = st.radio(label="Obim sazetka:", options=["Kratak", "Dugacak"], help='Kratki sazetrak je oko jedne strane A4. Dugacki sazetak zavisi od broja tema, otprilike 2-3 teme po stranici A4')
 
             submit_button = st.form_submit_button(label="Submit")
             
             if submit_button:
+                # Initializing ChatOpenAI model
+                llm = ChatOpenAI(
+                    model_name="gpt-4-turbo-preview", temperature=temp
+                    )
+
+                st.info(f"Temperatura je {temp}")
                 with st.spinner("Sačekajte trenutak..."):
                     if ye_old_way:
                         opis_kraj = opis
@@ -314,11 +282,8 @@ and use markdown such is H1, H2, etc."""
                         # st.write(type(suma.content))
                     elif koristi_dugacak == "Dugacak":
                         ulaz= result[0].page_content
-                        suma = summarize_meeting_transcript(ulaz)
-                    try:
-                        st.session_state.dld = suma.contect
-                    except:
-                        st.session_state.dld = suma
+                        suma = summarize_meeting_transcript(ulaz, temp, broj_tema)
+                    st.session_state.dld = suma
                     
         if st.session_state.dld != "Zapisnik":
             with st.sidebar:
