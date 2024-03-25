@@ -25,7 +25,7 @@ from myfunc.mojafunkcija import sacuvaj_dokument
 from myfunc.asistenti import (audio_izlaz, 
                               priprema, 
                               )
-
+from myfunc.various_tools import summarize_meeting_transcript
 import nltk
 
 from openai import OpenAI
@@ -39,81 +39,17 @@ st_style()
 client=OpenAI()
 
 
-
-# novi dugacki zapisnik
-def summarize_meeting_transcript(transcript, temp, broj_tema):
-    """
-    Summarize a meeting transcript by first extracting the date, participants, and topics,
-    and then summarizing each topic individually while excluding the introductory information
-    from the summaries.
-
-    Parameters: 
-        transcript (str): The transcript of the meeting.
-    """
-
-    def get_response(prompt, text, temp):
-        """
-        Generate a response from the model based on the given prompt and text.
-        
-        Parameters:
-            prompt (str): The prompt to send to the model.
-            text (str): The text to summarize or extract information from.
-        """
-        
-        response = client.chat.completions.create(
-            model="gpt-4-turbo-preview",
-            temperature=temp,  
-            messages=[
-                {"role": "system", "content": prompt + "Use only the Serbian Language"},
-                {"role": "user", "content": text}
-            ]
-        )
-        
-        return response.choices[0].message.content
-
-    # Extract introductory details like date, participants, and a brief overview
-    intro_prompt = "Extract the meeting date and the participants."
-    introduction = get_response(intro_prompt, transcript, temp)
-
-    # Identify the main topics in the transcript
-    topic_identification_prompt = f"List up to {broj_tema} main topics discussed in the transcript excluding the introductory details and explanation of the topics. All remaining topics summarize in the single topic Razno."
-    topics = get_response(topic_identification_prompt, transcript, temp).split('\n')
-    
-    st.success("Identifikovane su teme:")
-    for topic in topics:
-        st.success(topic)
-
-    # Summarize each identified topic
-    summaries = []
-    for topic in topics:
-        summary_prompt = f"Summarize the discussion on the topic: {topic}, excluding the introductory details."
-        summary = get_response(summary_prompt, transcript, temp)
-        summaries.append(f"## Tema: {topic} \n{summary}")
-        st.info(f"Obradjujem temu: {topic}")
-        
-    # Optional: Generate a conclusion from the whole transcript
-    conclusion_prompt = "Generate a conclusion from the whole meeting."
-    conclusion = get_response(conclusion_prompt, transcript, temp)
-    
-    # Compile the full text
-    full_text = (
-    f"## Sastanak koordinacije AI Tima\n\n{introduction}\n\n"
-    f"## Teme sastanka\n\n" + "\n".join([f"{topic}" for topic in topics]) + "\n\n"
-    + "\n\n".join(summaries) 
-    + f"\n\n## Zaključak\n\n{conclusion}"
-)
-    return full_text
-
+# namerno nije ubacen os.envrion.get za promptove
 if "init_prompts" not in st.session_state:
     st.session_state.init_prompts = True
     from myfunc.retrievers import PromptDatabase
     with PromptDatabase() as db:
-        prompt_map = db.get_prompts_by_names(["result1", "result2"],["SUM_PAM", "SUM_SUMARIZATOR"])
-        st.session_state.result1 = prompt_map.get("result1", "You are helpful assistant that always writes in Sebian.")
-        st.session_state.result2 = prompt_map.get("result2", "You are helpful assistant that always writes in Sebian.")
+        prompt_map = db.get_prompts_by_names(["upit_kraj", "upit_pocetak"],["SUM_PAM", "SUM_SUMARIZATOR"])
+        st.session_state.upit_kraj = prompt_map.get("upit_kraj", "You are helpful assistant that always writes in Sebian.")
+        st.session_state.upit_pocetak = prompt_map.get("upit_pocetak", "You are helpful assistant that always writes in Sebian.")
 
 
-version = "24.03.24."
+version = "25.03.24."
 # this function does summarization of the text 
 def main():
 
@@ -258,8 +194,8 @@ and use markdown such is H1, H2, etc."""
                             llm,
                             chain_type="map_reduce",
                             verbose=True,
-                            map_prompt=PromptTemplate(template=st.session_state.result2.format(text="text", opis="opis"), input_variables=["text", "opis"]),
-                            combine_prompt=PromptTemplate(template=st.session_state.result1.format(text="text", opis_kraj="opis_kraj"), input_variables=["text", "opis_kraj"]),
+                            map_prompt=PromptTemplate(template=st.session_state.upit_pocetak.format(text="text", opis="opis"), input_variables=["text", "opis"]),
+                            combine_prompt=PromptTemplate(template=st.session_state.upit_kraj.format(text="text", opis_kraj="opis_kraj"), input_variables=["text", "opis_kraj"]),
                             token_max=4000,)
 
                         suma = AIMessage(

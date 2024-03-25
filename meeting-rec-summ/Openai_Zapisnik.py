@@ -19,13 +19,12 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains.summarize import load_summarize_chain
 # from pydub import AudioSegment
 
-from docx import Document
-
+from myfunc.various_tools import MeetingTranscriptSummarizer
 from myfunc.mojafunkcija import sacuvaj_dokument
 from myfunc.asistenti import (audio_izlaz, 
                               priprema, 
                               )
-import nltk
+import nltk     # mora
 
 from openai import OpenAI
 
@@ -38,65 +37,15 @@ st_style()
 client=OpenAI()
 
 
-
-# novi dugacki zapisnik
-class MeetingTranscriptSummarizer:
-    def __init__(self, transcript, temperature, number_of_topics):
-        self.transcript = transcript
-        self.temperature = temperature
-        self.number_of_topics = number_of_topics
-
-    def get_response(self, prompt, text):
-        response = client.chat.completions.create(
-            model="gpt-4-turbo-preview",
-            temperature=self.temperature,
-            messages=[
-                {"role": "system", "content": prompt + "Use only the Serbian Language"},
-                {"role": "user", "content": text}
-            ]
-        )
-        return response.choices[0].message.content
-
-    def summarize(self):
-        introduction = self.get_response("Extract the meeting date and the participants.", self.transcript)
-        topic_identification_prompt = (
-            f"List up to {self.number_of_topics} main topics discussed in the transcript "
-            "excluding the introductory details and explanation of the topics. "
-            "All remaining topics summarize in the single topic Razno."
-        )
-        topics = self.get_response(topic_identification_prompt, self.transcript).split('\n')
-        
-        st.success("Identifikovane su teme:")
-        for topic in topics:
-            st.success(topic)
-
-        summaries = []
-        for topic in topics:
-            summary_prompt = f"Summarize the discussion on the topic: {topic}, excluding the introductory details."
-            summary = self.get_response(summary_prompt, self.transcript)
-            summaries.append(f"## Tema: {topic} \n{summary}")
-            st.info(f"Obradjujem temu: {topic}")
-        
-        conclusion = self.get_response("Generate a conclusion from the whole meeting.", self.transcript)
-        full_text = (
-            f"## Sastanak koordinacije AI Tima\n\n{introduction}\n\n"
-            f"## Teme sastanka\n\n" + "\n".join([f"{topic}" for topic in topics]) + "\n\n"
-            + "\n\n".join(summaries) 
-            + f"\n\n## Zaključak\n\n{conclusion}"
-        )
-        return full_text
-
-
 if "init_prompts" not in st.session_state:
     st.session_state.init_prompts = True
     from myfunc.retrievers import PromptDatabase
     with PromptDatabase() as db:
-        prompt_map = db.get_prompts_by_names(["result1", "result2"],["SUM_PAM", "SUM_SUMARIZATOR"])
-        st.session_state.result1 = prompt_map.get("result1", "You are helpful assistant that always writes in Sebian.")
-        st.session_state.result2 = prompt_map.get("result2", "You are helpful assistant that always writes in Sebian.")
+        prompt_map = db.get_prompts_by_names(["upit_kraj", "upit_pocetak"],[os.environ.get("SUM_PAM"), os.environ.get("SUM_SUMARIZATOR")])
+        st.session_state.upit_pocetak = prompt_map.get("upit_pocetak", "You are helpful assistant that always writes in Sebian.")
+        st.session_state.upit_kraj = prompt_map.get("upit_kraj", "You are helpful assistant that always writes in Sebian.")
 
-
-version = "24.03.24."
+version = "25.03.24."
 # this function does summarization of the text 
 def main():
 
@@ -241,8 +190,8 @@ and use markdown such is H1, H2, etc."""
                             llm,
                             chain_type="map_reduce",
                             verbose=True,
-                            map_prompt=PromptTemplate(template=st.session_state.result2.format(text="text", opis="opis"), input_variables=["text", "opis"]),
-                            combine_prompt=PromptTemplate(template=st.session_state.result1.format(text="text", opis_kraj="opis_kraj"), input_variables=["text", "opis_kraj"]),
+                            map_prompt=PromptTemplate(template=st.session_state.upit_pocetak.format(text="text", opis="opis"), input_variables=["text", "opis"]),
+                            combine_prompt=PromptTemplate(template=st.session_state.upit_kraj.format(text="text", opis_kraj="opis_kraj"), input_variables=["text", "opis_kraj"]),
                             token_max=4000,)
 
                         suma = AIMessage(
@@ -268,7 +217,6 @@ and use markdown such is H1, H2, etc."""
                         ulaz= result[0].page_content
                         summarizer = MeetingTranscriptSummarizer(ulaz, temp, broj_tema)
                         suma = summarizer.summarize()
-                        # suma = summarize_meeting_transcript(ulaz, temp, broj_tema)
                     st.session_state.dld = suma
                     
         if st.session_state.dld != "Zapisnik":
