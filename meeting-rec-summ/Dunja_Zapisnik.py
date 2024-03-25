@@ -25,6 +25,7 @@ from myfunc.mojafunkcija import sacuvaj_dokument
 from myfunc.asistenti import (audio_izlaz, 
                               priprema, 
                               )
+
 import nltk
 
 from openai import OpenAI
