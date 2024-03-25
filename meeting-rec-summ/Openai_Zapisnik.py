@@ -40,68 +40,52 @@ client=OpenAI()
 
 
 # novi dugacki zapisnik
-def summarize_meeting_transcript(transcript, temp, broj_tema):
-    """
-    Summarize a meeting transcript by first extracting the date, participants, and topics,
-    and then summarizing each topic individually while excluding the introductory information
-    from the summaries.
+class MeetingTranscriptSummarizer:
+    def __init__(self, transcript, temperature, number_of_topics):
+        self.transcript = transcript
+        self.temperature = temperature
+        self.number_of_topics = number_of_topics
 
-    Parameters: 
-        transcript (str): The transcript of the meeting.
-    """
-
-    def get_response(prompt, text, temp):
-        """
-        Generate a response from the model based on the given prompt and text.
-        
-        Parameters:
-            prompt (str): The prompt to send to the model.
-            text (str): The text to summarize or extract information from.
-        """
-        
+    def get_response(self, prompt, text):
         response = client.chat.completions.create(
             model="gpt-4-turbo-preview",
-            temperature=temp,  
+            temperature=self.temperature,
             messages=[
                 {"role": "system", "content": prompt + "Use only the Serbian Language"},
                 {"role": "user", "content": text}
             ]
         )
-        
         return response.choices[0].message.content
 
-    # Extract introductory details like date, participants, and a brief overview
-    intro_prompt = "Extract the meeting date and the participants."
-    introduction = get_response(intro_prompt, transcript, temp)
-
-    # Identify the main topics in the transcript
-    topic_identification_prompt = f"List up to {broj_tema} main topics discussed in the transcript excluding the introductory details and explanation of the topics. All remaining topics summarize in the single topic Razno."
-    topics = get_response(topic_identification_prompt, transcript, temp).split('\n')
-    
-    st.success("Identifikovane su teme:")
-    for topic in topics:
-        st.success(topic)
-
-    # Summarize each identified topic
-    summaries = []
-    for topic in topics:
-        summary_prompt = f"Summarize the discussion on the topic: {topic}, excluding the introductory details."
-        summary = get_response(summary_prompt, transcript, temp)
-        summaries.append(f"## Tema: {topic} \n{summary}")
-        st.info(f"Obradjujem temu: {topic}")
+    def summarize(self):
+        introduction = self.get_response("Extract the meeting date and the participants.", self.transcript)
+        topic_identification_prompt = (
+            f"List up to {self.number_of_topics} main topics discussed in the transcript "
+            "excluding the introductory details and explanation of the topics. "
+            "All remaining topics summarize in the single topic Razno."
+        )
+        topics = self.get_response(topic_identification_prompt, self.transcript).split('\n')
         
-    # Optional: Generate a conclusion from the whole transcript
-    conclusion_prompt = "Generate a conclusion from the whole meeting."
-    conclusion = get_response(conclusion_prompt, transcript, temp)
-    
-    # Compile the full text
-    full_text = (
-    f"## Sastanak koordinacije AI Tima\n\n{introduction}\n\n"
-    f"## Teme sastanka\n\n" + "\n".join([f"{topic}" for topic in topics]) + "\n\n"
-    + "\n\n".join(summaries) 
-    + f"\n\n## Zaključak\n\n{conclusion}"
-)
-    return full_text
+        st.success("Identifikovane su teme:")
+        for topic in topics:
+            st.success(topic)
+
+        summaries = []
+        for topic in topics:
+            summary_prompt = f"Summarize the discussion on the topic: {topic}, excluding the introductory details."
+            summary = self.get_response(summary_prompt, self.transcript)
+            summaries.append(f"## Tema: {topic} \n{summary}")
+            st.info(f"Obradjujem temu: {topic}")
+        
+        conclusion = self.get_response("Generate a conclusion from the whole meeting.", self.transcript)
+        full_text = (
+            f"## Sastanak koordinacije AI Tima\n\n{introduction}\n\n"
+            f"## Teme sastanka\n\n" + "\n".join([f"{topic}" for topic in topics]) + "\n\n"
+            + "\n\n".join(summaries) 
+            + f"\n\n## Zaključak\n\n{conclusion}"
+        )
+        return full_text
+
 
 if "init_prompts" not in st.session_state:
     st.session_state.init_prompts = True
@@ -282,7 +266,9 @@ and use markdown such is H1, H2, etc."""
                         # st.write(type(suma.content))
                     elif koristi_dugacak == "Dugacak":
                         ulaz= result[0].page_content
-                        suma = summarize_meeting_transcript(ulaz, temp, broj_tema)
+                        summarizer = MeetingTranscriptSummarizer(ulaz, temp, broj_tema)
+                        suma = summarizer.summarize()
+                        # suma = summarize_meeting_transcript(ulaz, temp, broj_tema)
                     st.session_state.dld = suma
                     
         if st.session_state.dld != "Zapisnik":
