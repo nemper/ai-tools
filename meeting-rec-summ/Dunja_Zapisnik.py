@@ -17,7 +17,7 @@ from myfunc.mojafunkcija import (
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains.summarize import load_summarize_chain
-# from pydub import AudioSegment
+# from pydub import AudioSegment dunja
 
 from docx import Document
 
