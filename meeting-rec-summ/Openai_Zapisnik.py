@@ -1,32 +1,27 @@
-from langchain_community.document_loaders import UnstructuredFileLoader
-from langchain_openai.chat_models import ChatOpenAI
-from langchain.schema import AIMessage
-from langchain.prompts import PromptTemplate
-from langchain.chains.combine_documents.stuff import StuffDocumentsChain
-from langchain.chains.llm import LLMChain
-
-import streamlit as st
+import io
+import nltk     # mora
 import os
 import PyPDF2
 import re
-import io
-from myfunc.mojafunkcija import (
-    st_style,
-    positive_login,
-   )
-
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.chains.summarize import load_summarize_chain
-# from pydub import AudioSegment
-
-from myfunc.various_tools import MeetingTranscriptSummarizer
-from myfunc.mojafunkcija import sacuvaj_dokument
-from myfunc.asistenti import (audio_izlaz, 
-                              priprema, 
-                              )
-import nltk     # mora
+import streamlit as st
 
 from openai import OpenAI
+
+from langchain.chains.combine_documents.stuff import StuffDocumentsChain
+from langchain.chains.llm import LLMChain
+from langchain.chains.summarize import load_summarize_chain
+from langchain.prompts import PromptTemplate
+from langchain.schema import AIMessage
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.document_loaders import UnstructuredFileLoader
+from langchain_openai.chat_models import ChatOpenAI
+
+from myfunc.asistenti import audio_izlaz, priprema
+from myfunc.mojafunkcija import positive_login, sacuvaj_dokument, st_style
+from myfunc.various_tools import MeetingTranscriptSummarizer
+
+# from pydub import AudioSegment
+
 
 # Setting the title for Streamlit application
 st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
