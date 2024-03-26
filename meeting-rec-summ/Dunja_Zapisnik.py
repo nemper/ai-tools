@@ -20,8 +20,7 @@ from myfunc.asistenti import audio_izlaz, priprema
 from myfunc.mojafunkcija import positive_login, sacuvaj_dokument, st_style
 from myfunc.various_tools import summarize_meeting_transcript
 
-# Setting the title for Streamlit application
-st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
+# st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
 st_style()
 # os.environ["LANGCHAIN_TRACING_V2"] = "true"
 # os.environ["LANGCHAIN_PROJECT"] = f"Dugacki Zapisnik"
