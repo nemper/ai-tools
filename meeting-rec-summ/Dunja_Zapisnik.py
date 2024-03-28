@@ -17,11 +17,10 @@ from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain_openai.chat_models import ChatOpenAI
 
 from myfunc.asistenti import audio_izlaz, priprema
-from myfunc.mojafunkcija import positive_login, sacuvaj_dokument, st_style
+from myfunc.mojafunkcija import positive_login, sacuvaj_dokument
 from myfunc.various_tools import summarize_meeting_transcript
 
 # st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
-st_style()
 # os.environ["LANGCHAIN_TRACING_V2"] = "true"
 # os.environ["LANGCHAIN_PROJECT"] = f"Dugacki Zapisnik"
 # os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
@@ -31,7 +30,7 @@ client=OpenAI()
 # namerno nije ubacen os.envrion.get za promptove
 if "init_prompts" not in st.session_state:
     st.session_state.init_prompts = True
-    from myfunc.retrievers import PromptDatabase
+    from myfunc.prompts import PromptDatabase
     with PromptDatabase() as db:
         prompt_map = db.get_prompts_by_names(["upit_kraj", "upit_pocetak"],["SUM_PAM", "SUM_SUMARIZATOR"])
         st.session_state.upit_kraj = prompt_map.get("upit_kraj", "You are helpful assistant that always writes in Sebian.")

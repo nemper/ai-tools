@@ -20,12 +20,7 @@ from myfunc.asistenti import audio_izlaz, priprema
 from myfunc.mojafunkcija import positive_login, sacuvaj_dokument, st_style
 from myfunc.various_tools import MeetingTranscriptSummarizer
 
-# from pydub import AudioSegment
-
-
 # Setting the title for Streamlit application
-st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
-st_style()
 # os.environ["LANGCHAIN_TRACING_V2"] = "true"
 # os.environ["LANGCHAIN_PROJECT"] = f"Dugacki Zapisnik"
 # os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
@@ -34,7 +29,7 @@ client=OpenAI()
 
 if "init_prompts" not in st.session_state:
     st.session_state.init_prompts = True
-    from myfunc.retrievers import PromptDatabase
+    from myfunc.prompts import PromptDatabase
     with PromptDatabase() as db:
         prompt_map = db.get_prompts_by_names(["upit_kraj", "upit_pocetak"],[os.environ.get("SUM_PAM"), os.environ.get("SUM_SUMARIZATOR")])
         st.session_state.upit_pocetak = prompt_map.get("upit_pocetak", "You are helpful assistant that always writes in Sebian.")
