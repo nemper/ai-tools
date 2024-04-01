@@ -29,15 +29,15 @@ client=OpenAI()
 
 # namerno nije ubacen os.envrion.get za promptove
 if "init_prompts" not in st.session_state:
-    st.session_state.init_prompts = True
+    st.session_state.init_prompts = 42
     from myfunc.prompts import PromptDatabase
     with PromptDatabase() as db:
-        prompt_map = db.get_prompts_by_names(["upit_kraj", "upit_pocetak"],["SUM_PAM", "SUM_SUMARIZATOR"])
-        st.session_state.upit_kraj = prompt_map.get("upit_kraj", "You are helpful assistant that always writes in Sebian.")
-        st.session_state.upit_pocetak = prompt_map.get("upit_pocetak", "You are helpful assistant that always writes in Sebian.")
+        prompt_map = db.get_prompts_by_names(["summary_end", "summary_begin"],["SUMMARY_END", "SUMMARY_BEGIN"])
+        st.session_state.summary_end = prompt_map.get("summary_end", "You are helpful assistant that always writes in Sebian.")
+        st.session_state.summary_begin = prompt_map.get("summary_begin", "You are helpful assistant that always writes in Sebian.")
 
 
-version = "25.03.24."
+version = "01.04.24."
 # this function does summarization of the text 
 def main():
 
@@ -182,8 +182,8 @@ and use markdown such is H1, H2, etc."""
                             llm,
                             chain_type="map_reduce",
                             verbose=True,
-                            map_prompt=PromptTemplate(template=st.session_state.upit_pocetak.format(text="text", opis="opis"), input_variables=["text", "opis"]),
-                            combine_prompt=PromptTemplate(template=st.session_state.upit_kraj.format(text="text", opis_kraj="opis_kraj"), input_variables=["text", "opis_kraj"]),
+                            map_prompt=PromptTemplate(template=st.session_state.summary_begin.format(text="text", opis="opis"), input_variables=["text", "opis"]),
+                            combine_prompt=PromptTemplate(template=st.session_state.summary_end.format(text="text", opis_kraj="opis_kraj"), input_variables=["text", "opis_kraj"]),
                             token_max=4000,)
 
                         suma = AIMessage(
