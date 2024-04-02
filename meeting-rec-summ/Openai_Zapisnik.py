@@ -62,6 +62,7 @@ class MeetingTranscriptSummarizer:
         topic_identification_prompt = st.session_state.topic_list_summary.format(number_of_topics = self.number_of_topics)
         topics = self.get_response(topic_identification_prompt, self.transcript).split('\n')
         
+        
         st.success("Identifikovane su teme:")
         for topic in topics:
             st.success(topic)
