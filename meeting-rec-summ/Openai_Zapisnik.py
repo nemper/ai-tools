@@ -35,7 +35,7 @@ with PromptDatabase() as db:
     st.session_state.topic_list_summary = prompt_map.get("topic_list_summary", "You are helpful assistant that always writes in Sebian.")
     st.session_state.date_participants_summary = prompt_map.get("date_participants_summary", "You are helpful assistant that always writes in Sebian.")
     st.session_state.topic_summary = prompt_map.get("topic_summary", "You are helpful assistant that always writes in Sebian.")
-    c = prompt_map.get("conclusion_summary", "You are helpful assistant that always writes in Sebian.")
+    st.session_state.conclusion_summary = prompt_map.get("conclusion_summary", "You are helpful assistant that always writes in Sebian.")
 
 version = "02.04.24."
 
@@ -73,7 +73,7 @@ class MeetingTranscriptSummarizer:
             summaries.append(f"## Tema: {topic} \n{summary}")
             st.info(f"Obradjujem temu: {topic}")
         
-        conclusion = self.get_response(st.session_state.topic_summary, self.transcript)
+        conclusion = self.get_response(st.session_state.conclusion_summary, self.transcript)
         full_text = (
             f"## Sastanak koordinacije AI Tima\n\n{introduction}\n\n ## Teme sastanka\n\n" + 
             "\n".join([f"{topic}" for topic in topics]) + "\n\n"
