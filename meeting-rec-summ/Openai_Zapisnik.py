@@ -37,6 +37,12 @@ with PromptDatabase() as db:
     st.session_state.topic_summary = prompt_map.get("topic_summary", "You are helpful assistant that always writes in Sebian.")
     st.session_state.conclusion_summary = prompt_map.get("conclusion_summary", "You are helpful assistant that always writes in Sebian.")
 
+    st.write("IS >> ", st.session_state.intro_summary)
+    st.write("TLS >> ", st.session_state.topic_list_summary)
+    st.write("DPS >> ", st.session_state.date_participants_summary)
+    st.write("TS >> ", st.session_state.topic_summary)
+    st.write("CS >> ", st.session_state.conclusion_summary)
+
 version = "02.04.24."
 
 # this class does long summarization of the text 
@@ -62,7 +68,6 @@ class MeetingTranscriptSummarizer:
         topic_identification_prompt = st.session_state.topic_list_summary.format(number_of_topics = self.number_of_topics)
         topics = self.get_response(topic_identification_prompt, self.transcript).split('\n')
         
-        st.write(topics)
         st.success("Identifikovane su teme:")
         for topic in topics:
             st.success(topic)
