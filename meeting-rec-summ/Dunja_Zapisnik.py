@@ -16,29 +16,70 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain_openai.chat_models import ChatOpenAI
 
-from myfunc.asistenti import audio_izlaz, priprema
+from myfunc.asistenti import priprema
 from myfunc.mojafunkcija import positive_login, sacuvaj_dokument
-from myfunc.various_tools import summarize_meeting_transcript
 
-# st.set_page_config(page_title="Zapisnik", page_icon="👉", layout="wide")
-# os.environ["LANGCHAIN_TRACING_V2"] = "true"
-# os.environ["LANGCHAIN_PROJECT"] = f"Dugacki Zapisnik"
-# os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
 client=OpenAI()
 
-
-# namerno nije ubacen os.envrion.get za promptove
 if "init_prompts" not in st.session_state:
     st.session_state.init_prompts = 42
-    from myfunc.prompts import PromptDatabase
+    from myfunc.retrievers import PromptDatabase
     with PromptDatabase() as db:
-        prompt_map = db.get_prompts_by_names(["summary_end", "summary_begin"],["SUMMARY_END", "SUMMARY_BEGIN"])
+        prompt_map = db.get_prompts_by_names(["summary_end", "summary_begin"],[os.getenv("SUMMARY_END"), os.getenv("SUMMARY_BEGIN")])
+        
         st.session_state.summary_end = prompt_map.get("summary_end", "You are helpful assistant that always writes in Sebian.")
         st.session_state.summary_begin = prompt_map.get("summary_begin", "You are helpful assistant that always writes in Sebian.")
 
+version = "02.04.24."
 
-version = "01.04.24."
-# this function does summarization of the text 
+# this class does long summarization of the text 
+class MeetingTranscriptSummarizer:
+    def __init__(self, transcript, temperature, number_of_topics):
+        self.transcript = transcript
+        self.temperature = temperature
+        self.number_of_topics = number_of_topics
+
+    def get_response(self, prompt, text):
+        response = client.chat.completions.create(
+            model="gpt-4-turbo-preview",
+            temperature=self.temperature,
+            messages=[
+                {"role": "system", "content": prompt + "Use only the Serbian Language"},
+                {"role": "user", "content": text}
+            ]
+        )
+        return response.choices[0].message.content
+
+    def summarize(self):
+        introduction = self.get_response("Extract the meeting date and the participants.", self.transcript)
+        topic_identification_prompt = (
+            f"List up to {self.number_of_topics} main topics discussed in the transcript "
+            "excluding the introductory details and explanation of the topics. "
+            "All remaining topics summarize in the single topic Razno."
+        )
+        topics = self.get_response(topic_identification_prompt, self.transcript).split('\n')
+        
+        st.success("Identifikovane su teme:")
+        for topic in topics:
+            st.success(topic)
+
+        summaries = []
+        for topic in topics:
+            summary_prompt = f"Summarize the discussion only on the single topic: {topic}, excluding the introductory details."
+            summary = self.get_response(summary_prompt, self.transcript)
+            summaries.append(f"## Tema: {topic} \n{summary}")
+            st.info(f"Obradjujem temu: {topic}")
+        
+        conclusion = self.get_response("Generate a conclusion from the whole meeting.", self.transcript)
+        full_text = (
+            f"## Sastanak koordinacije AI Tima\n\n{introduction}\n\n ## Teme sastanka\n\n" + 
+            "\n".join([f"{topic}" for topic in topics]) + "\n\n"
+            + "\n\n".join(summaries) 
+            + f"\n\n## Zaključak\n\n{conclusion}"
+        )
+        return full_text
+    
+#main function
 def main():
 
     with st.sidebar:
@@ -66,7 +107,6 @@ Dobrodošli na alat za sažimanje teksta i transkribovanje zvučnih zapisa! Ovaj
 **Generisanje Sažetka**
    - Mozete odabrati opcije Kratki i Dugacki Summary. Kratki summary kao izlaz daje jednu stranicu A4. 
    - Mozete odabrati temperaturu. Visa tempratura daje manje detrministicki odgovor.
-   - Omogucavanje glasovne naracije moze povecati troskove i trajanje procesa. U zavisnosti od duzine dugackog sazetka moze biti izvan mogucnosti ovog alata da uradi glasovnu naraciju.
    - Dugacki summary daje otprilike 2-3 teme po jednoj stranici A4, ali traje duze i koristi mnogo vise tokena. Za dugacki summary mozete odrediti i maksimalni broj glavnih tema. Ostale identifikovane teme bice obradjene pod tackom Razno 
    - Pritisnite dugme "Submit" kako biste pokrenuli proces sažimanja. Sažetak će se prikazati u prozoru "Sažetak". Takođe, imate opciju preuzimanja sažetka kao .txt, .docx i .pdf.
    - Ukoliko je dokument duzi od 275000 karaktera, bice primenjen drugi, sporiji nacim rada, zbog trenutog ogranicenja GPT-4 modela na 4000 tokena za izlaz. U ovom slucaju dugacki summary nije dostupan.
@@ -102,6 +142,7 @@ Dobrodošli na alat za sažimanje teksta i transkribovanje zvučnih zapisa! Ovaj
 Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀 
                    """
         )
+ 
     uploaded_file = st.file_uploader(
         "Izaberite tekst za sumarizaciju",
         key="upload_file",
@@ -155,9 +196,7 @@ and use markdown such is H1, H2, etc."""
 
         with st.form(key="my_form", clear_on_submit=False):
             opis = prva
-            col1, col2, col3, col4 = st.columns(4)
-            with col4:
-                audio_i = st.checkbox("Glasovna naracija", help='Omogucavanje glasovne naracije moze povecati troskove i trajanje procesa. U zavisnosti od duzine dugackog sazetka moze biti izvan mogucnosti ovog alata da uradi glasovnu naraciju.')
+            col1, col2, col3 = st.columns(3)
             with col2:
                 temp = st.slider("Temperatura:", min_value=0.0, max_value=1.0, value=0.0, step=0.1, help="Manja temperatura je precizniji odgovor. Max temperatura modela je 2, ali nije omogucena u ovom slucaju")
             with col3:
@@ -207,7 +246,13 @@ and use markdown such is H1, H2, etc."""
                         # st.write(type(suma.content))
                     elif koristi_dugacak == "Dugacak":
                         ulaz= result[0].page_content
-                        suma = summarize_meeting_transcript(ulaz, temp, broj_tema)
+                        summarizer = MeetingTranscriptSummarizer(
+                            transcript=ulaz, 
+                            temperature=temp, 
+                            number_of_topics=broj_tema
+                            )
+                        
+                        suma = summarizer.summarize()
                     st.session_state.dld = suma
                     
         if st.session_state.dld != "Zapisnik":
@@ -218,10 +263,6 @@ and use markdown such is H1, H2, etc."""
                 )
                 
                 sacuvaj_dokument(st.session_state.dld, out_name)
-                
-            if audio_i == True:
-                            st.write("Glasovna naracija")    
-                            audio_izlaz(st.session_state.dld)    
             with st.expander("Sažetak", True):
                 # Generate the summary by running the chain on the input documents and store it in an AIMessage object
                 st.write(st.session_state.dld)  # Displaying the summary
