@@ -23,12 +23,19 @@ client=OpenAI()
 
 if "init_prompts" not in st.session_state:
     st.session_state.init_prompts = 42
-    from myfunc.retrievers import PromptDatabase
-    with PromptDatabase() as db:
-        prompt_map = db.get_prompts_by_names(["summary_end", "summary_begin"],[os.getenv("SUMMARY_END"), os.getenv("SUMMARY_BEGIN")])
-        
-        st.session_state.summary_end = prompt_map.get("summary_end", "You are helpful assistant that always writes in Sebian.")
-        st.session_state.summary_begin = prompt_map.get("summary_begin", "You are helpful assistant that always writes in Sebian.")
+from myfunc.prompts import PromptDatabase
+with PromptDatabase() as db:
+    prompt_map = db.get_prompts_by_names(["summary_end", "summary_begin", "intro_summary", "topic_list_summary", "date_participants_summary", "topic_summary", "conclusion_summary"],
+                                            [os.getenv("SUMMARY_END"), os.getenv("SUMMARY_BEGIN"), os.getenv("INTRO_SUMMARY"), os.getenv("TOPIC_LIST_SUMMARY"), 
+                                            os.getenv("DATE_PARTICIPANTS_SUMMARY"), os.getenv("TOPIC_SUMMARY"), os.getenv("CONCLUSION_SUMMARY") ])
+    
+    st.session_state.summary_end = prompt_map.get("summary_end", "You are helpful assistant that always writes in Sebian.")
+    st.session_state.summary_begin = prompt_map.get("summary_begin", "You are helpful assistant that always writes in Sebian.")
+    st.session_state.intro_summary = prompt_map.get("intro_summary", "You are helpful assistant that always writes in Sebian.")
+    st.session_state.topic_list_summary = prompt_map.get("topic_list_summary", "You are helpful assistant that always writes in Sebian.")
+    st.session_state.date_participants_summary = prompt_map.get("date_participants_summary", "You are helpful assistant that always writes in Sebian.")
+    st.session_state.topic_summary = prompt_map.get("topic_summary", "You are helpful assistant that always writes in Sebian.")
+    c = prompt_map.get("conclusion_summary", "You are helpful assistant that always writes in Sebian.")
 
 version = "02.04.24."
 
@@ -51,12 +58,8 @@ class MeetingTranscriptSummarizer:
         return response.choices[0].message.content
 
     def summarize(self):
-        introduction = self.get_response("Extract the meeting date and the participants.", self.transcript)
-        topic_identification_prompt = (
-            f"List up to {self.number_of_topics} main topics discussed in the transcript "
-            "excluding the introductory details and explanation of the topics. "
-            "All remaining topics summarize in the single topic Razno."
-        )
+        introduction = self.get_response(st.session_state.date_participants_summary, self.transcript)
+        topic_identification_prompt = st.session_state.topic_list_summary.format(number_of_topics = self.number_of_topics)
         topics = self.get_response(topic_identification_prompt, self.transcript).split('\n')
         
         st.success("Identifikovane su teme:")
@@ -65,12 +68,12 @@ class MeetingTranscriptSummarizer:
 
         summaries = []
         for topic in topics:
-            summary_prompt = f"Summarize the discussion only on the single topic: {topic}, excluding the introductory details."
+            summary_prompt = st.session_state.topic_summary.format(topic = topic)
             summary = self.get_response(summary_prompt, self.transcript)
             summaries.append(f"## Tema: {topic} \n{summary}")
             st.info(f"Obradjujem temu: {topic}")
         
-        conclusion = self.get_response("Generate a conclusion from the whole meeting.", self.transcript)
+        conclusion = self.get_response(st.session_state.topic_summary, self.transcript)
         full_text = (
             f"## Sastanak koordinacije AI Tima\n\n{introduction}\n\n ## Teme sastanka\n\n" + 
             "\n".join([f"{topic}" for topic in topics]) + "\n\n"
@@ -156,10 +159,6 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
     # summarize chosen file
     if uploaded_file is not None:
         
-        prva = """Write a detailed summary. Be sure to describe every topic and the name used in the text. \
-Write it as a newspaper article. Write only in Serbian language. Give it a Title and subtitles where appropriate \
-and use markdown such is H1, H2, etc."""
-
         with io.open(uploaded_file.name, "wb") as file:
             file.write(uploaded_file.getbuffer())
 
@@ -195,7 +194,7 @@ and use markdown such is H1, H2, etc."""
         texts = text_splitter.split_documents(result)
 
         with st.form(key="my_form", clear_on_submit=False):
-            opis = prva
+            opis = st.session_state.intro_summary
             col1, col2, col3 = st.columns(3)
             with col2:
                 temp = st.slider("Temperatura:", min_value=0.0, max_value=1.0, value=0.0, step=0.1, help="Manja temperatura je precizniji odgovor. Max temperatura modela je 2, ali nije omogucena u ovom slucaju")
