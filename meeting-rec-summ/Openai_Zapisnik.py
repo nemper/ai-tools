@@ -59,10 +59,10 @@ class MeetingTranscriptSummarizer:
 
     def summarize(self):
         introduction = self.get_response(st.session_state.date_participants_summary, self.transcript)
+        
         topic_identification_prompt = st.session_state.topic_list_summary.format(number_of_topics = self.number_of_topics)
         topics = self.get_response(topic_identification_prompt, self.transcript).split('\n')
         
-        st.write(topics)
         st.success("Identifikovane su teme:")
         for topic in topics:
             st.success(topic)
@@ -119,7 +119,7 @@ Dobrodošli na alat za sažimanje teksta i transkribovanje zvučnih zapisa! Ovaj
 
 1. **Učitavanje Zvučnog Zapisa**
    - U bočnoj traci, kliknite na opciju "Transkribovanje zvučnih zapisa" u padajućem meniju. Učitajte zvučni zapis (.mp3) koji želite transkribovati. \
-   Možete poslušati sadržaj fajla po potrebi. **Napomena:** Zvučni zapis ne sme biti veći od 25Mb. 
+   Možete poslušati sadržaj fajla po potrebi. **Napomena:** Zvučni zapis ne sme biti veći od 25Mb. Optimalni zapis je mp3, mono, 16000 Hz, 145-185 kbps, ne duzi od 1 sata
 
 2. **Odabir Jezika**
    - Izaberite jezik izvornog teksta zvučnog zapisa u padajućem meniju "Odaberite jezik izvornog teksta".
