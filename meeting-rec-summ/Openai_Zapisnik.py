@@ -37,7 +37,7 @@ with PromptDatabase() as db:
     st.session_state.topic_summary = prompt_map.get("topic_summary", "You are helpful assistant that always writes in Sebian.")
     st.session_state.conclusion_summary = prompt_map.get("conclusion_summary", "You are helpful assistant that always writes in Sebian.")
 
-version = "06.04.24."
+version = "08.04.24."
 
 # this class does long summarization of the text 
 class MeetingTranscriptSummarizer:
@@ -62,10 +62,11 @@ class MeetingTranscriptSummarizer:
         
         topic_identification_prompt = st.session_state.topic_list_summary.format(number_of_topics = self.number_of_topics)
         topics = self.get_response(topic_identification_prompt, self.transcript).split('\n')
-        
+        lista_tema=""
         st.success("Identifikovane su teme:")
         for topic in topics:
-            st.success(topic)
+            lista_tema +=topic + "\n"
+        st.success(lista_tema)
 
         summaries = []
         for topic in topics:
@@ -200,7 +201,7 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
             with col2:
                 temp = st.slider("Temperatura:", min_value=0.0, max_value=1.0, value=0.0, step=0.1, help="Manja temperatura je precizniji odgovor. Max temperatura modela je 2, ali nije omogucena u ovom slucaju")
             with col3:
-                broj_tema= st.number_input("Broj glavnih tema za duzi sazetak max:", min_value=3, max_value=10, value=5, step=1, help="Max broj glavnih tema. Model moze odabrati i manji broj tema, a ostale ce biti obradjene pod tackom Razno")
+                broj_tema= st.number_input("Broj glavnih tema za duzi sazetak max:", min_value=1, max_value=20, value=5, step=1, help="Max broj glavnih tema. Model moze odabrati i manji broj tema, a ostale ce biti obradjene pod tackom Razno")
             with col1:    
                 koristi_dugacak = st.radio(label="Obim sazetka:", options=["Kratak", "Dugacak"], help='Kratki sazetrak je oko jedne strane A4. Dugacki sazetak zavisi od broja tema, otprilike 2-3 teme po stranici A4')
 
