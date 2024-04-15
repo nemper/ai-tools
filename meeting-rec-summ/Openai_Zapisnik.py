@@ -255,6 +255,16 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
                         
                         suma = summarizer.summarize()
                     st.session_state.dld = suma
+
+                    
+                    directory = os.getcwd()
+                    for filename in os.listdir(directory):
+                        if filename.endswith('.txt') and filename not in ['requirements.txt', "prompt1.txt", out_name]:
+                            file_path = os.path.join(directory, filename)
+                            os.remove(file_path)
+                        elif filename.endswith('.docx') or filename.endswith('.pdf'):
+                            file_path = os.path.join(directory, filename)
+                            os.remove(file_path)
                     
         if st.session_state.dld != "Zapisnik":
             with st.sidebar:

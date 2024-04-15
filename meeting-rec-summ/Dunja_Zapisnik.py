@@ -266,6 +266,15 @@ and use markdown such is H1, H2, etc."""
             with st.expander("Sažetak", True):
                 # Generate the summary by running the chain on the input documents and store it in an AIMessage object
                 st.write(st.session_state.dld)  # Displaying the summary
+    
+            directory = os.getcwd()
+            for filename in os.listdir(directory):
+                if filename.endswith('.txt') and filename not in ['requirements.txt', "prompt1.txt", out_name]:
+                    file_path = os.path.join(directory, filename)
+                    os.remove(file_path)
+                elif filename.endswith('.docx') or filename.endswith('.pdf'):
+                    file_path = os.path.join(directory, filename)
+                    os.remove(file_path)
 
 # Deployment on Stremalit Login functionality
 deployment_environment = os.environ.get("DEPLOYMENT_ENVIRONMENT")
