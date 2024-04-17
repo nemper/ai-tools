@@ -38,7 +38,7 @@ with PromptDatabase() as db:
     st.session_state.topic_summary = prompt_map.get("topic_summary", "You are helpful assistant that always writes in Sebian.")
     st.session_state.conclusion_summary = prompt_map.get("conclusion_summary", "You are helpful assistant that always writes in Sebian.")
 
-version = "08.04.24."
+version = "17.04.24."
 
 # this class does long summarization of the text 
 class MeetingTranscriptSummarizer:

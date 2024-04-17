@@ -31,7 +31,7 @@ if "init_prompts" not in st.session_state:
         st.session_state.summary_end = prompt_map.get("summary_end", "You are helpful assistant that always writes in Sebian.")
         st.session_state.summary_begin = prompt_map.get("summary_begin", "You are helpful assistant that always writes in Sebian.")
 
-version = "02.04.24."
+version = "17.04.24."
 
 # this class does long summarization of the text 
 class MeetingTranscriptSummarizer:
