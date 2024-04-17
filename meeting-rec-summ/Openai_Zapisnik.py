@@ -18,6 +18,7 @@ from langchain_openai.chat_models import ChatOpenAI
 
 from myfunc.asistenti import priprema
 from myfunc.mojafunkcija import positive_login, sacuvaj_dokument
+from myfunc.varvars_dicts import work_vars
 
 client=OpenAI()
 
@@ -48,7 +49,7 @@ class MeetingTranscriptSummarizer:
 
     def get_response(self, prompt, text):
         response = client.chat.completions.create(
-            model="gpt-4-turbo-preview",
+            model=work_vars["names"]["openai_model"],
             temperature=self.temperature,
             messages=[
                 {"role": "system", "content": prompt + "Use only the Serbian Language"},
@@ -210,7 +211,7 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
             if submit_button:
                 # Initializing ChatOpenAI model
                 llm = ChatOpenAI(
-                    model_name="gpt-4-turbo-preview", temperature=temp
+                    model_name=work_vars["names"]["openai_model"], temperature=temp
                     )
 
                 st.info(f"Temperatura je {temp}")
