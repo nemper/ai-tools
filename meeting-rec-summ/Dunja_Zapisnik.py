@@ -24,7 +24,7 @@ client=OpenAI()
 
 if "init_prompts" not in st.session_state:
     st.session_state.init_prompts = 42
-    from myfunc.retrievers import PromptDatabase
+    from myfunc.prompts import PromptDatabase
     with PromptDatabase() as db:
         prompt_map = db.get_prompts_by_names(["summary_end", "summary_begin"],[os.getenv("SUMMARY_END"), os.getenv("SUMMARY_BEGIN")])
         
