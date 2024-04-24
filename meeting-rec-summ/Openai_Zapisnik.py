@@ -23,10 +23,8 @@ from myfunc.varvars_dicts import work_vars
 
 client=OpenAI()
 
-
 try:
-    a = st.session_state.summary_end
-    b = st.session_state.conclusion_summary
+    x = st.session_state.summary_end
 except:
     with PromptDatabase() as db:
         prompt_map = db.get_prompts_by_names(["summary_end", "summary_begin", "intro_summary", "topic_list_summary", "date_participants_summary", "topic_summary", "conclusion_summary"],
@@ -63,10 +61,7 @@ class MeetingTranscriptSummarizer:
 
     def summarize(self):
         introduction = self.get_response(st.session_state.date_participants_summary, self.transcript)
-        try:
-            topic_identification_prompt = st.session_state.topic_list_summary.format(number_of_topics = self.number_of_topics)
-        except:
-            topic_identification_prompt = st.session_state.topic_list_summary.format(topic = self.number_of_topics)
+        topic_identification_prompt = st.session_state.topic_list_summary.format(number_of_topics = self.number_of_topics)
         topics = self.get_response(topic_identification_prompt, self.transcript).split('\n')
         lista_tema=""
         st.success("Identifikovane su teme:")
