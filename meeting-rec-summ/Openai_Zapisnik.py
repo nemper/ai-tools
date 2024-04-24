@@ -18,27 +18,30 @@ from langchain_openai.chat_models import ChatOpenAI
 
 from myfunc.asistenti import priprema
 from myfunc.mojafunkcija import positive_login, sacuvaj_dokument
+from myfunc.prompts import PromptDatabase
 from myfunc.varvars_dicts import work_vars
 
 client=OpenAI()
 
-if "init_prompts" not in st.session_state:
-    st.session_state.init_prompts = 42
-from myfunc.prompts import PromptDatabase
-with PromptDatabase() as db:
-    prompt_map = db.get_prompts_by_names(["summary_end", "summary_begin", "intro_summary", "topic_list_summary", "date_participants_summary", "topic_summary", "conclusion_summary"],
-                                            [os.getenv("SUMMARY_END"), os.getenv("SUMMARY_BEGIN"), os.getenv("INTRO_SUMMARY"), os.getenv("TOPIC_LIST_SUMMARY"), 
-                                            os.getenv("DATE_PARTICIPANTS_SUMMARY"), os.getenv("TOPIC_SUMMARY"), os.getenv("CONCLUSION_SUMMARY") ])
-    
-    st.session_state.summary_end = prompt_map.get("summary_end", "You are helpful assistant that always writes in Sebian.")
-    st.session_state.summary_begin = prompt_map.get("summary_begin", "You are helpful assistant that always writes in Sebian.")
-    st.session_state.intro_summary = prompt_map.get("intro_summary", "You are helpful assistant that always writes in Sebian.")
-    st.session_state.topic_list_summary = prompt_map.get("topic_list_summary", "You are helpful assistant that always writes in Sebian.")
-    st.session_state.date_participants_summary = prompt_map.get("date_participants_summary", "You are helpful assistant that always writes in Sebian.")
-    st.session_state.topic_summary = prompt_map.get("topic_summary", "You are helpful assistant that always writes in Sebian.")
-    st.session_state.conclusion_summary = prompt_map.get("conclusion_summary", "You are helpful assistant that always writes in Sebian.")
 
-version = "17.04.24."
+try:
+    st.session_state.summary_end
+    st.session_state.conclusion_summary
+except:
+    with PromptDatabase() as db:
+        prompt_map = db.get_prompts_by_names(["summary_end", "summary_begin", "intro_summary", "topic_list_summary", "date_participants_summary", "topic_summary", "conclusion_summary"],
+                                                [os.getenv("SUMMARY_END"), os.getenv("SUMMARY_BEGIN"), os.getenv("INTRO_SUMMARY"), os.getenv("TOPIC_LIST_SUMMARY"), 
+                                                os.getenv("DATE_PARTICIPANTS_SUMMARY"), os.getenv("TOPIC_SUMMARY"), os.getenv("CONCLUSION_SUMMARY") ])
+        
+        st.session_state.summary_end = prompt_map.get("summary_end", "You are helpful assistant that always writes in Sebian.")
+        st.session_state.summary_begin = prompt_map.get("summary_begin", "You are helpful assistant that always writes in Sebian.")
+        st.session_state.intro_summary = prompt_map.get("intro_summary", "You are helpful assistant that always writes in Sebian.")
+        st.session_state.topic_list_summary = prompt_map.get("topic_list_summary", "You are helpful assistant that always writes in Sebian.")
+        st.session_state.date_participants_summary = prompt_map.get("date_participants_summary", "You are helpful assistant that always writes in Sebian.")
+        st.session_state.topic_summary = prompt_map.get("topic_summary", "You are helpful assistant that always writes in Sebian.")
+        st.session_state.conclusion_summary = prompt_map.get("conclusion_summary", "You are helpful assistant that always writes in Sebian.")
+
+version = "24.04.24."
 
 # this class does long summarization of the text 
 class MeetingTranscriptSummarizer:
