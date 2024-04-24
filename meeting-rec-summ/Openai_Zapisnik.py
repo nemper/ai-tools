@@ -25,8 +25,8 @@ client=OpenAI()
 
 
 try:
-    st.session_state.summary_end
-    st.session_state.conclusion_summary
+    a = st.session_state.summary_end
+    b = st.session_state.conclusion_summary
 except:
     with PromptDatabase() as db:
         prompt_map = db.get_prompts_by_names(["summary_end", "summary_begin", "intro_summary", "topic_list_summary", "date_participants_summary", "topic_summary", "conclusion_summary"],
