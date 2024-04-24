@@ -63,9 +63,10 @@ class MeetingTranscriptSummarizer:
 
     def summarize(self):
         introduction = self.get_response(st.session_state.date_participants_summary, self.transcript)
-        st.write(self.number_of_topics)
-        st.write(st.session_state.topic_list_summary)
-        topic_identification_prompt = st.session_state.topic_list_summary.format(number_of_topics = self.number_of_topics)
+        try:
+            topic_identification_prompt = st.session_state.topic_list_summary.format(number_of_topics = self.number_of_topics)
+        except:
+            topic_identification_prompt = st.session_state.topic_list_summary.format(topic = self.number_of_topics)
         topics = self.get_response(topic_identification_prompt, self.transcript).split('\n')
         lista_tema=""
         st.success("Identifikovane su teme:")
