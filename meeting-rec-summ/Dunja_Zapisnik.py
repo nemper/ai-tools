@@ -17,11 +17,16 @@ from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain_openai.chat_models import ChatOpenAI
 
 from myfunc.asistenti import priprema
-from myfunc.mojafunkcija import positive_login, sacuvaj_dokument
+from myfunc.mojafunkcija import positive_login, sacuvaj_dokument, custom_streamlit_style
 from myfunc.prompts import PromptDatabase
 from myfunc.varvars_dicts import work_vars
 
 client=OpenAI()
+
+
+st.html(custom_streamlit_style)
+# st.markdown("Lorem ipsum")
+
 
 
 try:
