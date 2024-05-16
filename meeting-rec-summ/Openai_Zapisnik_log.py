@@ -1,3 +1,63 @@
+import logging
+import warnings
+import subprocess
+
+# Setup basic logging
+logging.basicConfig(filename='detailed_import_logs.log', level=logging.DEBUG,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Capture Python warnings through logging
+def log_warnings(message, category, filename, lineno, file=None, line=None):
+    log = logging.getLogger("py.warnings")
+    log.warning(f"{category.__name__}: {message} at {filename}:{lineno}")
+
+warnings.showwarning = log_warnings
+
+# Logger setup
+logger = logging.getLogger(__name__)
+
+
+def capture_system_logs():
+    try:
+        # Example: querying application logs; adjust the query as needed for your scenario
+        logs = subprocess.check_output(['wevtutil', 'qe', 'Application', 
+            '/q:*[System[Provider[@Name="MyApp"]]]', '/c:10', '/rd:true', '/f:text'], text=True)
+        logger.info("System logs captured successfully")
+        return logs
+    except subprocess.CalledProcessError as e:
+        logger.error(f"Failed to capture system logs: {e}")
+        return ""
+
+
+def import_with_logging():
+    try:
+        from myfunc.prompts import PromptDatabase
+        logger.debug("Successfully imported PromptDatabase from myfunc.prompts")
+    except ImportError as e:
+        logger.error(f"Failed to import PromptDatabase from myfunc.prompts: {e}")
+        logger.info("Attempting to capture system logs due to import error...")
+        system_logs = capture_system_logs()
+        logger.debug(f"System logs: {system_logs}")
+
+    try:
+        from myfunc.asistenti import priprema
+        logger.debug("Successfully imported priprema from myfunc.asistenti")
+    except ImportError as e:
+        logger.error(f"Failed to import priprema from myfunc.asistenti: {e}")
+
+    try:
+        from myfunc.mojafunkcija import positive_login, sacuvaj_dokument
+        logger.debug("Successfully imported positive_login, sacuvaj_dokument from myfunc.mojafunkcija")
+    except ImportError as e:
+        logger.error(f"Failed to import positive_login, sacuvaj_dokument from myfunc.mojafunkcija: {e}")
+
+# Execute the import function
+import_with_logging()
+
+
+
+
+
 import io
 import nltk
 import os
@@ -17,28 +77,29 @@ from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain_openai.chat_models import ChatOpenAI
 
 from myfunc.asistenti import priprema
-from myfunc.mojafunkcija import positive_login, sacuvaj_dokument, custom_streamlit_style
+from myfunc.mojafunkcija import positive_login, sacuvaj_dokument
 from myfunc.prompts import PromptDatabase
 from myfunc.varvars_dicts import work_vars
 
 client=OpenAI()
 
-
-st.html(custom_streamlit_style)
-# st.markdown("Lorem ipsum")
-
-
-
 try:
     x = st.session_state.summary_end
 except:
     with PromptDatabase() as db:
-        prompt_map = db.get_prompts_by_names(["summary_end", "summary_begin"],[os.getenv("SUMMARY_END"), os.getenv("SUMMARY_BEGIN")])
+        prompt_map = db.get_prompts_by_names(["summary_end", "summary_begin", "intro_summary", "topic_list_summary", "date_participants_summary", "topic_summary", "conclusion_summary"],
+                                                [os.getenv("SUMMARY_END"), os.getenv("SUMMARY_BEGIN"), os.getenv("INTRO_SUMMARY"), os.getenv("TOPIC_LIST_SUMMARY"), 
+                                                os.getenv("DATE_PARTICIPANTS_SUMMARY"), os.getenv("TOPIC_SUMMARY"), os.getenv("CONCLUSION_SUMMARY") ])
         
         st.session_state.summary_end = prompt_map.get("summary_end", "You are helpful assistant that always writes in Sebian.")
         st.session_state.summary_begin = prompt_map.get("summary_begin", "You are helpful assistant that always writes in Sebian.")
+        st.session_state.intro_summary = prompt_map.get("intro_summary", "You are helpful assistant that always writes in Sebian.")
+        st.session_state.topic_list_summary = prompt_map.get("topic_list_summary", "You are helpful assistant that always writes in Sebian.")
+        st.session_state.date_participants_summary = prompt_map.get("date_participants_summary", "You are helpful assistant that always writes in Sebian.")
+        st.session_state.topic_summary = prompt_map.get("topic_summary", "You are helpful assistant that always writes in Sebian.")
+        st.session_state.conclusion_summary = prompt_map.get("conclusion_summary", "You are helpful assistant that always writes in Sebian.")
 
-version = "17.04.24."
+version = "24.04.24."
 
 # this class does long summarization of the text 
 class MeetingTranscriptSummarizer:
@@ -59,26 +120,23 @@ class MeetingTranscriptSummarizer:
         return response.choices[0].message.content
 
     def summarize(self):
-        introduction = self.get_response("Extract the meeting date and the participants.", self.transcript)
-        topic_identification_prompt = (
-            f"List up to {self.number_of_topics} main topics discussed in the transcript "
-            "excluding the introductory details and explanation of the topics. "
-            "All remaining topics summarize in the single topic Razno."
-        )
+        introduction = self.get_response(st.session_state.date_participants_summary, self.transcript)
+        topic_identification_prompt = st.session_state.topic_list_summary.format(number_of_topics = self.number_of_topics)
         topics = self.get_response(topic_identification_prompt, self.transcript).split('\n')
-        
+        lista_tema=""
         st.success("Identifikovane su teme:")
         for topic in topics:
-            st.success(topic)
+            lista_tema +=topic + "\n"
+        st.success(lista_tema)
 
         summaries = []
         for topic in topics:
-            summary_prompt = f"Summarize the discussion only on the single topic: {topic}, excluding the introductory details."
+            summary_prompt = st.session_state.topic_summary.format(topic = topic)
             summary = self.get_response(summary_prompt, self.transcript)
             summaries.append(f"## Tema: {topic} \n{summary}")
             st.info(f"Obradjujem temu: {topic}")
         
-        conclusion = self.get_response("Generate a conclusion from the whole meeting.", self.transcript)
+        conclusion = self.get_response(st.session_state.conclusion_summary, self.transcript)
         full_text = (
             f"## Sastanak koordinacije AI Tima\n\n{introduction}\n\n ## Teme sastanka\n\n" + 
             "\n".join([f"{topic}" for topic in topics]) + "\n\n"
@@ -123,7 +181,7 @@ Dobrodošli na alat za sažimanje teksta i transkribovanje zvučnih zapisa! Ovaj
 
 1. **Učitavanje Zvučnog Zapisa**
    - U bočnoj traci, kliknite na opciju "Transkribovanje zvučnih zapisa" u padajućem meniju. Učitajte zvučni zapis (.mp3) koji želite transkribovati. \
-   Možete poslušati sadržaj fajla po potrebi. **Napomena:** Zvučni zapis ne sme biti veći od 25Mb. 
+   Možete poslušati sadržaj fajla po potrebi. **Napomena:** Zvučni zapis ne sme biti veći od 25Mb. Optimalni zapis je mp3, mono, 16000 Hz, 145-185 kbps, ne duzi od 1 sata
 
 2. **Odabir Jezika**
    - Izaberite jezik izvornog teksta zvučnog zapisa u padajućem meniju "Odaberite jezik izvornog teksta".
@@ -164,10 +222,6 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
     # summarize chosen file
     if uploaded_file is not None:
         
-        prva = """Write a detailed summary. Be sure to describe every topic and the name used in the text. \
-Write it as a newspaper article. Write only in Serbian language. Give it a Title and subtitles where appropriate \
-and use markdown such is H1, H2, etc."""
-
         with io.open(uploaded_file.name, "wb") as file:
             file.write(uploaded_file.getbuffer())
 
@@ -203,12 +257,12 @@ and use markdown such is H1, H2, etc."""
         texts = text_splitter.split_documents(result)
 
         with st.form(key="my_form", clear_on_submit=False):
-            opis = prva
+            opis = st.session_state.intro_summary
             col1, col2, col3 = st.columns(3)
             with col2:
                 temp = st.slider("Temperatura:", min_value=0.0, max_value=1.0, value=0.0, step=0.1, help="Manja temperatura je precizniji odgovor. Max temperatura modela je 2, ali nije omogucena u ovom slucaju")
             with col3:
-                broj_tema= st.number_input("Broj glavnih tema za duzi sazetak max:", min_value=3, max_value=10, value=5, step=1, help="Max broj glavnih tema. Model moze odabrati i manji broj tema, a ostale ce biti obradjene pod tackom Razno")
+                broj_tema= st.number_input("Broj glavnih tema za duzi sazetak max:", min_value=1, max_value=20, value=5, step=1, help="Max broj glavnih tema. Model moze odabrati i manji broj tema, a ostale ce biti obradjene pod tackom Razno")
             with col1:    
                 koristi_dugacak = st.radio(label="Obim sazetka:", options=["Kratak", "Dugacak"], help='Kratki sazetrak je oko jedne strane A4. Dugacki sazetak zavisi od broja tema, otprilike 2-3 teme po stranici A4')
 
@@ -251,7 +305,7 @@ and use markdown such is H1, H2, etc."""
                         suma = AIMessage(
                             content=stuff_chain.invoke({"input_documents": result, "additional_variable": opis})["output_text"]
                         ).content
-                        # st.write(type(suma.content))
+                     
                     elif koristi_dugacak == "Dugacak":
                         ulaz= result[0].page_content
                         summarizer = MeetingTranscriptSummarizer(
@@ -262,6 +316,16 @@ and use markdown such is H1, H2, etc."""
                         
                         suma = summarizer.summarize()
                     st.session_state.dld = suma
+
+                    
+                    directory = os.getcwd()
+                    for filename in os.listdir(directory):
+                        if filename.endswith('.txt') and filename not in ['requirements.txt', "prompt1.txt", out_name]:
+                            file_path = os.path.join(directory, filename)
+                            os.remove(file_path)
+                        elif filename.endswith('.docx') or filename.endswith('.pdf'):
+                            file_path = os.path.join(directory, filename)
+                            os.remove(file_path)
                     
         if st.session_state.dld != "Zapisnik":
             with st.sidebar:
@@ -274,15 +338,6 @@ and use markdown such is H1, H2, etc."""
             with st.expander("Sažetak", True):
                 # Generate the summary by running the chain on the input documents and store it in an AIMessage object
                 st.write(st.session_state.dld)  # Displaying the summary
-    
-            directory = os.getcwd()
-            for filename in os.listdir(directory):
-                if filename.endswith('.txt') and filename not in ['requirements.txt', "prompt1.txt", out_name]:
-                    file_path = os.path.join(directory, filename)
-                    os.remove(file_path)
-                elif filename.endswith('.docx') or filename.endswith('.pdf'):
-                    file_path = os.path.join(directory, filename)
-                    os.remove(file_path)
 
 # Deployment on Stremalit Login functionality
 deployment_environment = os.environ.get("DEPLOYMENT_ENVIRONMENT")

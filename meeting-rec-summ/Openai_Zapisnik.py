@@ -18,27 +18,28 @@ from langchain_openai.chat_models import ChatOpenAI
 
 from myfunc.asistenti import priprema
 from myfunc.mojafunkcija import positive_login, sacuvaj_dokument
+from myfunc.prompts import PromptDatabase
 from myfunc.varvars_dicts import work_vars
 
 client=OpenAI()
 
-if "init_prompts" not in st.session_state:
-    st.session_state.init_prompts = 42
-from myfunc.prompts import PromptDatabase
-with PromptDatabase() as db:
-    prompt_map = db.get_prompts_by_names(["summary_end", "summary_begin", "intro_summary", "topic_list_summary", "date_participants_summary", "topic_summary", "conclusion_summary"],
-                                            [os.getenv("SUMMARY_END"), os.getenv("SUMMARY_BEGIN"), os.getenv("INTRO_SUMMARY"), os.getenv("TOPIC_LIST_SUMMARY"), 
-                                            os.getenv("DATE_PARTICIPANTS_SUMMARY"), os.getenv("TOPIC_SUMMARY"), os.getenv("CONCLUSION_SUMMARY") ])
-    
-    st.session_state.summary_end = prompt_map.get("summary_end", "You are helpful assistant that always writes in Sebian.")
-    st.session_state.summary_begin = prompt_map.get("summary_begin", "You are helpful assistant that always writes in Sebian.")
-    st.session_state.intro_summary = prompt_map.get("intro_summary", "You are helpful assistant that always writes in Sebian.")
-    st.session_state.topic_list_summary = prompt_map.get("topic_list_summary", "You are helpful assistant that always writes in Sebian.")
-    st.session_state.date_participants_summary = prompt_map.get("date_participants_summary", "You are helpful assistant that always writes in Sebian.")
-    st.session_state.topic_summary = prompt_map.get("topic_summary", "You are helpful assistant that always writes in Sebian.")
-    st.session_state.conclusion_summary = prompt_map.get("conclusion_summary", "You are helpful assistant that always writes in Sebian.")
+try:
+    x = st.session_state.summary_end
+except:
+    with PromptDatabase() as db:
+        prompt_map = db.get_prompts_by_names(["summary_end", "summary_begin", "intro_summary", "topic_list_summary", "date_participants_summary", "topic_summary", "conclusion_summary"],
+                                                [os.getenv("SUMMARY_END"), os.getenv("SUMMARY_BEGIN"), os.getenv("INTRO_SUMMARY"), os.getenv("TOPIC_LIST_SUMMARY"), 
+                                                os.getenv("DATE_PARTICIPANTS_SUMMARY"), os.getenv("TOPIC_SUMMARY"), os.getenv("CONCLUSION_SUMMARY") ])
+        
+        st.session_state.summary_end = prompt_map.get("summary_end", "You are helpful assistant that always writes in Sebian.")
+        st.session_state.summary_begin = prompt_map.get("summary_begin", "You are helpful assistant that always writes in Sebian.")
+        st.session_state.intro_summary = prompt_map.get("intro_summary", "You are helpful assistant that always writes in Sebian.")
+        st.session_state.topic_list_summary = prompt_map.get("topic_list_summary", "You are helpful assistant that always writes in Sebian.")
+        st.session_state.date_participants_summary = prompt_map.get("date_participants_summary", "You are helpful assistant that always writes in Sebian.")
+        st.session_state.topic_summary = prompt_map.get("topic_summary", "You are helpful assistant that always writes in Sebian.")
+        st.session_state.conclusion_summary = prompt_map.get("conclusion_summary", "You are helpful assistant that always writes in Sebian.")
 
-version = "14.05.24."
+version = "24.04.24."
 
 # this class does long summarization of the text 
 class MeetingTranscriptSummarizer:
@@ -60,7 +61,6 @@ class MeetingTranscriptSummarizer:
 
     def summarize(self):
         introduction = self.get_response(st.session_state.date_participants_summary, self.transcript)
-        
         topic_identification_prompt = st.session_state.topic_list_summary.format(number_of_topics = self.number_of_topics)
         topics = self.get_response(topic_identification_prompt, self.transcript).split('\n')
         lista_tema=""
@@ -202,7 +202,7 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
             with col2:
                 temp = st.slider("Temperatura:", min_value=0.0, max_value=1.0, value=0.0, step=0.1, help="Manja temperatura je precizniji odgovor. Max temperatura modela je 2, ali nije omogucena u ovom slucaju")
             with col3:
-                broj_tema= st.number_input("Broj glavnih tema za duzi sazetak max:", min_value=1, max_value=10, value=5, step=1, help="Max broj glavnih tema (sve preko deset tema ce biti obradjeno takodje). Model moze odabrati i manji broj tema, a ostale ce biti obradjene pod tackom Razno")
+                broj_tema= st.number_input("Broj glavnih tema za duzi sazetak max:", min_value=1, max_value=20, value=5, step=1, help="Max broj glavnih tema. Model moze odabrati i manji broj tema, a ostale ce biti obradjene pod tackom Razno")
             with col1:    
                 koristi_dugacak = st.radio(label="Obim sazetka:", options=["Kratak", "Dugacak"], help='Kratki sazetrak je oko jedne strane A4. Dugacki sazetak zavisi od broja tema, otprilike 2-3 teme po stranici A4')
 
@@ -211,7 +211,6 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
             if submit_button:
                 # Initializing ChatOpenAI model
                 llm = ChatOpenAI(
-                    #model_name=work_vars["names"]["openai_model"], temperature=temp
                     model_name=work_vars["names"]["openai_model"], temperature=temp
                     )
 

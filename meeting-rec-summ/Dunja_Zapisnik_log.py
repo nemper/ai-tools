@@ -1,3 +1,62 @@
+import logging
+import warnings
+import subprocess
+
+# Setup basic logging
+logging.basicConfig(filename='detailed_import_logs.log', level=logging.DEBUG,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Capture Python warnings through logging
+def log_warnings(message, category, filename, lineno, file=None, line=None):
+    log = logging.getLogger("py.warnings")
+    log.warning(f"{category.__name__}: {message} at {filename}:{lineno}")
+
+warnings.showwarning = log_warnings
+
+# Logger setup
+logger = logging.getLogger(__name__)
+
+
+def capture_system_logs():
+    try:
+        # Example: querying application logs; adjust the query as needed for your scenario
+        logs = subprocess.check_output(['wevtutil', 'qe', 'Application', 
+            '/q:*[System[Provider[@Name="MyApp"]]]', '/c:10', '/rd:true', '/f:text'], text=True)
+        logger.info("System logs captured successfully")
+        return logs
+    except subprocess.CalledProcessError as e:
+        logger.error(f"Failed to capture system logs: {e}")
+        return ""
+
+
+def import_with_logging():
+    try:
+        from myfunc.prompts import PromptDatabase
+        logger.debug("Successfully imported PromptDatabase from myfunc.prompts")
+    except ImportError as e:
+        logger.error(f"Failed to import PromptDatabase from myfunc.prompts: {e}")
+        logger.info("Attempting to capture system logs due to import error...")
+        system_logs = capture_system_logs()
+        logger.debug(f"System logs: {system_logs}")
+
+    try:
+        from myfunc.asistenti import priprema
+        logger.debug("Successfully imported priprema from myfunc.asistenti")
+    except ImportError as e:
+        logger.error(f"Failed to import priprema from myfunc.asistenti: {e}")
+
+    try:
+        from myfunc.mojafunkcija import positive_login, sacuvaj_dokument
+        logger.debug("Successfully imported positive_login, sacuvaj_dokument from myfunc.mojafunkcija")
+    except ImportError as e:
+        logger.error(f"Failed to import positive_login, sacuvaj_dokument from myfunc.mojafunkcija: {e}")
+
+# Execute the import function
+import_with_logging()
+
+
+
+
 import io
 import nltk
 import os
@@ -17,16 +76,11 @@ from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain_openai.chat_models import ChatOpenAI
 
 from myfunc.asistenti import priprema
-from myfunc.mojafunkcija import positive_login, sacuvaj_dokument, custom_streamlit_style
+from myfunc.mojafunkcija import positive_login, sacuvaj_dokument
 from myfunc.prompts import PromptDatabase
 from myfunc.varvars_dicts import work_vars
 
 client=OpenAI()
-
-
-st.html(custom_streamlit_style)
-# st.markdown("Lorem ipsum")
-
 
 
 try:
