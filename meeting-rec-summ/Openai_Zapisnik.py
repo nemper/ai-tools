@@ -39,7 +39,7 @@ except:
         st.session_state.topic_summary = prompt_map.get("topic_summary", "You are helpful assistant that always writes in Sebian.")
         st.session_state.conclusion_summary = prompt_map.get("conclusion_summary", "You are helpful assistant that always writes in Sebian.")
 
-version = "16.05.24."
+version = "26.05.24."
 
 # this class does long summarization of the text 
 class MeetingTranscriptSummarizer:
