@@ -77,29 +77,28 @@ from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain_openai.chat_models import ChatOpenAI
 
 from myfunc.asistenti import priprema
-from myfunc.mojafunkcija import positive_login, sacuvaj_dokument
-from myfunc.prompts import PromptDatabase
+from myfunc.mojafunkcija import positive_login, sacuvaj_dokument, initialize_session_state
+from myfunc.prompts import get_prompts
 from myfunc.varvars_dicts import work_vars
 
 client=OpenAI()
 
-try:
-    x = st.session_state.summary_end
-except:
-    with PromptDatabase() as db:
-        prompt_map = db.get_prompts_by_names(["summary_end", "summary_begin", "intro_summary", "topic_list_summary", "date_participants_summary", "topic_summary", "conclusion_summary"],
-                                                [os.getenv("SUMMARY_END"), os.getenv("SUMMARY_BEGIN"), os.getenv("INTRO_SUMMARY"), os.getenv("TOPIC_LIST_SUMMARY"), 
-                                                os.getenv("DATE_PARTICIPANTS_SUMMARY"), os.getenv("TOPIC_SUMMARY"), os.getenv("CONCLUSION_SUMMARY") ])
-        
-        st.session_state.summary_end = prompt_map.get("summary_end", "You are helpful assistant that always writes in Sebian.")
-        st.session_state.summary_begin = prompt_map.get("summary_begin", "You are helpful assistant that always writes in Sebian.")
-        st.session_state.intro_summary = prompt_map.get("intro_summary", "You are helpful assistant that always writes in Sebian.")
-        st.session_state.topic_list_summary = prompt_map.get("topic_list_summary", "You are helpful assistant that always writes in Sebian.")
-        st.session_state.date_participants_summary = prompt_map.get("date_participants_summary", "You are helpful assistant that always writes in Sebian.")
-        st.session_state.topic_summary = prompt_map.get("topic_summary", "You are helpful assistant that always writes in Sebian.")
-        st.session_state.conclusion_summary = prompt_map.get("conclusion_summary", "You are helpful assistant that always writes in Sebian.")
+default_values = {
+    "summary_end": "You are a helpful assistant",
+    "summary_begin": "You are a helpful assistant",
+    "intro_summary": "You are a helpful assistant",
+    "topic_list_summary": "You are a helpful assistant",
+    "date_participants_summary": "You are a helpful assistant",
+    "topic_summary": "You are a helpful assistant",
+    "conclusion_summary": "You are a helpful assistant"
+}
 
-version = "24.04.24."
+initialize_session_state(default_values)
+
+if st.session_state.summary_end == "You are a helpful assistant":
+    get_prompts([key for key in default_values.keys()])
+
+version = "29.05.24."
 
 # this class does long summarization of the text 
 class MeetingTranscriptSummarizer:

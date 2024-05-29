@@ -76,23 +76,23 @@ from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain_openai.chat_models import ChatOpenAI
 
 from myfunc.asistenti import priprema
-from myfunc.mojafunkcija import positive_login, sacuvaj_dokument
-from myfunc.prompts import PromptDatabase
+from myfunc.mojafunkcija import positive_login, sacuvaj_dokument, initialize_session_state
+from myfunc.prompts import get_prompts
 from myfunc.varvars_dicts import work_vars
 
 client=OpenAI()
 
+default_values = {
+    "summary_end": "You are a helpful assistant",
+    "summary_begin": "You are a helpful assistant",
+}
 
-try:
-    x = st.session_state.summary_end
-except:
-    with PromptDatabase() as db:
-        prompt_map = db.get_prompts_by_names(["summary_end", "summary_begin"],[os.getenv("SUMMARY_END"), os.getenv("SUMMARY_BEGIN")])
-        
-        st.session_state.summary_end = prompt_map.get("summary_end", "You are helpful assistant that always writes in Sebian.")
-        st.session_state.summary_begin = prompt_map.get("summary_begin", "You are helpful assistant that always writes in Sebian.")
+initialize_session_state(default_values)
 
-version = "17.04.24."
+if st.session_state.summary_end == "You are a helpful assistant":
+    get_prompts([key for key in default_values.keys()])
+
+version = "29.05.24."
 
 # this class does long summarization of the text 
 class MeetingTranscriptSummarizer:
