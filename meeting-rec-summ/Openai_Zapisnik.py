@@ -24,6 +24,7 @@ from myfunc.varvars_dicts import work_vars
 client=OpenAI()
 
 default_values = {
+    "dld": "Zapisnik",
     "summary_end": "You are a helpful assistant",
     "summary_begin": "You are a helpful assistant",
     "intro_summary": "You are a helpful assistant",
@@ -36,7 +37,7 @@ default_values = {
 initialize_session_state(default_values)
 
 if st.session_state.summary_end == "You are a helpful assistant":
-    get_prompts([key for key in default_values.keys()])
+    get_prompts([key for key in default_values.keys() if key != "dld"])
 
 version = "29.05.24."
 
@@ -154,9 +155,6 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
         type=["txt", "pdf", "docx"],
         help = "Odabir dokumenta",
     )
-
-    if "dld" not in st.session_state:
-        st.session_state.dld = "Zapisnik"
 
     # summarize chosen file
     if uploaded_file is not None:
