@@ -37,7 +37,7 @@ default_values = {
 initialize_session_state(default_values)
 
 if st.session_state.summary_end == "You are a helpful assistant":
-    get_prompts([key for key in default_values.keys() if key != "dld"])
+    get_prompts("summary_end", "summary_begin", "intro_summary", "topic_list_summary", "date_participants_summary", "topic_summary", "conclusion_summary")
 
 version = "29.05.24."
 
