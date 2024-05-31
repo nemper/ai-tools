@@ -30,11 +30,9 @@ from myfunc.mojafunkcija import (
     open_file,
 )
 
-
 # setup stranica
 st.set_page_config(page_title="Multi Tool Chatbot", page_icon="👉", layout="wide")
 st_style()
-
 
 # prebaciti u mojafunkcija ?
 def app_version():
@@ -43,7 +41,6 @@ def app_version():
         f"<p style='font-size: 10px; color: grey;'>{version}</p>",
         unsafe_allow_html=True,
     )
-
 
 # setup aplikacije
 def app_setup():
@@ -201,7 +198,6 @@ def app_setup():
             horizontal=True,
         )
 
-
 # citanje csv fajla i pretraga po njemu
 def read_csv(upit):
     agent = create_csv_agent(
@@ -217,7 +213,6 @@ def read_csv(upit):
     else:
         odgovor = agent.run(upit)
     return str(odgovor)
-
 
 # semantic search - klasini model
 def rag(upit):
@@ -258,7 +253,6 @@ def rag(upit):
             odgovor += page_cont + "\n\n"
 
     return odgovor
-
 
 # selfquery search - pretrazuje po meta poljima
 def selfquery(upit):
@@ -315,7 +309,6 @@ def selfquery(upit):
         odgovor += member.page_content + "\n\n"
 
     return odgovor
-
 
 # hybrid search - kombinacija semantic i selfquery metoda po kljucnoj reci
 def hybrid_query(upit):
@@ -388,7 +381,6 @@ def hybrid_query(upit):
             odgovor += item["metadata"]["context"] + "\n\n"
     return odgovor
 
-
 # pocinje novi chat, brise se memorija
 def new_chat():
     st.session_state["generated"] = []
@@ -396,7 +388,6 @@ def new_chat():
     st.session_state["input"] = ""
     st.session_state.memory.clear()
     st.session_state["messages"] = []
-
 
 # glavna aplikacija - Chatbot
 def main():
