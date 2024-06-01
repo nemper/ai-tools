@@ -17,7 +17,7 @@ from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain_openai.chat_models import ChatOpenAI
 
 from myfunc.asistenti import priprema
-from myfunc.mojafunkcija import positive_login, sacuvaj_dokument, initialize_session_state
+from myfunc.mojafunkcija import initialize_session_state, positive_login, sacuvaj_dokument
 from myfunc.prompts import get_prompts
 from myfunc.varvars_dicts import work_vars
 
