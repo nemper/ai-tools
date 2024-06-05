@@ -1,7 +1,5 @@
 *.txt
 !requirements.txt
-!prompt_pam.txt
-!prompt_summarizer.txt
 *.json
 *.exe
 *.mp3
@@ -14,3 +12,4 @@
 slnx.sqlite
 *.JSONL
 *.vs
+/venv
