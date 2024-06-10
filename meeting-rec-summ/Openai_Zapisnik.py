@@ -20,6 +20,7 @@ from myfunc.asistenti import priprema
 from myfunc.mojafunkcija import initialize_session_state, positive_login, sacuvaj_dokument
 from myfunc.varvars_dicts import work_prompts, work_vars
 
+mprompts = work_prompts()
 client=OpenAI()
 
 default_values = {
@@ -49,8 +50,8 @@ class MeetingTranscriptSummarizer:
         return response.choices[0].message.content
 
     def summarize(self):
-        introduction = self.get_response(st.session_state.date_participants_summary, self.transcript)
-        topic_identification_prompt = st.session_state.topic_list_summary.format(number_of_topics = self.number_of_topics)
+        introduction = self.get_response(mprompts["date_participants_summary"], self.transcript)
+        topic_identification_prompt = mprompts["topic_list_summary"].format(number_of_topics = self.number_of_topics)
         topics = self.get_response(topic_identification_prompt, self.transcript).split('\n')
         lista_tema=""
         st.success("Identifikovane su teme:")
@@ -60,12 +61,12 @@ class MeetingTranscriptSummarizer:
 
         summaries = []
         for topic in topics:
-            summary_prompt = st.session_state.topic_summary.format(topic = topic)
+            summary_prompt = mprompts["topic_summary"].format(topic = topic)
             summary = self.get_response(summary_prompt, self.transcript)
             summaries.append(f"## Tema: {topic} \n{summary}")
             st.info(f"Obradjujem temu: {topic}")
         
-        conclusion = self.get_response(st.session_state.conclusion_summary, self.transcript)
+        conclusion = self.get_response(mprompts["conclusion_summary"], self.transcript)
         full_text = (
             f"## Sastanak koordinacije AI Tima\n\n{introduction}\n\n ## Teme sastanka\n\n" + 
             "\n".join([f"{topic}" for topic in topics]) + "\n\n"
@@ -184,7 +185,7 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
             texts = text_splitter.split_documents(result)
 
             with st.form(key="my_form", clear_on_submit=False):
-                opis = st.session_state.intro_summary
+                opis = mprompts["intro_summary"]
                 col1, col2, col3 = st.columns(3)
                 with col2:
                     temp = st.slider("Temperatura:", min_value=0.0, max_value=1.0, value=0.0, step=0.1, help="Manja temperatura je precizniji odgovor. Max temperatura modela je 2, ali nije omogucena u ovom slucaju")
@@ -210,8 +211,8 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
                                 llm,
                                 chain_type="map_reduce",
                                 verbose=True,
-                                map_prompt=PromptTemplate(template=st.session_state.summary_begin.format(text="text", opis="opis"), input_variables=["text", "opis"]),
-                                combine_prompt=PromptTemplate(template=st.session_state.summary_end.format(text="text", opis_kraj="opis_kraj"), input_variables=["text", "opis_kraj"]),
+                                map_prompt=PromptTemplate(template=mprompts["summary_begin"].format(text="text", opis="opis"), input_variables=["text", "opis"]),
+                                combine_prompt=PromptTemplate(template=mprompts["summary_end"].format(text="text", opis_kraj="opis_kraj"), input_variables=["text", "opis_kraj"]),
                                 token_max=4000,)
 
                             suma = AIMessage(

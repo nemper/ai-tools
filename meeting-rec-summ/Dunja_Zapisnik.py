@@ -18,24 +18,19 @@ from langchain_openai.chat_models import ChatOpenAI
 
 from myfunc.asistenti import priprema
 from myfunc.mojafunkcija import custom_streamlit_style, initialize_session_state, positive_login, sacuvaj_dokument
-from myfunc.prompts import get_prompts
-from myfunc.varvars_dicts import work_vars
+from myfunc.varvars_dicts import work_prompts, work_vars
 
+mprompts = work_prompts()
 client=OpenAI()
 st.html(custom_streamlit_style)
 
 default_values = {
     "dld" : "Zapisnik",
-    "summary_end": "You are a helpful assistant",
-    "summary_begin": "You are a helpful assistant",
 }
 
 initialize_session_state(default_values)
 
-if st.session_state.summary_end == "You are a helpful assistant":
-    get_prompts("summary_end", "summary_begin")
-
-version = "29.05.24."
+version = "07.06.24."
 
 # this class does long summarization of the text 
 class MeetingTranscriptSummarizer:
@@ -223,8 +218,8 @@ and use markdown such is H1, H2, etc."""
                             llm,
                             chain_type="map_reduce",
                             verbose=True,
-                            map_prompt=PromptTemplate(template=st.session_state.summary_begin.format(text="text", opis="opis"), input_variables=["text", "opis"]),
-                            combine_prompt=PromptTemplate(template=st.session_state.summary_end.format(text="text", opis_kraj="opis_kraj"), input_variables=["text", "opis_kraj"]),
+                            map_prompt=PromptTemplate(template=mprompts["summary_begin"].format(text="text", opis="opis"), input_variables=["text", "opis"]),
+                            combine_prompt=PromptTemplate(template=mprompts["summary_end"].format(text="text", opis_kraj="opis_kraj"), input_variables=["text", "opis_kraj"]),
                             token_max=4000,)
 
                         suma = AIMessage(
