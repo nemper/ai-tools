@@ -18,28 +18,17 @@ from langchain_openai.chat_models import ChatOpenAI
 
 from myfunc.asistenti import priprema
 from myfunc.mojafunkcija import initialize_session_state, positive_login, sacuvaj_dokument
-from myfunc.prompts import get_prompts
-from myfunc.varvars_dicts import work_vars
+from myfunc.varvars_dicts import work_prompts, work_vars
 
 client=OpenAI()
 
 default_values = {
     "dld": "Zapisnik",
-    "summary_end": "You are a helpful assistant",
-    "summary_begin": "You are a helpful assistant",
-    "intro_summary": "You are a helpful assistant",
-    "topic_list_summary": "You are a helpful assistant",
-    "date_participants_summary": "You are a helpful assistant",
-    "topic_summary": "You are a helpful assistant",
-    "conclusion_summary": "You are a helpful assistant"
 }
-
 initialize_session_state(default_values)
 
-if st.session_state.summary_end == "You are a helpful assistant":
-    get_prompts("summary_end", "summary_begin", "intro_summary", "topic_list_summary", "date_participants_summary", "topic_summary", "conclusion_summary")
 
-version = "29.05.24."
+version = "07.06.24."
 
 # this class does long summarization of the text 
 class MeetingTranscriptSummarizer:
@@ -87,7 +76,8 @@ class MeetingTranscriptSummarizer:
     
 #main function
 def main():
-
+    if "file_content" not in st.session_state:
+        st.session_state.file_content = None
     with st.sidebar:
         priprema()
 
@@ -158,7 +148,6 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
 
     # summarize chosen file
     if uploaded_file is not None:
-        
         with io.open(uploaded_file.name, "wb") as file:
             file.write(uploaded_file.getbuffer())
 
@@ -181,100 +170,101 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
             loader = UnstructuredFileLoader(file_path=uploaded_file.name, encoding="utf-8")
 
         result = loader.load()
+        st.session_state.file_content = result[0].page_content
 
         out_name = "Zapisnik"
+        if st.session_state.file_content:
+            ye_old_way = False
+            if len(result[0].page_content) > 275000:
+                ye_old_way = True
+                st.warning("Vaš dokument je duži od 275000 karaktera. Koristiće se map reduce document chain (radi sporije, a daje drugačije rezultate) - ovo je temporary rešenje. Za ovu opciju dugacki summary nije dostupan.")
 
-        ye_old_way = False
-        if len(result[0].page_content) > 275000:
-            ye_old_way = True
-            st.warning("Vaš dokument je duži od 275000 karaktera. Koristiće se map reduce document chain (radi sporije, a daje drugačije rezultate) - ovo je temporary rešenje. Za ovu opciju dugacki summary nije dostupan.")
+            text_splitter = RecursiveCharacterTextSplitter(
+                chunk_size=75000, chunk_overlap=5000,)
+            texts = text_splitter.split_documents(result)
 
-        text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=75000, chunk_overlap=5000,)
-        texts = text_splitter.split_documents(result)
+            with st.form(key="my_form", clear_on_submit=False):
+                opis = st.session_state.intro_summary
+                col1, col2, col3 = st.columns(3)
+                with col2:
+                    temp = st.slider("Temperatura:", min_value=0.0, max_value=1.0, value=0.0, step=0.1, help="Manja temperatura je precizniji odgovor. Max temperatura modela je 2, ali nije omogucena u ovom slucaju")
+                with col3:
+                    broj_tema= st.number_input("Broj glavnih tema za duzi sazetak max:", min_value=1, max_value=10, value=5, step=1, help="Max broj glavnih tema. Model moze odabrati i manji broj tema, a ostale ce biti obradjene pod tackom Razno")
+                with col1:    
+                    koristi_dugacak = st.radio(label="Obim sazetka:", options=["Kratak", "Dugacak"], help='Kratki sazetrak je oko jedne strane A4. Dugacki sazetak zavisi od broja tema, otprilike 2-3 teme po stranici A4')
 
-        with st.form(key="my_form", clear_on_submit=False):
-            opis = st.session_state.intro_summary
-            col1, col2, col3 = st.columns(3)
-            with col2:
-                temp = st.slider("Temperatura:", min_value=0.0, max_value=1.0, value=0.0, step=0.1, help="Manja temperatura je precizniji odgovor. Max temperatura modela je 2, ali nije omogucena u ovom slucaju")
-            with col3:
-                broj_tema= st.number_input("Broj glavnih tema za duzi sazetak max:", min_value=1, max_value=10, value=5, step=1, help="Max broj glavnih tema. Model moze odabrati i manji broj tema, a ostale ce biti obradjene pod tackom Razno")
-            with col1:    
-                koristi_dugacak = st.radio(label="Obim sazetka:", options=["Kratak", "Dugacak"], help='Kratki sazetrak je oko jedne strane A4. Dugacki sazetak zavisi od broja tema, otprilike 2-3 teme po stranici A4')
-
-            submit_button = st.form_submit_button(label="Submit")
-            
-            if submit_button:
-                # Initializing ChatOpenAI model
-                llm = ChatOpenAI(
-                    model_name=work_vars["names"]["openai_model"], temperature=temp
-                    )
-
-                st.info(f"Temperatura je {temp}")
-                with st.spinner("Sačekajte trenutak..."):
-                    if ye_old_way:
-                        opis_kraj = opis
-                        opis = "Summarize comprehensively the content of the document."
-                        chain = load_summarize_chain(
-                            llm,
-                            chain_type="map_reduce",
-                            verbose=True,
-                            map_prompt=PromptTemplate(template=st.session_state.summary_begin.format(text="text", opis="opis"), input_variables=["text", "opis"]),
-                            combine_prompt=PromptTemplate(template=st.session_state.summary_end.format(text="text", opis_kraj="opis_kraj"), input_variables=["text", "opis_kraj"]),
-                            token_max=4000,)
-
-                        suma = AIMessage(
-                            content=chain.invoke(
-                                {"input_documents": texts, "opis": opis, "opis_kraj": opis_kraj})["output_text"]
-                                ).content
-                    elif koristi_dugacak == "Kratak":
-                        prompt_template = """ "{additional_variable}"
-                        "{text}"
-                        SUMMARY:"""
-                        prompt = PromptTemplate.from_template(prompt_template)
-                        prompt.input_variables = ["text", "additional_variable"] 
-                        # Define LLM chain
-                        llm_chain = LLMChain(llm=llm, prompt=prompt)
-                        # Define StuffDocumentsChain
-                        stuff_chain = StuffDocumentsChain(llm_chain=llm_chain, document_variable_name="text")       
-
-                        suma = AIMessage(
-                            content=stuff_chain.invoke({"input_documents": result, "additional_variable": opis})["output_text"]
-                        ).content
-                     
-                    elif koristi_dugacak == "Dugacak":
-                        ulaz= result[0].page_content
-                        summarizer = MeetingTranscriptSummarizer(
-                            transcript=ulaz, 
-                            temperature=temp, 
-                            number_of_topics=broj_tema
-                            )
-                        
-                        suma = summarizer.summarize()
-                    st.session_state.dld = suma
-
-                    
-                    directory = os.getcwd()
-                    for filename in os.listdir(directory):
-                        if filename.endswith('.txt') and filename not in ['requirements.txt', "prompt1.txt", out_name]:
-                            file_path = os.path.join(directory, filename)
-                            os.remove(file_path)
-                        elif filename.endswith('.docx') or filename.endswith('.pdf'):
-                            file_path = os.path.join(directory, filename)
-                            os.remove(file_path)
-                    
-        if st.session_state.dld != "Zapisnik":
-            with st.sidebar:
-                            
-                st.download_button(
-                    "Download prompt as .txt", opis, file_name="prompt1.txt", help = "Čuvanje zadatog prompta"
-                )
+                submit_button = st.form_submit_button(label="Submit")
                 
-                sacuvaj_dokument(st.session_state.dld, out_name)
-            with st.expander("Sažetak", True):
-                # Generate the summary by running the chain on the input documents and store it in an AIMessage object
-                st.write(st.session_state.dld)  # Displaying the summary
+                if submit_button:
+                    # Initializing ChatOpenAI model
+                    llm = ChatOpenAI(
+                        model_name=work_vars["names"]["openai_model"], temperature=temp
+                        )
+
+                    st.info(f"Temperatura je {temp}")
+                    with st.spinner("Sačekajte trenutak..."):
+                        if ye_old_way:
+                            opis_kraj = opis
+                            opis = "Summarize comprehensively the content of the document."
+                            chain = load_summarize_chain(
+                                llm,
+                                chain_type="map_reduce",
+                                verbose=True,
+                                map_prompt=PromptTemplate(template=st.session_state.summary_begin.format(text="text", opis="opis"), input_variables=["text", "opis"]),
+                                combine_prompt=PromptTemplate(template=st.session_state.summary_end.format(text="text", opis_kraj="opis_kraj"), input_variables=["text", "opis_kraj"]),
+                                token_max=4000,)
+
+                            suma = AIMessage(
+                                content=chain.invoke(
+                                    {"input_documents": texts, "opis": opis, "opis_kraj": opis_kraj})["output_text"]
+                                    ).content
+                        elif koristi_dugacak == "Kratak":
+                            prompt_template = """ "{additional_variable}"
+                            "{text}"
+                            SUMMARY:"""
+                            prompt = PromptTemplate.from_template(prompt_template)
+                            prompt.input_variables = ["text", "additional_variable"] 
+                            llm_chain = LLMChain(llm=llm, prompt=prompt)
+
+                            # Define StuffDocumentsChain
+                            stuff_chain = StuffDocumentsChain(llm_chain=llm_chain, document_variable_name="text")       
+
+                            suma = AIMessage(
+                                content=stuff_chain.invoke({"input_documents": result, "additional_variable": opis})["output_text"]
+                            ).content
+                        
+                        elif koristi_dugacak == "Dugacak":
+                            ulaz= st.session_state.file_content
+                            summarizer = MeetingTranscriptSummarizer(
+                                transcript=ulaz, 
+                                temperature=temp, 
+                                number_of_topics=broj_tema
+                                )
+                            
+                            suma = summarizer.summarize()
+                        st.session_state.dld = suma
+
+                        
+                        directory = os.getcwd()
+                        for filename in os.listdir(directory):
+                            if filename.endswith('.txt') and filename not in ['requirements.txt', "prompt1.txt", out_name]:
+                                file_path = os.path.join(directory, filename)
+                                os.remove(file_path)
+                            elif filename.endswith('.docx') or filename.endswith('.pdf'):
+                                file_path = os.path.join(directory, filename)
+                                os.remove(file_path)
+                    
+            if st.session_state.dld != "Zapisnik":
+                with st.sidebar:
+                                
+                    st.download_button(
+                        "Download prompt as .txt", opis, file_name="prompt1.txt", help = "Čuvanje zadatog prompta"
+                    )
+                    
+                    sacuvaj_dokument(st.session_state.dld, out_name)
+                with st.expander("Sažetak", True):
+                    # Generate the summary by running the chain on the input documents and store it in an AIMessage object
+                    st.write(st.session_state.dld)  # Displaying the summary
 
 # Deployment on Stremalit Login functionality
 deployment_environment = os.environ.get("DEPLOYMENT_ENVIRONMENT")
