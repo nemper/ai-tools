@@ -12,4 +12,5 @@
 slnx.sqlite
 *.JSONL
 *.vs
+/myenv
 /venv
