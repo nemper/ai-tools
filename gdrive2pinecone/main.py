@@ -42,6 +42,3 @@ if st.button('List Google Drive Files'):
     else:
         for file in files:
             st.write(f"{file['name']} - [Open]({file['webViewLink']})")
-
-if __name__ == '__main__':
-    st.run()
