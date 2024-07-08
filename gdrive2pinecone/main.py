@@ -9,7 +9,7 @@ import pickle
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
-def get_drive_service():
+def get_drive_service(auth_code=None):
     creds = None
     if os.path.exists('token.pickle'):
         with open('token.pickle', 'rb') as token:
@@ -20,28 +20,44 @@ def get_drive_service():
         else:
             client_secret_json = os.getenv("GOOGLE_CLIENT_SECRET_JSON")
             client_secret = json.loads(client_secret_json)
-            flow = InstalledAppFlow.from_client_config(client_secret, SCOPES)
-            auth_url, _ = flow.authorization_url(prompt='consent')
-            st.write('Please go to this URL to authorize this application: [Authorization URL]({})'.format(auth_url))
-            auth_code = st.text_input('Enter the authorization code: ')
+            flow = InstalledAppFlow.from_client_config(client_secret, SCOPES, redirect_uri=os.getenv("REDIRECT_URI"))
             if auth_code:
                 flow.fetch_token(code=auth_code)
                 creds = flow.credentials
                 with open('token.pickle', 'wb') as token:
                     pickle.dump(creds, token)
+            else:
+                auth_url, _ = flow.authorization_url(prompt='consent')
+                return auth_url
     service = build('drive', 'v3', credentials=creds)
     return service
 
-def list_drive_files():
-    service = get_drive_service()
+def list_drive_files(auth_code=None):
+    service_or_url = get_drive_service(auth_code)
+    if isinstance(service_or_url, str):
+        return service_or_url, None
+    service = service_or_url
     results = service.files().list(pageSize=10, fields="nextPageToken, files(id, name, webViewLink)").execute()
     items = results.get('files', [])
-    return items
+    return None, items
 
 st.title('Google Drive File Viewer')
 
-if st.button('List Google Drive Files'):
-    files = list_drive_files()
+if 'auth_code' not in st.session_state:
+    st.session_state.auth_code = None
+
+if st.session_state.auth_code:
+    url, files = list_drive_files(st.session_state.auth_code)
+else:
+    url, files = list_drive_files()
+
+if url:
+    st.write('Please go to this URL to authorize this application: [Authorization URL]({})'.format(url))
+    auth_code = st.text_input('Enter the authorization code:')
+    if auth_code:
+        st.session_state.auth_code = auth_code
+        st.experimental_rerun()
+else:
     if not files:
         st.write('No files found.')
     else:
