@@ -7,7 +7,7 @@ import pandas as pd
 from io import StringIO
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
-FOLDER_ID = 'https://drive.google.com/drive/folders/17nHU4-wjd0V2gVlYQBVqkk6V4VH8GIBM'  # Replace with your Google Drive folder ID
+FOLDER_ID = '17nHU4-wjd0V2gVlYQBVqkk6V4VH8GIBM'  # Replace with your Google Drive folder ID
 
 def get_drive_service():
     client_secret_json = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
