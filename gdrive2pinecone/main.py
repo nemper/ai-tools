@@ -21,9 +21,14 @@ def get_drive_service():
             client_secret_json = os.getenv("GOOGLE_CLIENT_SECRET_JSON")
             client_secret = json.loads(client_secret_json)
             flow = InstalledAppFlow.from_client_config(client_secret, SCOPES)
-            creds = flow.run_local_server(port=0)
-            with open('token.pickle', 'wb') as token:
-                pickle.dump(creds, token)
+            auth_url, _ = flow.authorization_url(prompt='consent')
+            st.write('Please go to this URL to authorize this application: [Authorization URL]({})'.format(auth_url))
+            auth_code = st.text_input('Enter the authorization code: ')
+            if auth_code:
+                flow.fetch_token(code=auth_code)
+                creds = flow.credentials
+                with open('token.pickle', 'wb') as token:
+                    pickle.dump(creds, token)
     service = build('drive', 'v3', credentials=creds)
     return service
 
