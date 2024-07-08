@@ -7,6 +7,7 @@ import pandas as pd
 from io import StringIO
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
+FOLDER_ID = 'https://drive.google.com/drive/folders/17nHU4-wjd0V2gVlYQBVqkk6V4VH8GIBM'  # Replace with your Google Drive folder ID
 
 def get_drive_service():
     client_secret_json = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
@@ -15,16 +16,26 @@ def get_drive_service():
     service = build('drive', 'v3', credentials=credentials)
     return service
 
-def list_drive_files():
-    service = get_drive_service()
-    results = service.files().list(pageSize=100, fields="nextPageToken, files(id, name, webViewLink)").execute()
+def list_drive_files(service, folder_id):
+    query = f"'{folder_id}' in parents and trashed = false"
+    results = service.files().list(q=query, pageSize=1000, fields="nextPageToken, files(id, name, webViewLink, mimeType)").execute()
     items = results.get('files', [])
-    return items
+    
+    files = []
+    for item in items:
+        if item['mimeType'] == 'application/vnd.google-apps.folder':
+            files.extend(list_drive_files(service, item['id']))
+        else:
+            files.append(item)
+    
+    return files
 
 st.title('Google Drive File Viewer')
 
 if st.button('List Google Drive Files'):
-    files = list_drive_files()
+    service = get_drive_service()
+    files = list_drive_files(service, FOLDER_ID)
+    
     if not files:
         st.write('No files found.')
     else:
