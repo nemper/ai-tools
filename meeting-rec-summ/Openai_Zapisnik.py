@@ -29,7 +29,7 @@ default_values = {
 initialize_session_state(default_values)
 
 
-version = "10.0.24."
+version = "10.07.24."
 
 # this class does long summarization of the text 
 class MeetingTranscriptSummarizer:
