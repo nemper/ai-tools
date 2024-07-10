@@ -7,4 +7,5 @@ langchain==0.2.3
 langchain-community==0.2.4
 langchain-openai==0.1.8
 langchain-text-splitters==0.2.1
+pydub==0.25.1
 unstructured==0.14.4

@@ -15,8 +15,8 @@ from langchain.schema import AIMessage
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain_openai.chat_models import ChatOpenAI
-
-from myfunc.asistenti import priprema
+from Dunja_Zapisnik import priprema
+# from myfunc.asistenti import priprema
 from myfunc.mojafunkcija import initialize_session_state, positive_login, sacuvaj_dokument
 from myfunc.varvars_dicts import work_prompts, work_vars
 
@@ -29,7 +29,7 @@ default_values = {
 initialize_session_state(default_values)
 
 
-version = "07.06.24."
+version = "10.0.24."
 
 # this class does long summarization of the text 
 class MeetingTranscriptSummarizer:

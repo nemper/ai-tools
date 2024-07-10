@@ -1,283 +1,332 @@
-import io
-import nltk
-import os
-import PyPDF2
-import re
 import streamlit as st
+import openai
+import base64
+from PIL import Image
+import os
+import glob
+from io import BytesIO
+import requests
+from pydub import AudioSegment
 
-from openai import OpenAI
-
-from langchain.chains.combine_documents.stuff import StuffDocumentsChain
-from langchain.chains.llm import LLMChain
-from langchain.chains.summarize import load_summarize_chain
-from langchain.prompts import PromptTemplate
-from langchain.schema import AIMessage
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import UnstructuredFileLoader
-from langchain_openai.chat_models import ChatOpenAI
-
-from myfunc.asistenti import priprema
-from myfunc.mojafunkcija import custom_streamlit_style, initialize_session_state, positive_login, sacuvaj_dokument
 from myfunc.varvars_dicts import work_prompts, work_vars
-
 mprompts = work_prompts()
-client=OpenAI()
-st.html(custom_streamlit_style)
 
-default_values = {
-    "dld" : "Zapisnik",
-}
-
-initialize_session_state(default_values)
-
-version = "07.06.24."
-
-# this class does long summarization of the text 
-class MeetingTranscriptSummarizer:
-    def __init__(self, transcript, temperature, number_of_topics):
-        self.transcript = transcript
-        self.temperature = temperature
-        self.number_of_topics = number_of_topics
-
-    def get_response(self, prompt, text):
-        response = client.chat.completions.create(
-            model=work_vars["names"]["openai_model"],
-            temperature=self.temperature,
-            messages=[
-                {"role": "system", "content": prompt + "Use only the Serbian Language"},
-                {"role": "user", "content": text}
-            ]
-        )
-        return response.choices[0].message.content
-
-    def summarize(self):
-        introduction = self.get_response("Extract the meeting date and the participants.", self.transcript)
-        topic_identification_prompt = (
-            f"List up to {self.number_of_topics} main topics discussed in the transcript "
-            "excluding the introductory details and explanation of the topics. "
-            "All remaining topics summarize in the single topic Razno."
-        )
-        topics = self.get_response(topic_identification_prompt, self.transcript).split('\n')
-        
-        st.success("Identifikovane su teme:")
-        for topic in topics:
-            st.success(topic)
-
-        summaries = []
-        for topic in topics:
-            summary_prompt = f"Summarize the discussion only on the single topic: {topic}, excluding the introductory details."
-            summary = self.get_response(summary_prompt, self.transcript)
-            summaries.append(f"## Tema: {topic} \n{summary}")
-            st.info(f"Obradjujem temu: {topic}")
-        
-        conclusion = self.get_response("Generate a conclusion from the whole meeting.", self.transcript)
-        full_text = (
-            f"## Sastanak koordinacije AI Tima\n\n{introduction}\n\n ## Teme sastanka\n\n" + 
-            "\n".join([f"{topic}" for topic in topics]) + "\n\n"
-            + "\n\n".join(summaries) 
-            + f"\n\n## Zaključak\n\n{conclusion}"
-        )
-        return full_text
+# in myfunc.asistenti.py
+def priprema():
+    """ Prepare the data for the assistant. """    
     
-#main function
-def main():
+    izbor_radnji = st.selectbox("Odaberite pripremne radnje", 
+                    ("Transkribovanje Zvučnih Zapisa", "Čitanje sa slike iz fajla", "Čitanje sa slike sa URL-a"),
+                    help = "Odabir pripremnih radnji"
+                    )
+    if izbor_radnji == "Transkribovanje Zvučnih Zapisa":
+        transkript()
+    elif izbor_radnji == "Čitanje sa slike iz fajla":
+        read_local_image()
+    elif izbor_radnji == "Čitanje sa slike sa URL-a":
+        read_url_image()
 
-    with st.sidebar:
-        priprema()
 
-    # initial prompt
-    opis = "opis"
-    st.markdown(
-        f"<p style='font-size: 10px; color: grey;'>{version}</p>",
-        unsafe_allow_html=True,
-    )
-    st.subheader("Zapisnik OpenAI NEW ✍️")  # Setting the title for Streamlit application
-    with st.expander("Pročitajte uputstvo 🧜"):
-        st.caption(
-            """
-                   ### Korisničko Uputstvo za Sažimanje Teksta i Transkribovanje 🧜
-
-Dobrodošli na alat za sažimanje teksta i transkribovanje zvučnih zapisa! Ovaj alat vam pruža mogućnost generisanja sažetaka tekstova sastanaka, kao i transkribovanja zvučnih zapisa. Evo kako možete koristiti ovaj alat:
-
-#### Sažimanje Teksta
-
-1. **Učitavanje Teksta**
-   - U prozoru "Izaberite tekst za sumarizaciju" učitajte tekstualni dokument koji želite sažeti. Podržani formati su .txt, .pdf i .docx.
-
-**Generisanje Sažetka**
-   - Mozete odabrati opcije Kratki i Dugacki Summary. Kratki summary kao izlaz daje jednu stranicu A4. 
-   - Mozete odabrati temperaturu. Visa tempratura daje manje detrministicki odgovor.
-   - Dugacki summary daje otprilike 2-3 teme po jednoj stranici A4, ali traje duze i koristi mnogo vise tokena. Za dugacki summary mozete odrediti i maksimalni broj glavnih tema. Ostale identifikovane teme bice obradjene pod tackom Razno 
-   - Pritisnite dugme "Submit" kako biste pokrenuli proces sažimanja. Sažetak će se prikazati u prozoru "Sažetak". Takođe, imate opciju preuzimanja sažetka kao .txt, .docx i .pdf.
-   - Ukoliko je dokument duzi od 275000 karaktera, bice primenjen drugi, sporiji nacim rada, zbog trenutog ogranicenja GPT-4 modela na 4000 tokena za izlaz. U ovom slucaju dugacki summary nije dostupan.
-
-#### Transkribovanje Zvučnih Zapisa
-
-1. **Učitavanje Zvučnog Zapisa**
-   - U bočnoj traci, kliknite na opciju "Transkribovanje zvučnih zapisa" u padajućem meniju. Učitajte zvučni zapis (.mp3) koji želite transkribovati. \
-   Možete poslušati sadržaj fajla po potrebi. **Napomena:** Zvučni zapis ne sme biti veći od 25Mb. 
-
-2. **Odabir Jezika**
-   - Izaberite jezik izvornog teksta zvučnog zapisa u padajućem meniju "Odaberite jezik izvornog teksta".
-
-3. **Generisanje Transkripta**
-   - Pritisnite dugme "Submit" kako biste pokrenuli proces transkribovanja. Transkript će se prikazati u prozoru "Transkript". Takođe, možete preuzeti transkript kao .txt.
-
-   #### Čitanje slika iz fajla i sa URL-a
-
-1. **Učitavanje slike**
-   - U bočnoj traci, kliknite na opciju "Čitanje sa slike iz fajla" ili "Čitanje sa slike sa URL-a" u padajućem meniju. Učitajte sliku (.jpg) koji želite da bude opisana. Prikazaće se preview slike.
-
-2. **Uputstvo**
-   - Korigujte uputsvo po potrebi.
-
-3. **Generisanje opisa**
-   - Pritisnite dugme "Submit" kako biste pokrenuli proces opisivanja. Opis će se prikazati u prozoru "Opis slike". Takođe, možete preuzeti opis kao .txt.
-
-**Napomena:**
-- Za transkribovanje zvučnih zapisa koristi se OpenAI Whisper model. Zvučni zapis mora biti u .MP3 formatu i ne veći od 25Mb.
-- Za sažimanje teksta i citanje sa slika koristi se odgovarajući OpenAI GPT-4 model.
-- Sve generisane datoteke možete preuzeti pomoću odgovarajućih dugmadi za preuzimanje u bočnoj traci.
-
-Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀 
-                   """
+# in myfunc.asistenti.py
+def transkript():
+    """This function does transcription of the audio file and then corrects the transcript.
+    It calls the function transcribe and generate_corrected_transcript
+    Convert mp3 to text. """
+    
+    # Read OpenAI API key from env
+    with st.sidebar:  # App start
+        st.info("Konvertujte audio/video u TXT")
+        audio_file = st.file_uploader(
+            "Odaberite audio/video fajl",
+            key="audio_",
+            help="Odabir dokumenta",
         )
- 
-    uploaded_file = st.file_uploader(
-        "Izaberite tekst za sumarizaciju",
-        key="upload_file",
-        type=["txt", "pdf", "docx"],
-        help = "Odabir dokumenta",
-    )
-
-    # summarize chosen file
-    if uploaded_file is not None:
+        transcript = ""
         
-        prva = """Write a detailed summary. Be sure to describe every topic and the name used in the text. \
-Write it as a newspaper article. Write only in Serbian language. Give it a Title and subtitles where appropriate \
-and use markdown such is H1, H2, etc."""
+        if audio_file is not None:
+            st.audio(audio_file.getvalue(), format="audio/mp3")
+            placeholder = st.empty()
 
-        with io.open(uploaded_file.name, "wb") as file:
-            file.write(uploaded_file.getbuffer())
+            with placeholder.form(key="my_jezik", clear_on_submit=False):
+                jezik = st.selectbox(
+                    "Odaberite jezik izvornog teksta 👉",
+                    (
+                        "sr",
+                        "en",
+                    ),
+                    key="jezik",
+                    help="Odabir jezika",
+                )
 
-        if ".pdf" in uploaded_file.name:
-            pdf_reader = PyPDF2.PdfReader(uploaded_file)
-            num_pages = len(pdf_reader.pages)
-            text_content = ""
+                submit_button = st.form_submit_button(label="Submit")
+                client = openai
+                if submit_button:
+                    with st.spinner("Sačekajte trenutak..."):
+                        system_prompt=mprompts["text_from_audio"]
+                        # does transcription of the audio file and then corrects the transcript
+                        transcript = generate_corrected_transcript(client, system_prompt, audio_file, jezik)            
+                        with st.expander("Transkript"):
+                            st.info(transcript)
+                            
+            if transcript !="":
+                st.download_button(
+                    "Download transcript",
+                    transcript,
+                    file_name="transcript.txt",
+                    help="Odabir dokumenta",
+                )
+                delete_mp3_files(".")
 
-            for page in range(num_pages):
-                page_obj = pdf_reader.pages[page]
-                text_content += page_obj.extract_text()
-            text_content = text_content.replace("•", "")
-            text_content = re.sub(r"(?<=\b\w) (?=\w\b)", "", text_content)
-            with io.open("temp.txt", "w", encoding="utf-8") as f:
-                f.write(text_content)
 
-            loader = UnstructuredFileLoader("temp.txt", encoding="utf-8")
-        else:
-            # Creating a file loader object
-            loader = UnstructuredFileLoader(file_path=uploaded_file.name, encoding="utf-8")
+# in myfunc.asistenti.py
+def read_local_image():
+    """ Describe the image from a local file. """
 
-        result = loader.load()
+    st.info("Čita sa slike")
+    image_f = st.file_uploader(
+        "Odaberite sliku",
+        type="jpg",
+        key="slika_",
+        help="Odabir dokumenta",
+    )
+    content = ""
+  
+    
+    if image_f is not None:
+        base64_image = base64.b64encode(image_f.getvalue()).decode('utf-8')
+        # Decode the base64 image
+        image_bytes = base64.b64decode(base64_image)
+        # Create a PIL Image object
+        image = Image.open(BytesIO(image_bytes))
+        # Display the image using st.image
+        st.image(image, width=150)
+        placeholder = st.empty()
 
-        out_name = "Zapisnik"
-
-        ye_old_way = False
-        if len(result[0].page_content) > 275000:
-            ye_old_way = True
-            st.warning("Vaš dokument je duži od 275000 karaktera. Koristiće se map reduce document chain (radi sporije, a daje drugačije rezultate) - ovo je temporary rešenje. Za ovu opciju dugacki summary nije dostupan.")
-
-        text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=75000, chunk_overlap=5000,)
-        texts = text_splitter.split_documents(result)
-
-        with st.form(key="my_form", clear_on_submit=False):
-            opis = prva
-            col1, col2, col3 = st.columns(3)
-            with col2:
-                temp = st.slider("Temperatura:", min_value=0.0, max_value=1.0, value=0.0, step=0.1, help="Manja temperatura je precizniji odgovor. Max temperatura modela je 2, ali nije omogucena u ovom slucaju")
-            with col3:
-                broj_tema= st.number_input("Broj glavnih tema za duzi sazetak max:", min_value=3, max_value=10, value=5, step=1, help="Max broj glavnih tema. Model moze odabrati i manji broj tema, a ostale ce biti obradjene pod tackom Razno")
-            with col1:    
-                koristi_dugacak = st.radio(label="Obim sazetka:", options=["Kratak", "Dugacak"], help='Kratki sazetrak je oko jedne strane A4. Dugacki sazetak zavisi od broja tema, otprilike 2-3 teme po stranici A4')
-
+        with placeholder.form(key="my_image", clear_on_submit=False):
+            default_text = mprompts["text_from_image"]
+            upit = st.text_area("Unesite uputstvo ", default_text)  
             submit_button = st.form_submit_button(label="Submit")
             
             if submit_button:
-                # Initializing ChatOpenAI model
-                llm = ChatOpenAI(
-                    model_name=work_vars["names"]["openai_model"], temperature=temp
-                    )
-
-                st.info(f"Temperatura je {temp}")
-                with st.spinner("Sačekajte trenutak..."):
-                    if ye_old_way:
-                        opis_kraj = opis
-                        opis = "Summarize comprehensively the content of the document."
-                        chain = load_summarize_chain(
-                            llm,
-                            chain_type="map_reduce",
-                            verbose=True,
-                            map_prompt=PromptTemplate(template=mprompts["summary_begin"].format(text="text", opis="opis"), input_variables=["text", "opis"]),
-                            combine_prompt=PromptTemplate(template=mprompts["summary_end"].format(text="text", opis_kraj="opis_kraj"), input_variables=["text", "opis_kraj"]),
-                            token_max=4000,)
-
-                        suma = AIMessage(
-                            content=chain.invoke(
-                                {"input_documents": texts, "opis": opis, "opis_kraj": opis_kraj})["output_text"]
-                                ).content
-                    elif koristi_dugacak == "Kratak":
-                        prompt_template = """ "{additional_variable}"
-                        "{text}"
-                        SUMMARY:"""
-                        prompt = PromptTemplate.from_template(prompt_template)
-                        prompt.input_variables = ["text", "additional_variable"] 
-                        # Define LLM chain
-                        llm_chain = LLMChain(llm=llm, prompt=prompt)
-                        # Define StuffDocumentsChain
-                        stuff_chain = StuffDocumentsChain(llm_chain=llm_chain, document_variable_name="text")       
-
-                        suma = AIMessage(
-                            content=stuff_chain.invoke({"input_documents": result, "additional_variable": opis})["output_text"]
-                        ).content
-                        # st.write(type(suma.content))
-                    elif koristi_dugacak == "Dugacak":
-                        ulaz= result[0].page_content
-                        summarizer = MeetingTranscriptSummarizer(
-                            transcript=ulaz, 
-                            temperature=temp, 
-                            number_of_topics=broj_tema
-                            )
-                        
-                        suma = summarizer.summarize()
-                    st.session_state.dld = suma
+                with st.spinner("Sačekajte trenutak..."):            
+            
+            # Path to your image
                     
-        if st.session_state.dld != "Zapisnik":
-            with st.sidebar:
+                    api_key = os.getenv("OPENAI_API_KEY")
+                    # Getting the base64 string
+                    
+
+                    headers = {
+                      "Content-Type": "application/json",
+                      "Authorization": f"Bearer {api_key}"
+                    }
+
+                    payload = {
+                      "model": work_vars["names"]["openai_model"],
+                      "messages": [
+                        {
+                          "role": "user",
+                          "content": [
+                            {
+                              "type": "text",
+                              "text": upit
+                            },
+                            {
+                              "type": "image_url",
+                              "image_url": {
+                                "url": f"data:image/jpeg;base64,{base64_image}"
+                              }
+                            }
+                          ]
+                        }
+                      ],
+                      "max_tokens": 300
+                    }
+
+                    response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
+
+                    json_data = response.json()
+                    content = json_data['choices'][0]['message']['content']
+                    with st.expander("Opis slike"):
+                            st.info(content)
                             
-                st.download_button(
-                    "Download prompt as .txt", opis, file_name="prompt1.txt", help = "Čuvanje zadatog prompta"
-                )
-                
-                sacuvaj_dokument(st.session_state.dld, out_name)
-            with st.expander("Sažetak", True):
-                # Generate the summary by running the chain on the input documents and store it in an AIMessage object
-                st.write(st.session_state.dld)  # Displaying the summary
+        if content !="":
+            st.download_button(
+                "Download opis slike",
+                content,
+                file_name=f"{image_f.name}.txt",
+                help="Čuvanje dokumenta",
+            )
+
+
+# in myfunc.asistenti.py
+def read_url_image():
+    """ Describe the image from a URL. """    
+    # version url
+
+    client = openai
     
-            directory = os.getcwd()
-            for filename in os.listdir(directory):
-                if filename.endswith('.txt') and filename not in ['requirements.txt', "prompt1.txt", out_name]:
-                    file_path = os.path.join(directory, filename)
-                    os.remove(file_path)
-                elif filename.endswith('.docx') or filename.endswith('.pdf'):
-                    file_path = os.path.join(directory, filename)
-                    os.remove(file_path)
+    st.info("Čita sa slike sa URL")
+    content = ""
+    
+    #with placeholder.form(key="my_image_url_name", clear_on_submit=False):
+    img_url = st.text_input("Unesite URL slike ")
+    #submit_btt = st.form_submit_button(label="Submit")
+    image_f = os.path.basename(img_url)   
+    if img_url !="":
+        st.image(img_url, width=150)
+        placeholder = st.empty()    
+    #if submit_btt:        
+        with placeholder.form(key="my_image_url", clear_on_submit=False):
+            default_text = mprompts["text_from_image"]
+        
+            upit = st.text_area("Unesite uputstvo ", default_text)
+            submit_button = st.form_submit_button(label="Submit")
+            if submit_button:
+                with st.spinner("Sačekajte trenutak..."):         
+                    
+                    response = client.chat.completions.create(
+                      model=work_vars["names"]["openai_model"],
+                      messages=[
+                        {
+                          "role": "user",
+                          "content": [
+                            {"type": "text", "text": upit},
+                            {
+                              "type": "image_url",
+                              "image_url": {
+                                "url": img_url,
+                              },
+                            },
+                          ],
+                        }
+                      ],
+                      max_tokens=300,
+                    )
+                    content = response.choices[0].message.content
+                    with st.expander("Opis slike"):
+                                st.info(content)
+                            
+    if content !="":
+        st.download_button(
+            "Download opis slike",
+            content,
+            file_name=f"{image_f}.txt",
+            help="Čuvanje dokumenta",
+        )
 
-# Deployment on Stremalit Login functionality
-deployment_environment = os.environ.get("DEPLOYMENT_ENVIRONMENT")
 
-if deployment_environment == "Streamlit":
-    name, authentication_status, username = positive_login(main, " ")
-else:
-    if __name__ == "__main__":
-        main()
+# in myfunc.asistenti.py
+def generate_corrected_transcript(client, system_prompt, audio_file, jezik):
+    """ Generate corrected transcript. 
+        Parameters: 
+            client (openai): The OpenAI client.
+            system_prompt (str): The system prompt.
+            audio_file (str): The audio file.
+            jezik (str): The language of the audio file.
+        """    
+    client= openai
+        
+
+    def convert_to_mp3(file_path, output_path):
+        # Load the audio file
+        audio = AudioSegment.from_file(file_path)
+        # Set parameters: mono, 16000Hz
+        audio = audio.set_channels(1).set_frame_rate(16000)
+        # Export as mp3
+        audio.export(output_path, format="mp3", bitrate="128k")
+
+    def transcribe_audio(file_path, jezik):
+        with open(file_path, "rb") as audio_file:
+            transcript = client.audio.transcriptions.create(
+            model="whisper-1", 
+            file=audio_file, 
+            language=jezik,
+            response_format="text"
+            )
+        return transcript
+            
+
+    def split_mp3_file(input_path, output_directory, max_file_size_mb=20, max_duration_minutes=45, jezik=jezik):
+        # Load the mp3 file
+        audio = AudioSegment.from_file(input_path, format="mp3")
+        
+        # Calculate the duration limit for the file size (in seconds)
+        max_file_size_bytes = max_file_size_mb * 1024 * 1024
+        bitrate_kbps = 128  # Assuming a bitrate of 128 kbps
+        
+        max_duration_seconds_file_size = (max_file_size_bytes * 8) / (bitrate_kbps * 1000)
+        
+        # Duration limit in seconds
+        max_duration_seconds_time = max_duration_minutes * 60
+        
+        # Use the smaller of the two duration limits
+        max_duration_seconds = min(max_duration_seconds_file_size, max_duration_seconds_time)
+        
+        # Split the audio file
+        parts = []
+        for i in range(0, len(audio), int(max_duration_seconds * 1000)):
+            part = audio[i:i + int(max_duration_seconds * 1000)]
+            parts.append(part)
+        
+        # Export each part and transcribe
+        all_transcripts = []
+        for idx, part in enumerate(parts):
+            part_path = os.path.join(output_directory, f"{os.path.splitext(os.path.basename(input_path))[0]}_part{idx + 1}.mp3")
+            part.export(part_path, format="mp3", bitrate="128k")
+            st.info(f"Kreiram transkript {part_path}")
+            transcript = transcribe_audio(part_path, jezik)
+            all_transcripts.append(transcript)
+        combined_transcript = " ".join(all_transcripts)
+        return combined_transcript
+    
+    def chunk_transcript(transkript, token_limit):
+        words = transkript.split()
+        chunks = []
+        current_chunk = ""
+
+        for word in words:
+            if len((current_chunk + " " + word).split()) > token_limit:
+                chunks.append(current_chunk.strip())
+                current_chunk = word
+            else:
+                current_chunk += " " + word
+
+        chunks.append(current_chunk.strip())
+
+        return chunks
+
+    convert_to_mp3(audio_file, "output.mp3")
+    transcript = split_mp3_file("output.mp3", ".", jezik=jezik)
+    
+    st.caption("delim u delove po 1000 reci")
+    chunks = chunk_transcript(transcript, 1000)
+    broj_delova = len(chunks)
+    st.caption (f"Broj delova je: {broj_delova}")
+    corrected_transcript = ""
+
+    # Loop through the token chunks
+    for i, chunk in enumerate(chunks):
+        
+        st.caption(f"Obradjujem {i + 1}. deo...")
+          
+        response = client.chat.completions.create(
+            model=work_vars["names"]["openai_model"],
+            temperature=0,
+            messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": chunk}])
+    
+        corrected_transcript += " " + response.choices[0].message.content.strip()
+
+    return corrected_transcript
+
+def delete_mp3_files(directory):
+    mp3_files = glob.glob(os.path.join(directory, "*.mp3"))
+    for mp3_file in mp3_files:
+        try:
+            os.remove(mp3_file)
+        except Exception as e:
+            st.info(f"Error deleting {mp3_file}: {e}")
+
+
+
+
