@@ -274,7 +274,7 @@ def generate_corrected_transcript(client, system_prompt, audio_file, jezik):
         for idx, part in enumerate(parts):
             part_path = os.path.join(output_directory, f"{os.path.splitext(os.path.basename(input_path))[0]}_part{idx + 1}.mp3")
             part.export(part_path, format="mp3", bitrate="128k")
-            st.info(f"Kreiram transkript {part_path}")
+            st.caption(f"Kreiram transkript {part_path}")
             transcript = transcribe_audio(part_path, jezik)
             all_transcripts.append(transcript)
         combined_transcript = " ".join(all_transcripts)

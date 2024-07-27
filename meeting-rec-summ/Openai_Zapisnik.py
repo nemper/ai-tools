@@ -15,8 +15,7 @@ from langchain.schema import AIMessage
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain_openai.chat_models import ChatOpenAI
-from Dunja_Zapisnik import priprema
-# from myfunc.asistenti import priprema
+from myfunc.asistenti import priprema
 from myfunc.mojafunkcija import initialize_session_state, positive_login, sacuvaj_dokument
 from myfunc.varvars_dicts import work_prompts, work_vars
 
@@ -40,7 +39,7 @@ class MeetingTranscriptSummarizer:
 
     def get_response(self, prompt, text):
         response = client.chat.completions.create(
-            model=work_vars["names"]["openai_model"],
+            model="gpt-4o-mini", # work_vars["names"]["openai_model"],
             temperature=self.temperature,
             messages=[
                 {"role": "system", "content": prompt + "Use only the Serbian Language"},
@@ -199,7 +198,7 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
                 if submit_button:
                     # Initializing ChatOpenAI model
                     llm = ChatOpenAI(
-                        model_name=work_vars["names"]["openai_model"], temperature=temp
+                        model_name="gpt-4o-mini", #work_vars["names"]["openai_model"], temperature=temp
                         )
 
                     st.info(f"Temperatura je {temp}")
