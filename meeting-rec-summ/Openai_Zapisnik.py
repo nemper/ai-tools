@@ -7,8 +7,6 @@ import streamlit as st
 
 from openai import OpenAI
 
-from langchain.chains.combine_documents.stuff import StuffDocumentsChain
-from langchain.chains.llm import LLMChain
 from langchain.chains.summarize import load_summarize_chain
 from langchain.prompts import PromptTemplate
 from langchain.schema import AIMessage
@@ -28,7 +26,7 @@ default_values = {
 initialize_session_state(default_values)
 
 
-version = "10.07.24."
+version = "28.07.24."
 
 # this class does long summarization of the text 
 class MeetingTranscriptSummarizer:
@@ -219,19 +217,15 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
                                     {"input_documents": texts, "opis": opis, "opis_kraj": opis_kraj})["output_text"]
                                     ).content
                         elif koristi_dugacak == "Kratak":
-                            prompt_template = """ "{additional_variable}"
-                            "{text}"
-                            SUMMARY:"""
-                            prompt = PromptTemplate.from_template(prompt_template)
-                            prompt.input_variables = ["text", "additional_variable"] 
-                            llm_chain = LLMChain(llm=llm, prompt=prompt)
-
-                            # Define StuffDocumentsChain
-                            stuff_chain = StuffDocumentsChain(llm_chain=llm_chain, document_variable_name="text")       
-
-                            suma = AIMessage(
-                                content=stuff_chain.invoke({"input_documents": result, "additional_variable": opis})["output_text"]
-                            ).content
+                            system_prompt = mprompts["intro_summary"]
+                            ulaz= st.session_state.file_content
+                            summarizer = MeetingTranscriptSummarizer(
+                                transcript=ulaz, 
+                                temperature=temp, 
+                                number_of_topics=broj_tema
+                                )
+                            
+                            suma = summarizer.get_response(system_prompt, ulaz)
                         
                         elif koristi_dugacak == "Dugacak":
                             ulaz= st.session_state.file_content
