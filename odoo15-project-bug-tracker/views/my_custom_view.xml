@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+	<!-- Kanban for Bug Stages -->
+	<record id="view_my_custom_bug_kanban_stage" model="ir.ui.view">
+		<field name="name">my.custom.bug.model.kanban.stage</field>
+		<field name="model">my.custom.bug.model</field>
+		<field name="arch" type="xml">
+			<kanban class="o_kanban_color_2" default_group_by="stage_id" create="false">
+				<field name="stage_id"/>
+				<field name="name"/>
+				<field name="priority"/>
+				<field name="assigned_to_id"/>
+				<field name="deadline"/>
+
+				<templates>
+					<t t-name="kanban-box">
+						<div t-attf-class="oe_kanban_global_click o_kanban_record">
+							<div class="o_kanban_details">
+								<strong><field name="name"/></strong>
+								<div class="o_kanban_tags">
+									<field name="stage_id" widget="many2one_tags"/>
+									<field name="priority" widget="selection"/>
+									<field name="assigned_to_id"/>
+								</div>
+								<div><field name="deadline"/></div>
+							</div>
+						</div>
+					</t>
+				</templates>
+			</kanban>
+		</field>
+	</record>
+	
+	<!-- Action for Bug Stages -->
+	<record id="action_my_custom_bug_kanban_stage" model="ir.actions.act_window">
+		<field name="name">Bug Stages</field>
+		<field name="res_model">my.custom.bug.model</field>
+		<field name="view_mode">kanban</field> <!-- Only kanban view -->
+		<field name="view_id" ref="view_my_custom_bug_kanban_stage"/> <!-- Reference the new Kanban view -->
+		<field name="target">current</field>
+	</record>
+
+	<!-- Form View for My Custom Model -->
+    <record id="view_my_custom_form" model="ir.ui.view">
+        <field name="name">my.custom.model.form</field>
+        <field name="model">my.custom.model</field>
+        <field name="arch" type="xml">
+            <form string="My Custom Form">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="company_id"/>
+                            <field name="company_address" readonly="1"/>
+                            <field name="company_phone" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="project_number" readonly="1"/>
+                            <field name="project_list" readonly="1" widget="text"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+	
+	<!-- Kanban for Manage Bugs -->
+	<record id="view_my_custom_bug_kanban" model="ir.ui.view">
+		<field name="name">my.custom.bug.model.kanban</field>
+		<field name="model">my.custom.bug.model</field>
+		<field name="arch" type="xml">
+			<kanban class="o_kanban_color_2">
+				<field name="stage_id"/>
+				<field name="name"/>
+				<field name="priority"/>
+				<field name="assigned_to_id"/>
+				<field name="deadline"/>
+
+				<templates>
+					<t t-name="kanban-box">
+						<div t-attf-class="oe_kanban_global_click o_kanban_record">
+							<div class="o_kanban_details">
+								<strong><field name="name"/></strong>
+								<div class="o_kanban_tags">
+									<field name="stage_id" widget="many2one_tags"/>
+									<field name="priority" widget="selection"/>
+									<field name="assigned_to_id"/>
+								</div>
+								<div><field name="deadline"/></div>
+							</div>
+						</div>
+					</t>
+				</templates>
+			</kanban>
+		</field>
+	</record>
+
+    <!-- Define the tree (list) view for the Bugs model -->
+    <record id="view_my_custom_bug_tree" model="ir.ui.view">
+        <field name="name">my.custom.bug.model.tree</field>
+        <field name="model">my.custom.bug.model</field>
+        <field name="arch" type="xml">
+            <tree string="Bugs">
+                <field name="bug_unique_id"/>
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="assigned_to_id"/>
+                <field name="priority"/>
+                <field name="stage_id"/>
+                <field name="deadline"/>
+            </tree>
+        </field>
+    </record>
+	
+	<!-- Bug Form View with Chatter -->
+	<record id="view_my_custom_bug_form" model="ir.ui.view">
+		<field name="name">my.custom.bug.model.form</field>
+		<field name="model">my.custom.bug.model</field>
+		<field name="arch" type="xml">
+			<form string="Bugs">
+				<header>
+					<field name="stage_id" widget="statusbar" statusbar_visible="True,False"/>
+					<field name="active" widget="statusbar" statusbar_visible="True,False"/>
+				</header>
+				<sheet>
+					<h1>
+						<field name="name"/>
+					</h1>
+					<group>
+						<group>
+							<field name="bug_unique_id" readonly="1" class="o_field_monospace"/>
+							<field name="project_id"/>
+							<field name="task_id"/>
+							<field name="assigned_to_id"/>
+							<field name="assigned_multi_user_ids" widget="many2many_tags"/>
+							<field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" context="{'default_name': ''}"/>  <!-- Enabled Create and Edit -->
+							<field name="client_id"/>
+							<field name="priority" widget="selection"/>
+							<field name="submitted_by_id"/>
+							<field name="version"/>
+						</group>
+						<group>
+							<field name="deadline"/>
+							<field name="issue_type" widget="selection"/>
+							<field name="build_date"/>
+							<field name="issue_resides_in" widget="selection"/>
+							<field name="client_urgency" widget="selection"/>
+							<field name="fixed_version"/>
+						</group>
+					</group>
+					<notebook>
+						<page string="Description">
+							<field name="description"/>
+						</page>
+						<page string="Steps To Replicate">
+							<field name="steps_to_replicate"/>
+						</page>
+						<page string="Expected Result">
+							<field name="expected_result"/>
+						</page>
+						<page string="Actual Result">
+							<field name="actual_result"/>
+						</page>
+						<page string="Solution">
+							<field name="solution"/>
+						</page>
+						<page string="Extra Info">
+							<field name="extra_info"/>
+						</page>
+					</notebook>
+				</sheet>
+				
+				<!-- Add Chatter Section Here -->
+				<div class="oe_chatter">
+					<field name="message_follower_ids" widget="mail_followers"/>
+					<field name="message_ids" widget="mail_thread"/>
+				</div>
+				
+			</form>
+		</field>
+	</record>
+	
+	<!-- Tag Form View -->
+	<record id="view_my_custom_bug_tag_form" model="ir.ui.view">
+		<field name="name">my.custom.bug.tag.form</field>
+		<field name="model">my.custom.bug.tag</field>
+		<field name="arch" type="xml">
+			<form string="Bug Tag">
+				<sheet>
+					<group>
+						<field name="name"/>
+					</group>
+				</sheet>
+			</form>
+		</field>
+	</record>
+
+	<!-- Tag Tree View -->
+	<record id="view_my_custom_bug_tag_tree" model="ir.ui.view">
+		<field name="name">my.custom.bug.tag.tree</field>
+		<field name="model">my.custom.bug.tag</field>
+		<field name="arch" type="xml">
+			<tree string="Bug Tags">
+				<field name="name"/>
+			</tree>
+		</field>
+	</record>
+	
+    <!-- Action for My Custom Form -->
+    <record id="action_my_custom_form" model="ir.actions.act_window">
+        <field name="name">My Custom Form</field>
+        <field name="res_model">my.custom.model</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_my_custom_form"/>
+        <field name="target">current</field>
+    </record>
+	
+    <!-- Action for managing bugs (kanban, tree, form views) -->
+	<record id="action_my_custom_bug_kanban" model="ir.actions.act_window">
+		<field name="name">Manage Bugs</field>
+		<field name="res_model">my.custom.bug.model</field>
+		<field name="view_mode">kanban,tree,form</field>
+		<field name="view_id" ref="view_my_custom_bug_kanban"/> <!-- Prioritize the Kanban view -->
+		<field name="target">current</field>
+	</record>
+
+    <!-- Action for Edit Tags -->
+    <record id="action_my_custom_bug_tags" model="ir.actions.act_window">
+        <field name="name">Edit Tags</field>
+        <field name="res_model">my.custom.bug.tag</field>
+        <field name="view_mode">tree,form</field>
+        <field name="target">current</field>
+    </record>
+	
+	
+	<!-- Root Menu -->
+    <menuitem id="menu_my_custom_module_root" name="My Custom Module" sequence="0"/>
+    <menuitem id="menu_my_custom_module_main" name="Company&amp;Projects" parent="menu_my_custom_module_root" action="action_my_custom_form" sequence="1"/>
+	<!-- Menu for Bugs with Submenus -->
+    <menuitem id="menu_my_custom_module_bugs" name="Bugs" parent="menu_my_custom_module_root" sequence="2"/>
+    <menuitem id="menu_my_custom_module_manage_bugs" name="Manage Bugs" parent="menu_my_custom_module_bugs" action="action_my_custom_bug_kanban" sequence="1"/>
+    <menuitem id="menu_my_custom_module_edit_tags" name="Edit Tags" parent="menu_my_custom_module_bugs" action="action_my_custom_bug_tags" sequence="2"/>
+    <menuitem id="menu_my_custom_module_random" name="Bug Stages" parent="menu_my_custom_module_bugs" action="action_my_custom_bug_kanban_stage" sequence="3"/>
+	
+</odoo>
