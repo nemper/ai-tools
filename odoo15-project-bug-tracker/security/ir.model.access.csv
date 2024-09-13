@@ -1,5 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_my_custom_model,my.custom.model,model_my_custom_model,base.group_user,1,1,1,1
 access_my_custom_bug_model,my.custom.bug.model,model_my_custom_bug_model,base.group_user,1,1,1,1
 access_my_custom_bug_stage,my.custom.bug.stage,model_my_custom_bug_stage,base.group_user,1,1,1,1
 access_my_custom_bug_tag,my.custom.bug.tag,model_my_custom_bug_tag,base.group_user,1,1,1,1

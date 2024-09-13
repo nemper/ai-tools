@@ -8,10 +8,11 @@ class MyCustomBugModel(models.Model):
     _name = 'my.custom.bug.model'
     _description = 'My Custom Bug Model'
     _order = 'bug_unique_id desc'
-    _inherit = ['mail.thread', 'mail.activity.mixin']  # Inherit from mail.thread and mail.activity.mixin
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    name = fields.Char(string="Bug Name", required=True)
+    # Ensure stage_id is properly defined
     stage_id = fields.Many2one('my.custom.bug.stage', string="Stage", group_expand='_read_group_stage_ids', default=lambda self: self.env['my.custom.bug.stage'].search([], limit=1))
+    name = fields.Char(string="Bug Name", required=True)
     project_id = fields.Many2one('project.project', string="Project")
     task_id = fields.Many2one('project.task', string="Task", domain="[('project_id', '=', project_id)]")
     assigned_to_id = fields.Many2one('res.users', string="Assigned to")

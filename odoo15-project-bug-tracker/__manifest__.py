@@ -1,9 +1,9 @@
 {
     'name': 'My Custom Module',
-    'version': '1.0',
-    'summary': 'A custom module with a blank form',
-    'description': 'This module creates a blank form accessible from the menu.',
-    'author': 'Your Name',
+    'version': '2.0',
+    'summary': 'Bug tracking module for Projects',
+    'description': '...',
+    'author': 'Nemanja Perunicic',
     'category': 'Uncategorized',
     'depends': ['base', 'contacts', 'project'],
     'data': [
@@ -13,5 +13,5 @@
     ],
     'installable': True,
     'application': True,
-    'license': 'LGPL-3',  # Adding the license key to avoid warnings
+    'license': 'LGPL-3',
 }
