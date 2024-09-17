@@ -1,4 +1,3 @@
-import os
 import json
 import streamlit as st
 from google.oauth2 import service_account
@@ -7,11 +6,15 @@ import pandas as pd
 from io import StringIO
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
-FOLDER_ID = os.getenv("FOLDER_ID")
+CREDENTIALS_FILE = '...'
+FOLDER_ID = '...'
 
 def get_drive_service():
-    client_secret_json = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-    service_account_info = json.loads(client_secret_json)
+    # Read the credentials JSON from the file
+    with open(CREDENTIALS_FILE) as f:
+        service_account_info = json.load(f)
+    
+    # Create credentials from the service account information
     credentials = service_account.Credentials.from_service_account_info(service_account_info, scopes=SCOPES)
     service = build('drive', 'v3', credentials=credentials)
     return service
