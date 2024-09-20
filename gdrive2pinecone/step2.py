@@ -6,8 +6,8 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
-CREDENTIALS_FILE = '...'
-FOLDER_ID = '...'
+CREDENTIALS_FILE = 'denty.json'
+FOLDER_ID = '1IIJ27nxhK_id93sJ8YhMwe3xTRkawB8S'
 DOWNLOAD_DIR = 'out'
 
 def get_drive_service():

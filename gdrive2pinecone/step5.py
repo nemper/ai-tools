@@ -1,120 +1,71 @@
-import os
 import json
-from time import sleep
-from tqdm import tqdm
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from pathlib import Path
 from openai import OpenAI
-from pinecone import Pinecone
-from concurrent.futures import ThreadPoolExecutor
-
-# Set up OpenAI API client
+import os
 client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
 
-# Set up Pinecone client and index
-api_key = os.environ.get('PINECONE_API_KEY')
-host = os.environ.get('PINECONE_HOST')
+# Function to check if the text is in English (you should implement this)
+def check_if_english(text: str) -> bool:
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        temperature=0.0,
+          messages=[
+            {"role": "system", "content": """You are a helpful assistant that does the following:
+             - Determines if a provided text is in English or not.
+             - If it isn't: return False. If it is in English you remove unintelligible parts from it, and return the edited text.
+             - If the entirety of the text is unintelligible (language can't be defined), return False.
 
-pinecone = Pinecone(api_key=api_key, host=host)
-index = pinecone.Index(host=host)
+             Do NOT edit the text in any other way."""},
+            {"role": "user", "content": "6 186 7 3/8 Kabeldurchfhrung Cable opening Passage de cble Pasacable Holzbalken wood studs poutre en bois madero 1260 49 5/8 410 16 1/8 347 13 5/8 53 2 1/8 162 6 3/8 2300 90 1/2 Deckenhhe Ceiling height Hauteur Altura del techo min"},
+            {"role": "assistant", "content": "False"},
+            {"role": "user", "content": "p~=a~=p=de 59 87 685 D 3352 D 3352.105.01.12.02 Dear customer You would like to have and will have many years of satisfaction with your p~ X-ray unit. Safety and reliability are necessary to ensure this."},
+            {"role": "assistant", "content": "Dear customer You would like to have and will have many years of satisfaction with your p~ X-ray unit. Safety and reliability are necessary to ensure this."},
+            {"role": "user", "content": "61 25 665 D3437 D3437.076.01.15.02 06.2012 15"},
+            {"role": "assistant", "content": "False"},
+            {"role": "user", "content": f"{text}"},
+        ]
+    )
+
+    return response.choices[0].message.content.strip()
+
 
 # Function to process each JSON file
-def process_json_file(json_file, json_dir, index, namespace, embed_model="text-embedding-3-large", batch_size=100):
-    err_log = ""
-    json_path = os.path.join(json_dir, json_file)
-
-    with open(json_path, 'r', encoding='utf-8') as f:
+def process_json_file(file_path):
+    # Load the JSON data
+    with open(file_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
+    
+    # Filter out non-English entries
+    filtered_data = [entry for entry in data if check_if_english(entry['text']) not in [False, "False"]]
 
-    # Initialize lists
-    texts = []
-    metadatas = []
-    ids = []
+    # Save the filtered data back to the same file (or a different one if preferred)
+    with open(file_path, 'w', encoding='utf-8') as f:
+        json.dump(filtered_data, f, ensure_ascii=False, indent=4)
 
-    # Process each JSON object in the data
-    for idx, item in enumerate(data):
-        text = item.get('text', '')
-        if not text.strip():
-            continue  # Skip empty texts
+    return file_path
 
-        texts.append(text)
-        metadata = {key: value for key, value in item.items() if key != 'text'}
-        metadatas.append(metadata)
-        # Generate a unique ID for each entry
-        ids.append(f"{os.path.splitext(json_file)[0]}_{metadata.get('page', idx)}")
+# Function to handle processing all JSON files concurrently
+def process_json_files_concurrently(json_folder, max_workers=12):
+    # Find all JSON files in the folder
+    json_files = list(Path(json_folder).glob("*.json"))
+    
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        # Submit tasks for each file
+        future_to_file = {executor.submit(process_json_file, file): file for file in json_files}
+        
+        # Process the results as they complete
+        for future in as_completed(future_to_file):
+            file = future_to_file[future]
+            try:
+                result = future.result()
+                print(f"Processed file: {result}")
+            except Exception as e:
+                print(f"Error processing file {file}: {e}")
 
-    # Process embeddings in batches
-    for i in tqdm(range(0, len(texts), batch_size), desc=f"Upserting {json_file}"):
-        # Get batch data
-        i_end = min(len(texts), i + batch_size)
-        batch_texts = texts[i:i_end]
-        batch_metadatas = metadatas[i:i_end]
-        batch_ids = ids[i:i_end]
-
-        # Create embeddings
-        try:
-            # Note: OpenAI API now returns an object, and we need to access 'data' attribute
-            response = client.embeddings.create(input=batch_texts, model=embed_model)
-            embeddings = [record.embedding for record in response.data]
-        except Exception as e:
-            print(f"Error generating embeddings for batch {i}-{i_end} in {json_file}: {e}")
-            err_log += f"Error generating embeddings for batch {i}-{i_end} in {json_file}: {e}\n"
-            sleep(5)
-            continue  # Skip this batch
-
-        # Prepare data for upsert
-        vectors = []
-        for j in range(len(embeddings)):
-            vector = {
-                'id': batch_ids[j],
-                'values': embeddings[j],
-                'metadata': batch_metadatas[j]
-            }
-            vectors.append(vector)
-
-        # Upsert vectors to Pinecone
-        try:
-            index.upsert(vectors=vectors, namespace=namespace)
-        except Exception as e:
-            print(f"Error upserting batch {i}-{i_end} in {json_file}: {e}")
-            err_log += f"Error upserting batch {i}-{i_end} in {json_file}: {e}\n"
-            sleep(5)
-            continue  # Skip this batch
-
-    print(f"Upserted data from {json_file}")
-
-    # Return any errors to be logged later
-    return err_log
-
-# Function to do embeddings concurrently
-def do_embeddings(json_dir, index, namespace):
-    # List all JSON files in the directory
-    json_files = [f for f in os.listdir(json_dir) if f.endswith('.json')]
-
-    # Track errors in processing
-    err_log = ""
-
-    # Use ThreadPoolExecutor to process files concurrently
-    with ThreadPoolExecutor(max_workers=4) as executor:
-        # Submit the jobs and process them concurrently
-        futures = [executor.submit(process_json_file, json_file, json_dir, index, namespace) for json_file in json_files]
-
-        # Collect the results (error logs) from the threads
-        for future in tqdm(futures, desc="Processing all files"):
-            err_log += future.result()  # Append error logs from each thread
-
-    # Save error log if any
-    if err_log:
-        with open("err_log.txt", "w", encoding="utf-8") as file:
-            file.write(err_log)
-        print("Errors occurred during upsert. Check err_log.txt for details.")
-
-    print("Data upserted to Pinecone successfully.")
-
-if __name__ == '__main__':
-    # Replace with your JSON output directory
-    json_output_dir = './json_output'  # Update this path if needed
-
-    # Enter the namespace
-    namespace = "serviser"
-
-    # Start the upsert process
-    do_embeddings(json_dir=json_output_dir, index=index, namespace=namespace)
+if __name__ == "__main__":
+    # Folder containing your JSON files
+    json_folder = "json_output"
+    
+    # Process JSON files concurrently using 12 cores
+    process_json_files_concurrently(json_folder, max_workers=12)

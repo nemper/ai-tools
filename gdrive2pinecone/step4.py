@@ -46,7 +46,7 @@ def process_json_file(filename):
 json_files = [f for f in os.listdir(json_folder_path) if f.endswith(".json")]
 
 # Use ThreadPoolExecutor to process files in parallel with 4 workers
-with ThreadPoolExecutor(max_workers=4) as executor:
+with ThreadPoolExecutor(max_workers=12) as executor:
     executor.map(process_json_file, json_files)
 
 print("Processing complete.")

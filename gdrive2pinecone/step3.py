@@ -9,6 +9,7 @@ import re
 import string
 import concurrent.futures
 
+# Set up OpenAI API key (replace 'YOUR_API_KEY' with your actual key)
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 # Function to convert a PDF page to an image
@@ -168,7 +169,7 @@ def process_pdfs(pdf_dir, output_dir):
         f for f in os.listdir(pdf_dir) if f.lower().endswith('.pdf')
     ]
 
-    with concurrent.futures.ProcessPoolExecutor(max_workers=4) as executor:
+    with concurrent.futures.ProcessPoolExecutor(max_workers=12) as executor:
         futures = {
             executor.submit(process_single_pdf, pdf_file, pdf_dir, output_dir): pdf_file
             for pdf_file in pdf_files

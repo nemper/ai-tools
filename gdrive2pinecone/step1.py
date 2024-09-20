@@ -6,8 +6,8 @@ import pandas as pd
 from io import StringIO
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
-CREDENTIALS_FILE = '...'
-FOLDER_ID = '...'
+CREDENTIALS_FILE = 'denty.json'  # Provide the full path to your JSON file
+FOLDER_ID = '17nHU4-wjd0V2gVlYQBVqkk6V4VH8GIBM'  # Replace with the actual folder ID from Google Drive
 
 def get_drive_service():
     # Read the credentials JSON from the file
