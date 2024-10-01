@@ -1,189 +1,114 @@
 import os
 import json
-import fitz  # PyMuPDF
-import pytesseract
-from PIL import Image
+from time import sleep
+from tqdm import tqdm
 from openai import OpenAI
-from langdetect import detect, LangDetectException
-import re
-import string
-import concurrent.futures
+from pinecone import Pinecone
+from concurrent.futures import ThreadPoolExecutor
 
-# Set up OpenAI API key (replace 'YOUR_API_KEY' with your actual key)
-client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+# Set up OpenAI API client
+client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
 
-# Function to convert a PDF page to an image
-def convert_page_to_image(page):
-    pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))
-    img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
-    return img
+# Set up Pinecone client and index
+api_key = os.environ.get('PINECONE_API_KEY')
+host = 'https://neo-positive-a9w1e6k.svc.apw5-4e34-81fa.pinecone.io'  # Replace with your actual host
 
-# Function to perform OCR on an image
-def ocr_image(image):
-    return pytesseract.image_to_string(image)
+pinecone = Pinecone(api_key=api_key, host=host)
+index = pinecone.Index(host=host)
 
-# Function to extract text from a page (uses OCR if necessary)
-def extract_text_from_page(page):
-    text = page.get_text()
-    if text.strip():
-        return text
-    else:
-        # No text found, perform OCR
-        page_image = convert_page_to_image(page)
-        ocr_text = ocr_image(page_image)
-        return ocr_text
+# Function to process each JSON file
+def process_json_file(json_file, json_dir, index, namespace, embed_model="text-embedding-3-large", batch_size=100):
+    err_log = ""
+    json_path = os.path.join(json_dir, json_file)
 
-# Function to clean up extracted text
-def clean_text(text):
-    # Remove non-printable characters
-    text = ''.join(filter(lambda x: x in string.printable, text))
-    # Remove extra whitespace
-    text = re.sub(r'\s+', ' ', text).strip()
-    return text
+    with open(json_path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
 
-# Function to check if text is in English
-def is_text_english(text):
-    try:
-        language = detect(text)
-        return language == 'en'
-    except LangDetectException:
-        # If detection fails, assume it's not English
-        return False
+    # Initialize lists
+    texts = []
+    metadatas = []
+    ids = []
 
-# Function to check if text is meaningful
-def is_text_meaningful(text):
-    # Check if text is empty after cleaning
-    if not text.strip():
-        return False
+    # Process each JSON object in the data
+    for idx, item in enumerate(data):
+        text = item.get('context', '')
+        if not text.strip():
+            continue  # Skip empty texts
 
-    # Calculate the proportion of alphabetic characters
-    num_alpha = sum(c.isalpha() for c in text)
-    num_chars = len(text)
-    if num_chars == 0:
-        return False
-    alpha_ratio = num_alpha / num_chars
+        texts.append(text)
+        metadata = {key: value for key, value in item.items()}
 
-    # If the ratio of alphabetic characters is low, consider text not meaningful
-    if alpha_ratio < 0.1:
-        return False
+        metadatas.append(metadata)
+        # Generate a unique ID for each entry
+        ids.append(f"{os.path.splitext(json_file)[0]}_{metadata.get('page', idx)}")
 
-    # If text length is too short, consider it not meaningful
-    if len(text) < 30:
-        return False
+    # Process embeddings in batches
+    for i in tqdm(range(0, len(texts), batch_size), desc=f"Upserting {json_file}"):
+        # Get batch data
+        i_end = min(len(texts), i + batch_size)
+        batch_texts = texts[i:i_end]
+        batch_metadatas = metadatas[i:i_end]
+        batch_ids = ids[i:i_end]
 
-    return True
+        # Create embeddings
+        try:
+            # Note: OpenAI API now returns an object, and we need to access 'data' attribute
+            response = client.embeddings.create(input=batch_texts, model=embed_model)
+            embeddings = [record.embedding for record in response.data]
+        except Exception as e:
+            print(f"Error generating embeddings for batch {i}-{i_end} in {json_file}: {e}")
+            err_log += f"Error generating embeddings for batch {i}-{i_end} in {json_file}: {e}\n"
+            sleep(5)
+            continue  # Skip this batch
 
-# Function to extract the device name using OpenAI API
-def get_device_name(text):
-    print("Extracting device name using OpenAI API...")
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {
-                "role": "system",
-                "content": f"""You are a helpful assistant that analyzes given text to extract device name. You do not change the form of the name, only extract it as it is.
-                Be careful not to alter the device name in any way; avoid adding any additional information or context to the extracted name. Do not use company name by mistake, e.g. "Sirona" is not a device name.
-                If there is no device name in the text, please respond with the closest alternative that you can find in the provided text.
-                Given the following text, extract the device name:"""
-            },
-            {
-                "role": "user",
-                "content": f"{text}"
+        # Prepare data for upsert
+        vectors = []
+        for j in range(len(embeddings)):
+            vector = {
+                'id': batch_ids[j],
+                'values': embeddings[j],
+                'metadata': batch_metadatas[j]
             }
-        ],
-        temperature=0.0
-    )
-    device_name = response.choices[0].message.content.strip()
-    return device_name
+            vectors.append(vector)
 
+        # Upsert vectors to Pinecone
+        try:
+            index.upsert(vectors=vectors, namespace=namespace)
+        except Exception as e:
+            print(f"Error upserting batch {i}-{i_end} in {json_file}: {e}")
+            err_log += f"Error upserting batch {i}-{i_end} in {json_file}: {e}\n"
+            sleep(5)
+            continue  # Skip this batch
 
-def process_single_pdf(pdf_file, pdf_dir, output_dir):
-    pdf_path = os.path.join(pdf_dir, pdf_file)
-    pdf_name = os.path.splitext(pdf_file)[0]
-    json_output = os.path.join(output_dir, pdf_name + '.json')
-    print(f"\nProcessing {pdf_file}...")
+    print(f"Upserted data from {json_file}")
 
-    # Open the PDF
-    document = fitz.open(pdf_path)
+    # Return any errors to be logged later
+    return err_log
 
-    # For the first page, extract text and get device name
-    first_page = document.load_page(0)
-    first_page_text = extract_text_from_page(first_page)
-    first_page_text_cleaned = clean_text(first_page_text)
+# Function to do embeddings concurrently
+def do_embeddings(json_dir, index, namespace):
+    # List all JSON files in the directory
+    json_files = [f for f in os.listdir(json_dir) if f.endswith('.json')]
 
-    # Check if the first page text is meaningful
-    if not is_text_meaningful(first_page_text_cleaned):
-        print(f"Skipping {pdf_file} as first page text is not meaningful.")
-        return
+    # Track errors in processing
+    err_log = ""
 
-    # Check if the first page text is in English
-    # if not is_text_english(first_page_text_cleaned):
-    #    print(f"Skipping {pdf_file} as it is not in English.")
-    #    continue  # Skip this document
+    # Use ThreadPoolExecutor to process files concurrently
+    with ThreadPoolExecutor(max_workers=12) as executor:
+        # Submit the jobs and process them concurrently
+        futures = [executor.submit(process_json_file, json_file, json_dir, index, namespace) for json_file in json_files]
 
-    device_name = get_device_name(first_page_text_cleaned)
-    print(f"Extracted device name: {device_name}")
+        # Collect the results (error logs) from the threads
+        for future in tqdm(futures, desc="Processing all files"):
+            err_log += future.result()  # Append error logs from each thread
 
-    # Process each page
-    results = []
-    for page_num in range(len(document)):
-        page = document.load_page(page_num)
-        page_text = extract_text_from_page(page)
-        page_text_cleaned = clean_text(page_text)
+    # Save error log if any
+    if err_log:
+        with open("err_log.txt", "w", encoding="utf-8") as file:
+            file.write(err_log)
+        print("Errors occurred during upsert. Check err_log.txt for details.")
 
-        # Check if the page text is meaningful
-        if not is_text_meaningful(page_text_cleaned):
-            print(f"Skipping page {page_num + 1} (text not meaningful).")
-            continue
-
-        # Check if the page text is in English
-        if not is_text_english(page_text_cleaned):
-            print(f"Skipping page {page_num + 1} (not in English).")
-            continue
-
-        page_dict = {
-            'date': 20240917,
-            'page': page_num + 1,
-            'text': page_text_cleaned,
-            'device': device_name,
-            'source': pdf_name + ".pdf",
-            'url': ''
-        }
-        results.append(page_dict)
-
-    if results:
-        # Save the results to a JSON file
-        with open(json_output, 'w', encoding='utf-8') as f:
-            json.dump(results, f, ensure_ascii=False, indent=4)
-        print(f"Saved results to {json_output}")
-    else:
-        print(f"No valid pages found in {pdf_file}.")
-
-
-# Main function to process PDFs
-def process_pdfs(pdf_dir, output_dir):
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-
-    pdf_files = [
-        f for f in os.listdir(pdf_dir) if f.lower().endswith('.pdf')
-    ]
-
-    with concurrent.futures.ProcessPoolExecutor(max_workers=12) as executor:
-        futures = {
-            executor.submit(process_single_pdf, pdf_file, pdf_dir, output_dir): pdf_file
-            for pdf_file in pdf_files
-        }
-        for future in concurrent.futures.as_completed(futures):
-            pdf_file = futures[future]
-            try:
-                future.result()
-            except Exception as exc:
-                print(f"{pdf_file} generated an exception: {exc}")
-            else:
-                print(f"{pdf_file} processed successfully.")
-
-
+    print("Data upserted to Pinecone successfully.")
 
 if __name__ == '__main__':
-    process_pdfs('./out', './json_output')
+    do_embeddings(json_dir='./gdrive_jsons', index=index, namespace='denty-komercijalista')
