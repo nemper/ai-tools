@@ -13,10 +13,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 SCOPES = ['https://www.googleapis.com/auth/drive']
 CREDENTIALS_FILE = 'denty.json'
 FOLDER_IDS = [
-    '17vXjaLOFp0iPg6WbnUlNBt5TxguazHx5',
-    '18S-dIodtT6RQ6Josiw1BOqkw05TRAVkL',
-    '1e12X3dkR7hlpV0n9OjLni4FGQQOxSzRl',
-    '1dzglHgMpQDO6E2yyAdDHTbn1xmIY75mq'
+    '...'
 ]
 DOWNLOAD_DIR = 'gdrive_files'
 CSV_FILE = 'gdrive_names_and_urls.csv'

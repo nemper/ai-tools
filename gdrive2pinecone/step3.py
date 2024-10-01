@@ -11,7 +11,7 @@ client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
 
 # Set up Pinecone client and index
 api_key = os.environ.get('PINECONE_API_KEY')
-host = 'https://neo-positive-a9w1e6k.svc.apw5-4e34-81fa.pinecone.io'  # Replace with your actual host
+host = os.getenv("PINECONE_HOST")  # Replace with your actual host
 
 pinecone = Pinecone(api_key=api_key, host=host)
 index = pinecone.Index(host=host)
