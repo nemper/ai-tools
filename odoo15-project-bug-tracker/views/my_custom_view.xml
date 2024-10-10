@@ -77,7 +77,7 @@
             <form string="Bug">
                 <header>
                     <field name="stage_id" widget="statusbar" statusbar_visible=""/>
-                    <button name="%(positivebugs.action_project_manage_bugs)d" type="action" string="View All Bugs" class="oe_highlight"/>
+                    <button name="%(positive_bugs.action_project_manage_bugs)d" type="action" string="View All Bugs" class="oe_highlight"/>
                 </header>
                 <sheet>
                     <group>
