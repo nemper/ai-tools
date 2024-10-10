@@ -13,6 +13,7 @@
         'data/bug_sequence.xml',
         'actions/actions.xml',
         'views/project_task_views_inherit.xml',
+        'views/my_custom_bug_stage_views.xml',
     ],
     'installable': True,
     'application': True,

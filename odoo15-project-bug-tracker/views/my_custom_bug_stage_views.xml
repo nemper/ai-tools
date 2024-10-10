@@ -1,0 +1,20 @@
+<!-- my_custom_bug_stage_views.xml -->
+<odoo>
+    <data>
+        <record id="view_my_custom_bug_stage_form" model="ir.ui.view">
+            <field name="name">my.custom.bug.stage.form</field>
+            <field name="model">my.custom.bug.stage</field>
+            <field name="arch" type="xml">
+                <form string="Bug Stage">
+                    <sheet>
+                        <group>
+                            <field name="name" placeholder="Stage Name"/>
+                            <field name="sequence"/>
+                            <field name="fold"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>
