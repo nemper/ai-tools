@@ -75,6 +75,13 @@ class MyCustomBugModel(models.Model):
         if self.assigned_to_id and self.assigned_to_id not in self.assigned_multi_user_ids:
             self.assigned_multi_user_ids |= self.assigned_to_id
 
+    @api.onchange('project_id')
+    def _onchange_project_id(self):
+        if self.project_id:
+            self.client_id = self.project_id.partner_id
+        else:
+            self.client_id = False
+            
     @api.model
     def create(self, vals):
         _logger.info('Creating a new bug with values: %s', vals)

@@ -1,6 +1,6 @@
 {
     'name': 'Project Bug Tracker',
-    'version': '15.0.0.2.4',
+    'version': '15.0.0.2.6',
     'summary': 'Bug tracking module for Projects',
     'description': '...',
     'author': 'Nemanja Perunicic',
