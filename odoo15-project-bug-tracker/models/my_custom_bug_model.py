@@ -48,8 +48,6 @@ class MyCustomBugModel(models.Model):
 
     bug_unique_id = fields.Char(string="Bug ID", readonly=True, copy=False, index=True, default='Auto-generated after Save')
 
-    stage_id = fields.Many2one('my.custom.bug.stage', string="Stage", group_expand='_read_group_stage_ids', default=lambda self: self.env['my.custom.bug.stage'].search([], limit=1))
-
     description = fields.Text(string="Description")
     steps_to_replicate = fields.Text(string="Steps to Replicate")
     expected_result = fields.Text(string="Expected Result")

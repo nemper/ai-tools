@@ -1,6 +1,6 @@
 {
-    'name': 'My Custom Module',
-    'version': '2.0',
+    'name': 'Project Bug Tracker',
+    'version': '15.0.0.0.1',
     'summary': 'Bug tracking module for Projects',
     'description': '...',
     'author': 'Nemanja Perunicic',

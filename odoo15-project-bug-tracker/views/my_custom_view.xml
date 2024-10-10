@@ -54,6 +54,21 @@
         </field>
     </record>
 
+	<!-- Define the Action for 'Manage Bugs' -->
+    <record id="action_project_manage_bugs" model="ir.actions.act_window">
+        <field name="name">Manage Bugs</field>
+        <field name="res_model">my.custom.bug.model</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_id" ref="view_my_custom_bug_kanban"/>
+        <!-- Ensure you have the correct XML ID for the default stage -->
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first bug report
+            </p>
+        </field>
+    </record>
+
     <!-- Define the Form View for Bugs -->
     <record id="view_my_custom_bug_form" model="ir.ui.view">
         <field name="name">my.custom.bug.model.form</field>
@@ -62,7 +77,7 @@
             <form string="Bug">
                 <header>
                     <field name="stage_id" widget="statusbar" statusbar_visible=""/>
-                    <button name="%(anmy_custom.action_project_manage_bugs)d" type="action" string="View All Bugs" class="oe_highlight"/>
+                    <button name="%(positivebugs.action_project_manage_bugs)d" type="action" string="View All Bugs" class="oe_highlight"/>
                 </header>
                 <sheet>
                     <group>
@@ -116,21 +131,6 @@
                     <field name="message_ids" widget="mail_thread"/>
                 </div>
             </form>
-        </field>
-    </record>
-
-    <!-- Define the Action for 'Manage Bugs' -->
-    <record id="action_project_manage_bugs" model="ir.actions.act_window">
-        <field name="name">Manage Bugs</field>
-        <field name="res_model">my.custom.bug.model</field>
-        <field name="view_mode">kanban,tree,form</field>
-        <field name="view_id" ref="view_my_custom_bug_kanban"/>
-        <!-- Ensure you have the correct XML ID for the default stage -->
-        <field name="context">{}</field>
-        <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">
-                Create your first bug report
-            </p>
         </field>
     </record>
 
