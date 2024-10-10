@@ -64,7 +64,11 @@ class MyCustomBugModel(models.Model):
     def create(self, vals):
         _logger.info('Creating a new bug with values: %s', vals)
         if not vals.get('bug_unique_id') or vals['bug_unique_id'] == 'Auto-generated after Save':
-            max_id = self.search([('bug_unique_id', '!=', 'Auto-generated after Save')], order='bug_unique_id desc', limit=1).bug_unique_id
+            max_id = self.search(
+                [('bug_unique_id', '!=', 'Auto-generated after Save')],
+                order='bug_unique_id desc',
+                limit=1
+            ).bug_unique_id
             if max_id and max_id.isdigit():
                 vals['bug_unique_id'] = str(int(max_id) + 1)
             else:
@@ -72,6 +76,14 @@ class MyCustomBugModel(models.Model):
         record = super(MyCustomBugModel, self).create(vals)
         if record.assigned_to_id and record.assigned_to_id not in record.assigned_multi_user_ids:
             record.assigned_multi_user_ids |= record.assigned_to_id
+        # Add assigned users as followers
+        partners_to_subscribe = []
+        if record.assigned_to_id:
+            partners_to_subscribe.append(record.assigned_to_id.partner_id.id)
+        if record.assigned_multi_user_ids:
+            partners_to_subscribe.extend(record.assigned_multi_user_ids.mapped('partner_id').ids)
+        if partners_to_subscribe:
+            record.message_subscribe(partners_to_subscribe)
         return record
 
     @api.model
@@ -82,10 +94,18 @@ class MyCustomBugModel(models.Model):
     
     def write(self, vals):
         res = super(MyCustomBugModel, self).write(vals)
-        if 'assigned_to_id' in vals:
-            for record in self:
-                if record.assigned_to_id and record.assigned_to_id not in record.assigned_multi_user_ids:
-                    record.assigned_multi_user_ids |= record.assigned_to_id
+        for record in self:
+            # Ensure assigned_to_id is in assigned_multi_user_ids
+            if 'assigned_to_id' in vals and record.assigned_to_id and record.assigned_to_id not in record.assigned_multi_user_ids:
+                record.assigned_multi_user_ids |= record.assigned_to_id
+            # Add assigned users as followers
+            partners_to_subscribe = []
+            if record.assigned_to_id:
+                partners_to_subscribe.append(record.assigned_to_id.partner_id.id)
+            if record.assigned_multi_user_ids:
+                partners_to_subscribe.extend(record.assigned_multi_user_ids.mapped('partner_id').ids)
+            if partners_to_subscribe:
+                record.message_subscribe(partners_to_subscribe)
         return res
 
 
