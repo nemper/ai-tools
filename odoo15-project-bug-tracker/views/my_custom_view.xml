@@ -84,6 +84,7 @@
                         <group>
                             <field name="bug_unique_id" readonly="1"/>
                             <field name="name"/>
+                            <field name="bug_type"/>
                             <field name="stage_id"/>
                             <field name="assigned_to_id"/>
                             <field name="assigned_multi_user_ids" widget="many2many_tags"/>
@@ -110,6 +111,22 @@
                         </page>
                         <page string="Steps to Replicate">
                             <field name="steps_to_replicate"/>
+                        </page>
+                        <page string="Timesheets">
+                            <field name="timesheet_ids" context="{'default_bug_id': active_id}">
+                                <tree editable="bottom">
+                                    <field name="date"/>
+                                    <field name="employee_id"/>
+                                    <field name="project_id"/>
+                                    <field name="task_id"/>
+                                    <field name="unit_amount"/>
+                                    <field name="name"/>
+                                    <field name="amount"/>
+                                    <field name="partner_id"/>
+                                    <field name="company_id" invisible="1"/>
+                                    <field name="bug_id"/>
+                                </tree>
+                            </field>
                         </page>
                         <page string="Expected Result">
                             <field name="expected_result"/>

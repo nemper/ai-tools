@@ -33,6 +33,12 @@ class MyCustomBugModel(models.Model):
         ('backend', 'Backend'),
         ('frontend', 'Frontend')
     ], string="Issue Type")
+    bug_type = fields.Selection([
+        ('bug', 'Bug'),
+        ('improvement', 'Improvement'),
+        ('user_request', 'User Request'),
+        ('new_functionality', 'New Functionality'),
+    ], string='Bug Type', required=True, default='bug')
     build_date = fields.Date(string="Build Date")
     issue_resides_in = fields.Selection([
         ('backend', 'Backend'),
@@ -53,7 +59,11 @@ class MyCustomBugModel(models.Model):
         index=True,
         default=lambda self: _('New')
     )
-
+    timesheet_ids = fields.One2many(
+        'account.analytic.line',  # Model representing timesheet entries
+        'bug_id',                 # Inverse field to be added in the timesheet model
+        string='Timesheets'
+    )
     description = fields.Text(string="Description")
     steps_to_replicate = fields.Text(string="Steps to Replicate")
     expected_result = fields.Text(string="Expected Result")
@@ -106,6 +116,26 @@ class MyCustomBugModel(models.Model):
                 record.message_subscribe(partners_to_subscribe)
         return res
 
+
+class AccountAnalyticLine(models.Model):
+    _inherit = 'account.analytic.line'
+
+    bug_id = fields.Many2one(
+        'my.custom.bug.model',
+        string='Bug'
+    )
+
+    @api.model
+    def default_get(self, fields_list):
+        res = super(AccountAnalyticLine, self).default_get(fields_list)
+        if 'employee_id' in fields_list and not res.get('employee_id'):
+            employee = self.env['hr.employee'].search([
+                ('user_id', '=', self.env.uid),
+                ('company_id', '=', res.get('company_id', self.env.company.id))
+            ], limit=1)
+            if employee:
+                res['employee_id'] = employee.id
+        return res
 
 class MyCustomBugTag(models.Model):
     _name = 'my.custom.bug.tag'
