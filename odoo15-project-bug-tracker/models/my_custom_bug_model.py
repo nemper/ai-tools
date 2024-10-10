@@ -55,6 +55,11 @@ class MyCustomBugModel(models.Model):
     solution = fields.Text(string="Solution")
     extra_info = fields.Text(string="Extra Info")
 
+    @api.onchange('assigned_to_id')
+    def _onchange_assigned_to_id(self):
+        if self.assigned_to_id and self.assigned_to_id not in self.assigned_multi_user_ids:
+            self.assigned_multi_user_ids |= self.assigned_to_id
+
     @api.model
     def create(self, vals):
         _logger.info('Creating a new bug with values: %s', vals)
@@ -64,13 +69,24 @@ class MyCustomBugModel(models.Model):
                 vals['bug_unique_id'] = str(int(max_id) + 1)
             else:
                 vals['bug_unique_id'] = '1'
-        return super(MyCustomBugModel, self).create(vals)
-    
+        record = super(MyCustomBugModel, self).create(vals)
+        if record.assigned_to_id and record.assigned_to_id not in record.assigned_multi_user_ids:
+            record.assigned_multi_user_ids |= record.assigned_to_id
+        return record
+
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
         # Define how the stages are grouped and ordered in the Kanban view
         stage_ids = stages.search([], order=order)
         return stage_ids
+    
+    def write(self, vals):
+        res = super(MyCustomBugModel, self).write(vals)
+        if 'assigned_to_id' in vals:
+            for record in self:
+                if record.assigned_to_id and record.assigned_to_id not in record.assigned_multi_user_ids:
+                    record.assigned_multi_user_ids |= record.assigned_to_id
+        return res
 
 
 class MyCustomBugTag(models.Model):
