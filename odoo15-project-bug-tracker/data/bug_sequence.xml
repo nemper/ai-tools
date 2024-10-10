@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="seq_my_custom_bug" model="ir.sequence">
+            <field name="name">My Custom Bug Sequence</field>
+            <field name="code">my.custom.bug.model</field>
+            <field name="prefix">BUG/</field>
+            <field name="padding">5</field>
+        </record>
+    </data>
+</odoo>

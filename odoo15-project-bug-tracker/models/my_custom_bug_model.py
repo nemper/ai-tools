@@ -46,7 +46,13 @@ class MyCustomBugModel(models.Model):
     fixed_version = fields.Char(string="Fixed Version")
     active = fields.Boolean(string="Active", default=True)
 
-    bug_unique_id = fields.Char(string="Bug ID", readonly=True, copy=False, index=True, default='Auto-generated after Save')
+    bug_unique_id = fields.Char(
+        string="Bug ID",
+        readonly=True,
+        copy=False,
+        index=True,
+        default=lambda self: _('New')
+    )
 
     description = fields.Text(string="Description")
     steps_to_replicate = fields.Text(string="Steps to Replicate")
@@ -63,16 +69,8 @@ class MyCustomBugModel(models.Model):
     @api.model
     def create(self, vals):
         _logger.info('Creating a new bug with values: %s', vals)
-        if not vals.get('bug_unique_id') or vals['bug_unique_id'] == 'Auto-generated after Save':
-            max_id = self.search(
-                [('bug_unique_id', '!=', 'Auto-generated after Save')],
-                order='bug_unique_id desc',
-                limit=1
-            ).bug_unique_id
-            if max_id and max_id.isdigit():
-                vals['bug_unique_id'] = str(int(max_id) + 1)
-            else:
-                vals['bug_unique_id'] = '1'
+        if vals.get('bug_unique_id', _('New')) == _('New'):
+            vals['bug_unique_id'] = self.env['ir.sequence'].next_by_code('my.custom.bug.model') or _('New')
         record = super(MyCustomBugModel, self).create(vals)
         if record.assigned_to_id and record.assigned_to_id not in record.assigned_multi_user_ids:
             record.assigned_multi_user_ids |= record.assigned_to_id

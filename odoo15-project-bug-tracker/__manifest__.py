@@ -10,6 +10,7 @@
         'security/ir.model.access.csv',
         'views/my_custom_view.xml',
         'data/bug_stage_data.xml',
+        'data/bug_sequence.xml',
     ],
     'installable': True,
     'application': True,
