@@ -1,0 +1,16 @@
+<!-- actions.xml -->
+<odoo>
+    <data>
+        <record id="action_my_custom_bug_model" model="ir.actions.act_window">
+            <field name="name">Bugs</field>
+            <field name="res_model">my.custom.bug.model</field>
+            <field name="view_mode">tree,form,kanban</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create the first bug
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>

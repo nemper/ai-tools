@@ -1,4 +1,3 @@
-import random
 from odoo import models, fields, api, _
 import logging
 _logger = logging.getLogger(__name__)
@@ -15,8 +14,8 @@ class MyCustomBugModel(models.Model):
     name = fields.Char(string="Bug Name", required=True)
     project_id = fields.Many2one('project.project', string="Project")
     task_id = fields.Many2one('project.task', string="Task", domain="[('project_id', '=', project_id)]")
-    assigned_to_id = fields.Many2one('res.users', string="Assigned to")
-    assigned_multi_user_ids = fields.Many2many('res.users', string="Assign Multi User")
+    assigned_to_id = fields.Many2one('hr.employee', string="Assigned to")
+    assigned_multi_user_ids = fields.Many2many('hr.employee', string="Assign Multi User")
     client_id = fields.Many2one('res.partner', string="Client")
     priority = fields.Selection([
         ('low', 'Low'),
@@ -86,10 +85,10 @@ class MyCustomBugModel(models.Model):
             record.assigned_multi_user_ids |= record.assigned_to_id
         # Add assigned users as followers
         partners_to_subscribe = []
-        if record.assigned_to_id:
-            partners_to_subscribe.append(record.assigned_to_id.partner_id.id)
+        if record.assigned_to_id and record.assigned_to_id.user_id:
+            partners_to_subscribe.append(record.assigned_to_id.user_id.partner_id.id)
         if record.assigned_multi_user_ids:
-            partners_to_subscribe.extend(record.assigned_multi_user_ids.mapped('partner_id').ids)
+            partners_to_subscribe.extend(record.assigned_multi_user_ids.mapped('user_id.partner_id').ids)
         if partners_to_subscribe:
             record.message_subscribe(partners_to_subscribe)
         return record
