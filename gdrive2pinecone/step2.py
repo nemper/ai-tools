@@ -8,20 +8,16 @@ import re
 import string
 import concurrent.futures
 
-# Set up OpenAI API key (replace 'YOUR_API_KEY' with your actual key)
 client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
-# Function to convert a PDF page to an image
 def convert_page_to_image(page):
     pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))
     img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
     return img
 
-# Function to perform OCR on an image
 def ocr_image(image):
     return pytesseract.image_to_string(image)
 
-# Function to extract text from a page (uses OCR if necessary)
 def extract_text_from_page(page):
     text = page.get_text()
     if text.strip():
@@ -32,7 +28,6 @@ def extract_text_from_page(page):
         ocr_text = ocr_image(page_image)
         return ocr_text
 
-# Function to clean up extracted text
 def clean_text(text):
     # Remove non-printable characters
     text = ''.join(filter(lambda x: x in string.printable, text))
@@ -40,7 +35,6 @@ def clean_text(text):
     text = re.sub(r'\s+', ' ', text).strip()
     return text
 
-# Function to check if text is meaningful
 def is_text_meaningful(text):
     # Check if text is empty after cleaning
     if not text.strip():
@@ -112,7 +106,6 @@ def process_single_pdf(pdf_file, pdf_dir, output_dir):
         print(f"No valid pages found in {pdf_file}.")
 
 
-# Main function to process PDFs
 def process_pdfs(pdf_dir, output_dir):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
