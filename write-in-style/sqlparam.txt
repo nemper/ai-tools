@@ -1,0 +1,4 @@
+Server=DJORDJE-E15\SQLEXPRESS01;Database=sqltest;Trusted_Connection=True;
+
+DJORDJE-E15\SQLEXPRESS01
+
