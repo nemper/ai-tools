@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Define the Kanban View for Bugs -->
+    <record id="view_my_custom_bug_kanban" model="ir.ui.view">
+        <field name="name">my.custom.bug.model.kanban</field>
+        <field name="model">my.custom.bug.model</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="stage_id" create="true">
+                <field name="name"/>
+                <field name="stage_id"/>
+                <field name="priority"/>
+                <field name="assigned_to_id"/>
+                <field name="deadline"/>
+                <field name="tag_ids"/>
+                <field name="project_id"/>
+                <field name="task_id"/>
+                <field name="bug_unique_id"/>
+
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click o_kanban_record">
+                            <div class="o_kanban_record_body">
+                                <strong><field name="bug_unique_id"/>: <field name="name"/></strong>
+                                <div><span>Assigned to:</span> <field name="assigned_to_id"/></div>
+                                <div><span>Priority:</span> <field name="priority" widget="selection"/></div>
+                                <div><span>Deadline:</span> <field name="deadline"/></div>
+                                <div><span>Tags:</span> <field name="tag_ids" widget="many2many_tags"/></div>
+                                <div><span>Project:</span> <field name="project_id"/></div>
+                                <div><span>Task:</span> <field name="task_id"/></div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Define the Tree View for Bugs -->
+    <record id="view_my_custom_bug_tree" model="ir.ui.view">
+        <field name="name">my.custom.bug.model.tree</field>
+        <field name="model">my.custom.bug.model</field>
+        <field name="arch" type="xml">
+            <tree string="Bugs">
+                <field name="bug_unique_id"/>
+                <field name="name"/>
+                <field name="stage_id"/>
+                <field name="assigned_to_id"/>
+                <field name="priority"/>
+                <field name="deadline"/>
+                <field name="project_id"/>
+                <field name="task_id"/>
+            </tree>
+        </field>
+    </record>
+
+	<!-- Define the Action for 'Manage Bugs' -->
+    <record id="action_project_manage_bugs" model="ir.actions.act_window">
+        <field name="name">Manage Bugs</field>
+        <field name="res_model">my.custom.bug.model</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_id" ref="view_my_custom_bug_kanban"/>
+        <!-- Ensure you have the correct XML ID for the default stage -->
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first bug report
+            </p>
+        </field>
+    </record>
+
+    <!-- Define the Form View for Bugs -->
+    <record id="view_my_custom_bug_form" model="ir.ui.view">
+        <field name="name">my.custom.bug.model.form</field>
+        <field name="model">my.custom.bug.model</field>
+        <field name="arch" type="xml">
+            <form string="Bug">
+                <header>
+                    <field name="stage_id" widget="statusbar" statusbar_visible=""/>
+                    <button name="%(positive_bugs.action_project_manage_bugs)d" type="action" string="View All Bugs" class="oe_highlight"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="bug_unique_id" readonly="1"/>
+                            <field name="name"/>
+                            <field name="bug_type"/>
+                            <field name="stage_id"/>
+                            <field name="assigned_to_id"/>
+                            <field name="assigned_multi_user_ids" widget="many2many_tags"/>
+                            <field name="priority"/>
+                            <field name="client_urgency"/>
+                            <field name="deadline"/>
+                        </group>
+                        <group>
+                            <field name="project_id"/>
+                            <field name="task_id" domain="[('project_id', '=', project_id)]"/>
+                            <field name="client_id"/>
+                            <field name="submitted_by_id"/>
+                            <field name="version"/>
+                            <field name="fixed_version"/>
+                            <field name="build_date"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description"/>
+                        </page>
+                        <page string="Steps to Replicate">
+                            <field name="steps_to_replicate"/>
+                        </page>
+                        <page string="Timesheets">
+                            <field name="timesheet_ids" context="{'default_bug_id': active_id}">
+                                <tree editable="bottom">
+                                    <field name="date"/>
+                                    <field name="employee_id"/>
+                                    <field name="project_id"/>
+                                    <field name="task_id"/>
+                                    <field name="unit_amount"/>
+                                    <field name="name"/>
+                                    <field name="amount"/>
+                                    <field name="partner_id"/>
+                                    <field name="company_id" invisible="1"/>
+                                    <field name="bug_id"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Expected Result">
+                            <field name="expected_result"/>
+                        </page>
+                        <page string="Actual Result">
+                            <field name="actual_result"/>
+                        </page>
+                        <page string="Solution">
+                            <field name="solution"/>
+                        </page>
+                        <page string="Extra Info">
+                            <field name="extra_info"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <!-- Chatter -->
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Define the Kanban View for Bug Stages (optional) -->
+    <!-- If you have custom stages and want to manage them, define views and actions for them -->
+
+    <!-- Action for 'Edit Tags' -->
+    <record id="action_project_edit_bug_tags" model="ir.actions.act_window">
+        <field name="name">Edit Tags</field>
+        <field name="res_model">my.custom.bug.tag</field>
+        <field name="view_mode">tree,form</field>
+        <!-- Define views for tags if necessary -->
+    </record>
+
+    <!-- Menu for Bugs under Project Module -->
+    <menuitem id="menu_project_bugs_root" name="Bugs" parent="project.menu_main_pm" sequence="200"/>
+
+    <!-- Submenu 'Manage Bugs' -->
+    <menuitem id="menu_project_manage_bugs" name="Manage Bugs" parent="menu_project_bugs_root" sequence="1"
+              action="action_project_manage_bugs"/>
+
+    <!-- Submenu 'Edit Tags' -->
+    <menuitem id="menu_project_edit_bug_tags" name="Edit Tags" parent="menu_project_bugs_root" sequence="2"
+              action="action_project_edit_bug_tags"/>
+
+</odoo>
