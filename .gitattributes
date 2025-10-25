@@ -1,0 +1,25 @@
+cat > .gitattributes << 'EOF'
+# De-emphasize assets & generated stuff so language stats reflect source
+*.png linguist-vendored
+*.jpg linguist-vendored
+*.jpeg linguist-vendored
+*.gif linguist-vendored
+*.webp linguist-vendored
+*.svg linguist-vendored
+*.pdf linguist-vendored
+*.csv linguist-vendored
+*.vsidx linguist-vendored
+
+# Treat Python as detectable source
+*.py linguist-detectable=true
+*.pyi linguist-detectable=true
+*.pyx linguist-detectable=true
+
+# Common vendor-ish dirs
+node_modules/** linguist-vendored
+dist/** linguist-vendored
+build/** linguist-vendored
+EOF
+
+git add .gitattributes
+git commit -m "chore(linguist): tune language detection for Python"
