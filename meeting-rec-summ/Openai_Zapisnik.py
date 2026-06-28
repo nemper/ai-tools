@@ -18,7 +18,7 @@ from myfunc.mojafunkcija import initialize_session_state, positive_login, sacuva
 from myfunc.varvars_dicts import work_prompts, work_vars
 
 mprompts = work_prompts()
-client=OpenAI()
+client = OpenAI()
 
 default_values = {
     "dld": "Zapisnik",
@@ -28,8 +28,9 @@ initialize_session_state(default_values)
 
 version = "28.07.24."
 
-# this class does long summarization of the text 
 class MeetingTranscriptSummarizer:
+    """Generate short or topic-by-topic meeting summaries from a transcript."""
+
     def __init__(self, transcript, temperature, number_of_topics):
         self.transcript = transcript
         self.temperature = temperature
@@ -72,8 +73,9 @@ class MeetingTranscriptSummarizer:
         )
         return full_text
     
-#main function
 def main():
+    """Render the Streamlit UI for transcript upload and summarization."""
+
     if "file_content" not in st.session_state:
         st.session_state.file_content = None
     with st.sidebar:
@@ -196,8 +198,9 @@ Srećno sa korišćenjem alata za sažimanje teksta i transkribovanje! 🚀
                 if submit_button:
                     # Initializing ChatOpenAI model
                     llm = ChatOpenAI(
-                        model_name="gpt-4o-mini", #work_vars["names"]["openai_model"], temperature=temp
-                        )
+                        model_name="gpt-4o-mini",  # work_vars["names"]["openai_model"]
+                        temperature=temp,
+                    )
 
                     st.info(f"Temperatura je {temp}")
                     with st.spinner("Sačekajte trenutak..."):

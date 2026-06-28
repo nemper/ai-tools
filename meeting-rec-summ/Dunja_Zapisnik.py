@@ -59,12 +59,11 @@ def transkript():
                 )
 
                 submit_button = st.form_submit_button(label="Submit")
-                client = openai
                 if submit_button:
                     with st.spinner("Sačekajte trenutak..."):
                         system_prompt=mprompts["text_from_audio"]
                         # does transcription of the audio file and then corrects the transcript
-                        transcript = generate_corrected_transcript(client, system_prompt, audio_file, jezik)            
+                        transcript = generate_corrected_transcript(openai, system_prompt, audio_file, jezik)
                         with st.expander("Transkript"):
                             st.info(transcript)
                             
@@ -164,7 +163,6 @@ def read_url_image():
     """ Describe the image from a URL. """    
     # version url
 
-    client = openai
     
     st.info("Čita sa slike sa URL")
     content = ""
@@ -185,7 +183,7 @@ def read_url_image():
             if submit_button:
                 with st.spinner("Sačekajte trenutak..."):         
                     
-                    response = client.chat.completions.create(
+                    response = openai.chat.completions.create(
                       model=work_vars["names"]["openai_model"],
                       messages=[
                         {
@@ -225,9 +223,6 @@ def generate_corrected_transcript(client, system_prompt, audio_file, jezik):
             audio_file (str): The audio file.
             jezik (str): The language of the audio file.
         """    
-    client= openai
-        
-
     def convert_to_mp3(file_path, output_path):
         # Load the audio file
         audio = AudioSegment.from_file(file_path)
