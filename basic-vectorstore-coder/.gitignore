@@ -1,5 +1,6 @@
 *.txt
 !requirements.txt
+!requirements-lock.txt
 *.json
 *.exe
 *.mp3
