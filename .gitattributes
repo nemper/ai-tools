@@ -1,4 +1,3 @@
-cat > .gitattributes << 'EOF'
 # De-emphasize assets & generated stuff so language stats reflect source
 *.png linguist-vendored
 *.jpg linguist-vendored
@@ -19,7 +18,3 @@ cat > .gitattributes << 'EOF'
 node_modules/** linguist-vendored
 dist/** linguist-vendored
 build/** linguist-vendored
-EOF
-
-git add .gitattributes
-git commit -m "chore(linguist): tune language detection for Python"
