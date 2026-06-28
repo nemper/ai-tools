@@ -8,9 +8,10 @@ point for the archived state is:
 streamlit run MultiTool_app.py
 ```
 
-The app depends on the private `myfunc` package pinned in `requirements.txt`,
-plus working OpenAI and Pinecone credentials. It is kept here as an internal
-archive of experimental variants and is not prepared for deployment.
+The private `myfunc` dependency has been removed; the helper functions it used
+are vendored locally in `app_utils.py`. The app still needs working OpenAI and
+Pinecone credentials. It is kept here as an internal archive of experimental
+variants and is not prepared for deployment.
 
 ## Files
 

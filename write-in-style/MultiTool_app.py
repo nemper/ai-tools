@@ -11,7 +11,7 @@ from pdfkit import from_string
 from markdown import markdown
 import streamlit as st
 
-from myfunc.mojafunkcija import st_style, positive_login, init_cond_llm
+from app_utils import st_style, positive_login, init_cond_llm
 from custom_llm_agent import our_custom_agent
 
 version = "16.11.23. Dj OpenAI"

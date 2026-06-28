@@ -42,7 +42,7 @@ def our_custom_agent(question: str, session_state: dict):
     client = OpenAI()
     import pinecone
     from pinecone_text.sparse import BM25Encoder
-    from myfunc.mojafunkcija import open_file
+    from app_utils import open_file
 
     environ.get("OPENAI_API_KEY")
 

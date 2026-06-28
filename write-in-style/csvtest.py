@@ -8,7 +8,7 @@ import streamlit as st
 from langchain.agents import AgentType
 from langchain.agents import create_csv_agent
 from langchain.chat_models import ChatOpenAI
-from myfunc.mojafunkcija import init_cond_llm
+from app_utils import init_cond_llm
 import io
 
 st.subheader("Testiranje modela na osnovu csv fajla")

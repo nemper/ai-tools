@@ -2,7 +2,7 @@ html2docx==1.6.0
 langchain==0.1.5
 langchain-openai==0.0.5
 Markdown==3.5.1
-myfunc @ git+https://github.com/djordjethai/myfunc.git@550b25a6bcdd08224cbcd2aec4fafa1f9315b130
+# myfunc removed: helpers vendored locally in app_utils.py
 openai==1.11.1
 pandas==2.1.2
 pdfkit==1.0.0

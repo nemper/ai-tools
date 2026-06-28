@@ -18,7 +18,7 @@ from langchain.prompts.chat import (
     ChatPromptTemplate,
 )
 from html2docx import html2docx
-from myfunc.mojafunkcija import st_style, positive_login, open_file, init_cond_llm
+from app_utils import st_style, positive_login, open_file, init_cond_llm
 import markdown
 import pdfkit
 from pinecone_text.sparse import BM25Encoder

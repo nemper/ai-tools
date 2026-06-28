@@ -27,7 +27,7 @@ from langchain.prompts import (
     SystemMessagePromptTemplate,
     HumanMessagePromptTemplate,
 )
-from myfunc.mojafunkcija import (
+from app_utils import (
     st_style,
     positive_login,
     StreamHandler,

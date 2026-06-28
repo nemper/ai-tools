@@ -22,7 +22,7 @@ from langchain.prompts.chat import (
     ChatPromptTemplate,
 )
 from html2docx import html2docx
-from myfunc.mojafunkcija import st_style, positive_login, open_file
+from app_utils import st_style, positive_login, open_file
 import markdown
 from langchain.utilities import GoogleSerperAPIWrapper
 import pdfkit

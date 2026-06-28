@@ -18,7 +18,7 @@ from langchain.chains.query_constructor.base import AttributeInfo
 from html2docx import html2docx
 import markdown
 import pdfkit
-from myfunc.mojafunkcija import st_style, positive_login, init_cond_llm
+from app_utils import st_style, positive_login, init_cond_llm
 
 # glavna funkcija
 
