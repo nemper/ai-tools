@@ -1,0 +1,18 @@
+# Secrets — never commit
+.env
+*.json            # service-account keys (e.g. denty.json)
+!.streamlit/*.json
+
+# Pipeline intermediates / outputs
+gdrive_files/
+gdrive_jsons/
+*.csv
+pinecone_out.txt
+err_log.txt
+output.mp3
+
+# Python / IDE artifacts
+__pycache__/
+*.pyc
+.vscode/
+.vs/
