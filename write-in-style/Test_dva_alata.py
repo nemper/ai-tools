@@ -202,8 +202,6 @@ def hybrid_query(upit):
         api_key=os.environ["PINECONE_API_KEY_POS"],
         environment=os.environ["PINECONE_ENVIRONMENT_POS"],
     )
-    # # Initialize OpenAI embeddings
-    # embeddings = OpenAIEmbeddings()
     index_name = "bis"
     index = pinecone.Index(index_name)
     # za prosledjivanje originalnog prompta alatu alternativa je upit
@@ -253,10 +251,8 @@ def hybrid_query(upit):
             include_metadata=True,
             namespace=st.session_state.name_hybrid,
         )
-        # return search results as dict
         return result.to_dict()
 
-    # st.session_state.tematika = vectorstore.get_relevant_documents(zahtev)
     st.session_state.tematika = hybrid_query(
         ceo_odgovor, top_k=st.session_state.broj_k, alpha=st.session_state.alpha
     )
@@ -415,7 +411,6 @@ def main():
             output = agent_chain.invoke(input=pitanje)
             output_text = output.get("output", "")
 
-            #            output_text = chat.predict(pitanje)
             st.session_state.stream_handler.clear_text()
             st.session_state.past.append(f"{name}: {upit}")
             st.session_state.generated.append(f"AI Asistent: {output_text}")

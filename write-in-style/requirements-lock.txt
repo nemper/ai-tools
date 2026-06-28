@@ -112,8 +112,7 @@ more-itertools==10.1.0
 mpmath==1.3.0
 multidict==6.0.4
 multiprocess==0.70.16
-# myfunc removed (repo no longer available); helpers vendored locally in app_utils.py
-# myfunc @ git+https://github.com/djordjethai/myfunc.git@550b25a6bcdd08224cbcd2aec4fafa1f9315b130
+# myfunc removed: helpers vendored locally in app_utils.py
 mypy-extensions==1.0.0
 mysql-connector-python==8.2.0
 nest-asyncio==1.5.6

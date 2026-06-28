@@ -19,11 +19,9 @@ from langchain.vectorstores.pinecone import Pinecone
 from langchain.chat_models import ChatOpenAI
 from langchain.retrievers.self_query.base import SelfQueryRetriever
 from langchain.chains.query_constructor.base import AttributeInfo
-from langchain.retrievers import PineconeHybridSearchRetriever
-from pinecone_text.sparse import BM25Encoder
 from langchain.agents.agent_types import AgentType
 from langchain.agents import create_csv_agent
-from mojafunkcija import init_cond_llm
+from app_utils import init_cond_llm
 from langchain.chains import RetrievalQA
 
 
@@ -33,12 +31,6 @@ if "rag_index" not in st.session_state:
         environment=os.environ["PINECONE_API_ENV"],
     )
 st.session_state.idx = pinecone.Index("embedings1")
-# if "hybrid_index" not in st.session_state:
-#     st.session_state.hybrid_index = pinecone.init(
-#         api_key=os.environ["PINECONE_API_KEY_POS"],
-#         environment=os.environ["PINECONE_ENVIRONMENT_POS"],
-#     )
-#     st.session_state.ind2 = pinecone.Index("bis")
 
 upit = st.text_input("Pitanje: ")
 
@@ -51,19 +43,6 @@ rag_retriever = Pinecone(
     text_key=text,
     namespace="positive",
 ).as_retriever()
-
-# index = pinecone.Index("bis")
-# hybrid search
-
-# hybrid_retriever = PineconeHybridSearchRetriever(
-#     index=index,
-#     embeddings=OpenAIEmbeddings(),
-#     sparse_encoder=BM25Encoder().default(),
-#     namespace="pravnikkraciprazan",
-#     top_k=3,
-#     alpha=0.5,
-# )
-
 
 llm = ChatOpenAI(temperature=0)
 # Define metadata fields
@@ -112,11 +91,6 @@ retriever_infos = [
         "description": "Good for answering questions when you mention word: navedi",
         "retriever": ret,
     },
-    # {
-    #     "name": "Hybrid retriever",
-    #     "description": "Good for answering questions when you want to list all ocurrences of a word",
-    #     "retriever": hybrid_retriever,
-    # },
 ]
 
 

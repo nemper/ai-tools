@@ -47,12 +47,10 @@ def our_custom_agent(question: str, session_state: dict):
     environ.get("OPENAI_API_KEY")
 
     # Tool #1 Web search
-    # @tool("Web search")
     web_search = GoogleSerperAPIWrapper(environment=environ["SERPER_API_KEY"])
 
 
     # Tools #2 & #3 Pinecone Hybrid search
-    # @tool("Pinecone Keyword search")
     def hybrid_search_process_alpha1(upit):
         """
         The Keyword Search tool is used to find exact matches for the terms in your query. \
@@ -64,7 +62,6 @@ def our_custom_agent(question: str, session_state: dict):
         return hybrid_search_process(upit, 0.1)
 
 
-    # @tool("Pinecone Semantic search")
     def hybrid_search_process_alpha2(upit):
         """
         The Semantic Search tool is used to understand the intent and contextual meaning of a query. \
@@ -138,14 +135,16 @@ def our_custom_agent(question: str, session_state: dict):
 
 
     # Tool #4 CSV search
-    # @tool("SQL search", return_direct=True)
     def sql_file_analyzer(upit):
         """
         This tool should be use when you are asked about structured data, e.g: numbers, counts or sums. This tool is relevant if the query is about Positive doo.
         Extremely important: when using this tool send it only the python code (with lowercase when searching for matches) that solves the problem. \
         Do not send any extra text/explanations.
         """
-        db = SQLDatabase.from_uri(f"mysql+pymysql://root:CrimsonRed_1@localhost:3306/test1")
+        # Connection string from DATABASE_URL env var; default is a non-secret placeholder.
+        db = SQLDatabase.from_uri(
+            environ.get("DATABASE_URL", "mysql+pymysql://user:password@localhost:3306/dbname")
+        )
         toolkit = SQLDatabaseToolkit(db=db, llm=OpenAI(model="gpt-3.5-turbo-instruct", temperature=0))
         # ovde moze Chat model, ali treba dodati i handle_parsing_errors=True
         agent_executor = create_sql_agent(

@@ -69,7 +69,6 @@ def update_json_file(json_path, url_dict):
                 not_found_count += 1
                 # Optionally, you can log or handle this case as needed
                 # For example, you might set 'url' to None or leave it empty
-                # entry['url'] = None  # Uncomment if you want to clear the URL
                 print(f"Warning: Source '{source}' not found in CSV. URL not updated.")
         
         # Save the updated JSON back to the file

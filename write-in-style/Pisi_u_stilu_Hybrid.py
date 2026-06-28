@@ -37,8 +37,6 @@ def main():
         api_key=os.environ["PINECONE_API_KEY_POS"],
         environment=os.environ["PINECONE_ENVIRONMENT_POS"],
     )
-    # Initialize OpenAI embeddings
-    # embeddings = OpenAIEmbeddings()
 
     # Initialize OpenAI embeddings and LLM and all variables
 
@@ -199,11 +197,9 @@ def main():
                     include_metadata=True,
                     namespace=st.session_state.namespace,
                 )
-                # return search results as dict
 
                 return result.to_dict()
 
-            # st.session_state.tematika = vectorstore.get_relevant_documents(zahtev)
             st.session_state.tematika = hybrid_query(
                 zahtev, top_k=st.session_state.broj_k, alpha=st.session_state.alpha
             )

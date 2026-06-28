@@ -12,12 +12,15 @@ from langchain.agents import AgentExecutor
 from langchain.agents.agent_types import AgentType
 from langchain.chat_models import ChatOpenAI
 import streamlit as st
+import os
 
 llm = ChatOpenAI(temperature=0)
 
-# db = SQLDatabase.from_uri(
-    #f"mssql+pyodbc://@DJORDJE-E15\SQLEXPRESS01/sqltest?driver=ODBC+Driver+17+for+SQL+Server&trusted_connection=yes&charset=UTF-8")
-db = SQLDatabase.from_uri(f"mysql+pymysql://root:CrimsonRed_1@localhost:3306/test1")
+# Connection string comes from the DATABASE_URL env var; the default is a
+# non-secret placeholder (never hardcode real credentials).
+db = SQLDatabase.from_uri(
+    os.getenv("DATABASE_URL", "mysql+pymysql://user:password@localhost:3306/dbname")
+)
 
 # cini se da je ovo najbolje resenje za sada. deluje da chat modeli kao sto je klasican turbo ne rade sa ovim alatom.
 # to je sasvim moguce i za CSV tool. Treba i tamo u samom toolu definisati OpenAI a ne chatOpenAI, slicno ovome
