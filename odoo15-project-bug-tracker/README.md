@@ -46,7 +46,13 @@ This Odoo 15 module introduces a custom bug tracking system integrated within th
 - **Deadline Management**:
   - Set deadlines for bug resolution to ensure timely fixes.
 
-...
+## Deployment / Technical Name
+
+> **Important:** the module's *technical name* is **`positive_bugs`**.
+> Several XML IDs (e.g. `%(positive_bugs.action_project_manage_bugs)d`) and an
+> `env.ref('positive_bugs.action_my_custom_bug_model')` call depend on it.
+> When installing, the addon directory **must be named `positive_bugs`**, even
+> though it lives under `odoo15-project-bug-tracker/` in this archive repository.
 
 ## Installation
 
@@ -56,10 +62,11 @@ This Odoo 15 module introduces a custom bug tracking system integrated within th
 
 2. **Download the Module**:
    - Clone or download this repository to your local machine.
-   - C:\Program Files\Odoo15\server\odoo\addons
 
 3. **Add to Odoo Addons Path**:
-   - Copy the module folder to your Odoo addons directory.
+   - Copy the module folder into your Odoo addons directory **renamed to
+     `positive_bugs`** (e.g. `<odoo>/addons/positive_bugs` or, on a default
+     Windows install, `C:\Program Files\Odoo15\server\odoo\addons\positive_bugs`).
 
 4. **Update Module List**:
    - Restart the Odoo server.
@@ -100,8 +107,6 @@ This Odoo 15 module introduces a custom bug tracking system integrated within th
 5. **Tags and Stages**:
    - Manage tags via the `Edit Tags` menu under `Bugs`.
    - Customize bug stages as needed for your workflow.
-
-...
 
 ## Configuration
 

@@ -81,45 +81,51 @@ class MyCustomBugModel(models.Model):
             self.client_id = self.project_id.partner_id
         else:
             self.client_id = False
-            
-    @api.model
-    def create(self, vals):
-        _logger.info('Creating a new bug with values: %s', vals)
-        if vals.get('bug_unique_id', _('New')) == _('New'):
-            vals['bug_unique_id'] = self.env['ir.sequence'].next_by_code('my.custom.bug.model') or _('New')
-        record = super(MyCustomBugModel, self).create(vals)
-        if record.assigned_to_id and record.assigned_to_id not in record.assigned_multi_user_ids:
-            record.assigned_multi_user_ids |= record.assigned_to_id
-        # Add assigned users as followers
-        partners_to_subscribe = []
-        if record.assigned_to_id and record.assigned_to_id.user_id:
-            partners_to_subscribe.append(record.assigned_to_id.user_id.partner_id.id)
-        if record.assigned_multi_user_ids:
-            partners_to_subscribe.extend(record.assigned_multi_user_ids.mapped('user_id.partner_id').ids)
-        if partners_to_subscribe:
-            record.message_subscribe(partners_to_subscribe)
-        return record
+
+    def _subscribe_assigned_employees(self):
+        """Subscribe the partners of all assigned employees as followers.
+
+        ``hr.employee`` has no direct ``partner_id`` field; the related partner is
+        reached through ``user_id.partner_id`` and only exists for employees that
+        are linked to a portal/internal user. ``mapped`` silently drops employees
+        without a user, so this is safe for unlinked employees too.
+        """
+        for record in self:
+            employees = record.assigned_to_id | record.assigned_multi_user_ids
+            partner_ids = employees.mapped('user_id.partner_id').ids
+            if partner_ids:
+                record.message_subscribe(partner_ids)
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        # Odoo 15 best practice: batch-aware create. Assign the sequence-based
+        # human-readable id to every record that does not already carry one.
+        for vals in vals_list:
+            _logger.info('Creating a new bug with values: %s', vals)
+            if vals.get('bug_unique_id', _('New')) == _('New'):
+                vals['bug_unique_id'] = self.env['ir.sequence'].next_by_code('my.custom.bug.model') or _('New')
+        records = super(MyCustomBugModel, self).create(vals_list)
+        for record in records:
+            # Keep the single "Assigned to" employee inside the multi-user set
+            if record.assigned_to_id and record.assigned_to_id not in record.assigned_multi_user_ids:
+                record.assigned_multi_user_ids |= record.assigned_to_id
+        records._subscribe_assigned_employees()
+        return records
 
     @api.model
     def _read_group_stage_ids(self, stages, domain, order):
         # Define how the stages are grouped and ordered in the Kanban view
         stage_ids = stages.search([], order=order)
         return stage_ids
-    
+
     def write(self, vals):
         res = super(MyCustomBugModel, self).write(vals)
         for record in self:
             # Ensure assigned_to_id is in assigned_multi_user_ids
             if 'assigned_to_id' in vals and record.assigned_to_id and record.assigned_to_id not in record.assigned_multi_user_ids:
                 record.assigned_multi_user_ids |= record.assigned_to_id
-            # Add assigned users as followers
-            partners_to_subscribe = []
-            if record.assigned_to_id:
-                partners_to_subscribe.append(record.assigned_to_id.partner_id.id)
-            if record.assigned_multi_user_ids:
-                partners_to_subscribe.extend(record.assigned_multi_user_ids.mapped('partner_id').ids)
-            if partners_to_subscribe:
-                record.message_subscribe(partners_to_subscribe)
+        # Refresh followers from the (possibly) updated assignments
+        self._subscribe_assigned_employees()
         return res
 
 
