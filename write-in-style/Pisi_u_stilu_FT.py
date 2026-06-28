@@ -1,3 +1,9 @@
+"""Experimental fine-tuned-model Streamlit style writer.
+
+Older standalone variant that writes text in selected fine-tuned styles using
+Pinecone context and OpenAI. Run locally with: streamlit run Pisi_u_stilu_FT.py
+"""
+
 # program za pisanje u stilu neke osobe, uzima stil i temu iz Pinecone indexa
 
 # uvoze se biblioteke

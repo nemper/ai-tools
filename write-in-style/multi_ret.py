@@ -1,3 +1,9 @@
+"""Experimental Streamlit retrieval router variant.
+
+Tests semantic and self-query retrievers against Pinecone indexes; it is not the
+main entry point. Run locally with: streamlit run multi_ret.py
+"""
+
 from langchain.chains.router import MultiRetrievalQAChain
 from langchain.chat_models import ChatOpenAI
 from langchain.vectorstores.pinecone import Pinecone

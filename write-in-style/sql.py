@@ -1,3 +1,9 @@
+"""Small experimental Streamlit SQL-agent utility.
+
+Tests a LangChain SQL agent against a local database; it is not the main
+style-writing app. Run locally with: streamlit run sql.py
+"""
+
 from langchain.agents import create_sql_agent
 from langchain.agents.agent_toolkits import SQLDatabaseToolkit
 from langchain.sql_database import SQLDatabase

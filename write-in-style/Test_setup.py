@@ -1,3 +1,9 @@
+"""Experimental multi-tool Streamlit chatbot setup.
+
+Development variant for testing semantic, self-query, hybrid, web, and CSV
+tools together. Run locally with: streamlit run Test_setup.py
+"""
+
 import os
 import sys
 import io

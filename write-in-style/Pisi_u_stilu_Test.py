@@ -1,3 +1,9 @@
+"""Experimental Streamlit test variant for style writing.
+
+Older standalone variant with adjustable retrieval count, namespaces, and model
+choices. Run locally with: streamlit run Pisi_u_stilu_Test.py
+"""
+
 # program za pisanje u stilu neke osobe, uzima stil i temu iz Pinecone indexa
 
 # uvoze se biblioteke

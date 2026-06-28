@@ -1,3 +1,9 @@
+"""Small experimental Streamlit CSV-agent utility.
+
+Tests LangChain's CSV agent with the selected OpenAI chat model; it is not the
+main style-writing app. Run locally with: streamlit run csvtest.py
+"""
+
 import streamlit as st
 from langchain.agents import AgentType
 from langchain.agents import create_csv_agent

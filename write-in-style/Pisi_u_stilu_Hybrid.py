@@ -1,3 +1,9 @@
+"""Experimental hybrid-search Streamlit style writer.
+
+Older standalone variant that combines keyword and semantic Pinecone search
+before generating Serbian text. Run locally with: streamlit run Pisi_u_stilu_Hybrid.py
+"""
+
 # program za pisanje u stilu neke osobe, uzima stil i temu iz Pinecone indexa
 
 # uvoze se biblioteke

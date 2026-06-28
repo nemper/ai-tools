@@ -1,3 +1,9 @@
+"""Support module for the main custom-agent style writer.
+
+Defines our_custom_agent(), combining web, Pinecone hybrid, and SQL tools for
+MultiTool_app.py. Use through: streamlit run MultiTool_app.py
+"""
+
 
 def our_custom_agent(question: str, session_state: dict):
     from langchain.agents import (

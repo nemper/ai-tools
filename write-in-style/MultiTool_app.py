@@ -1,3 +1,9 @@
+"""Main Streamlit entry for the archived style-writing tool.
+
+Runs the custom-agent hybrid-search writer that uses Pinecone, OpenAI, and the
+private myfunc package. Run locally with: streamlit run MultiTool_app.py
+"""
+
 from os import environ
 import io
 from html2docx import html2docx

@@ -1,3 +1,9 @@
+"""Small Azure Cognitive Search retrieval utility.
+
+Command-line experiment for querying an Azure Cognitive Search-backed LangChain
+retriever. Run locally with: python acs.py
+"""
+
 import os
 
 from langchain.retrievers import AzureCognitiveSearchRetriever

@@ -1,53 +1,50 @@
-# Text Style Generator using Pinecone and OpenAI
+# Write In Style
 
-This program is designed for generating text in the style of a specified person or model by taking inspiration from Pinecone indexes. Pinecone is a real-time vector database used for efficient storage and retrieval of embeddings. By utilizing Pinecone and OpenAI models, this program enables users to create text in a specific style.
+Archived Streamlit tool for generating Serbian text in a requested writing style
+using OpenAI models with Pinecone-backed context retrieval. The active entry
+point for the archived state is:
 
-## Overview
+```bash
+streamlit run MultiTool_app.py
+```
 
-The purpose of this program is to facilitate text generation in the style of various individuals or models. It retrieves text samples from Pinecone indexes related to a particular topic and then generates new text in a similar style using OpenAI models. It provides users with the ability to customize the style, topic, and text generation parameters.
+The app depends on the private `myfunc` package pinned in `requirements.txt`,
+plus working OpenAI and Pinecone credentials. It is kept here as an internal
+archive of experimental variants and is not prepared for deployment.
 
-## Key Features
+## Files
 
-Here are some of the key features and functionalities offered by this program:
+| File | Role |
+| --- | --- |
+| `MultiTool_app.py` | Main Streamlit entry point. Uses `custom_llm_agent.our_custom_agent`, hybrid Pinecone retrieval, OpenAI, and export helpers. |
+| `custom_llm_agent.py` | Support module for the main app. Defines the custom LangChain agent tools. |
+| `multi_ret.py` | Experimental retrieval-router Streamlit script. |
+| `Pisi_u_stilu_FT.py` | Older standalone fine-tuned-model style writer. |
+| `Pisi_u_stilu_Hybrid.py` | Older standalone hybrid-search style writer. |
+| `Pisi_u_stilu_Self.py` | Older standalone self-query retrieval style writer. |
+| `Pisi_u_stilu_Test.py` | Older standalone test variant with extra namespace/model controls. |
+| `Test_setup.py` | Development multi-tool chatbot experiment. |
+| `Test_dva_alata.py` | Development two-tool chatbot experiment for hybrid search and CSV. |
+| `csvtest.py` | Small CSV-agent Streamlit experiment. |
+| `acs.py` | Small Azure Cognitive Search command-line experiment. |
+| `sql.py` | Small SQL-agent Streamlit experiment. |
 
-- **Style Selection**: Users can choose the writing style of specific individuals or models, such as "Dragan Simic," "Miljan Radanovic," or "Pera Lozac," each with its unique characteristics.
+`PRAVILNIK O ORGANIZACIJI I SISTEMATIZACIJI RADNIH MESTA.txt` is included as a
+sample source document for internal testing and should be reviewed before any
+public redistribution.
 
-- **Topic-Based Text Retrieval**: The program fetches text samples related to a specified topic or theme from Pinecone indexes, ensuring that the generated text aligns with the chosen subject.
+## Configuration
 
-- **Text Generation Customization**: Users can fine-tune text generation settings by adjusting parameters like temperature and relevance, allowing for creative control over the generated content.
+Use `.env.example` as the inventory of environment variables referenced by the
+code. The main and variant scripts expect OpenAI and Pinecone credentials; some
+experiments also reference Serper/Google search, Azure Cognitive Search, or a
+local SQL database.
 
-- **Streamlit Interface**: The program provides an intuitive Streamlit user interface for easy interaction and text generation.
+`config.yaml` contains placeholder Streamlit-authenticator credentials only.
+Replace them with real credentials outside the archive workflow.
 
-## Getting Started
+## Dependencies
 
-To use this program effectively, follow these steps:
-
-1. Ensure you have Pinecone credentials set up with the required API key and environment variables.
-
-2. Clone or download the program to your local machine.
-
-3. Customize the program by specifying the desired writing style, topic, and text generation settings.
-
-4. Run the program using Streamlit to initiate the text generation process.
-
-5. Review and download the generated text in various formats, such as plain text, PDF, or DOCX.
-
-## Usage Guidelines
-
-- **Style Selection**: Choose the writing style of the text by selecting a specific individual or model from the available options. Each style offers a distinct tone and manner of writing.
-
-- **Topic Specification**: Describe the topic or theme for which you want to generate text. Provide details about the subject and the desired format of the text.
-
-- **Text Generation Settings**: Adjust parameters like temperature and relevance to control the creativity and relevance of the generated text.
-
-- **Text Retrieval**: The program will fetch relevant text samples from Pinecone indexes based on the specified topic. If no suitable content is found, it will perform an internet search for relevant information.
-
-- **Text Generation**: After processing the topic and style, the program generates text that mimics the chosen writing style. The generated text can be further customized and refined.
-
-## Script Details
-
-- **Author**: Positive
-- **Date**: 11.09.23
-- **License**: MIT
-
-Please note that this program relies on Pinecone for text retrieval and OpenAI for text generation. Proper setup and configuration of Pinecone and OpenAI credentials are essential for the program to function correctly.
+`requirements.txt` is intentionally slimmed to direct project dependencies. The
+original full pip-freeze has been preserved unchanged in `requirements-lock.txt`
+for historical reference.

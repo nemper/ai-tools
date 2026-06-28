@@ -1,3 +1,9 @@
+"""Experimental two-tool Streamlit chatbot variant.
+
+Development variant focused on hybrid Pinecone search plus CSV analysis. Run
+locally with: streamlit run Test_dva_alata.py
+"""
+
 import os
 import sys
 import io

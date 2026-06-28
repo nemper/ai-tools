@@ -1,3 +1,9 @@
+"""Experimental self-query Streamlit style writer.
+
+Older standalone variant that uses LangChain self-query retrieval over Pinecone
+metadata. Run locally with: streamlit run Pisi_u_stilu_Self.py
+"""
+
 # program za pisanje u stilu neke osobe, uzima stil i temu iz Pinecone indexa
 
 # uvoze se biblioteke
