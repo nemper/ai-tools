@@ -16,10 +16,16 @@ Archived Streamlit tool for summarizing meeting transcripts, transcribing audio/
 This app depends on:
 
 - OpenAI API access.
-- The private `myfunc` package, especially `myfunc.asistenti`, `myfunc.mojafunkcija`, and `myfunc.varvars_dicts`.
 - Python packages listed in `requirements.txt`.
 
-The helper implementations copied in `Dunja_Zapisnik.py` are reference copies only. The main app keeps importing from `myfunc.*`.
+It is **standalone** — the helpers it used to import from the private `myfunc`
+package (`myfunc.asistenti`, `myfunc.mojafunkcija`, `myfunc.varvars_dicts`) are
+now re-implemented locally in **`app_utils.py`**. `Dunja_Zapisnik.py` is kept as
+a thin reference that re-exports the `asistenti` helpers from `app_utils.py`.
+
+> Note: the summary download helper (`sacuvaj_dokument`) exports `.txt` and
+> `.docx`; the original PDF export relied on an external `wkhtmltopdf` binary and
+> was dropped to keep the tool self-contained.
 
 ## Environment
 

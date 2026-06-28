@@ -28,3 +28,35 @@ The main app is `Openai_Zapisnik.py`. It intentionally imports private helpers a
 - Rewrote `README.md` to accurately describe transcript summarization, Whisper transcription, image description, dependencies, environment variables, and the real Streamlit entry point.
 - Sanitized `config.yaml` to placeholder `admin` and `demo` users with fake bcrypt-format hashes and placeholder emails.
 - Added `.env.example` with `OPENAI_API_KEY` and `DEPLOYMENT_ENVIRONMENT`.
+
+## Update — removed the private `myfunc` dependency
+
+The tool imported helpers from `myfunc.asistenti`, `myfunc.mojafunkcija`, and
+`myfunc.varvars_dicts`, which are no longer available. These are now
+re-implemented from scratch in a local, self-contained `app_utils.py`:
+
+- `varvars_dicts`: `work_prompts()` (freshly authored prompt templates matching
+  how each key is used) and the `work_vars` dict.
+- `mojafunkcija`: `positive_login` (streamlit-authenticator over `config.yaml`),
+  `initialize_session_state`, and `sacuvaj_dokument` (now `.txt` + `.docx`; the
+  PDF path that needed the external `wkhtmltopdf` binary was dropped).
+- `asistenti`: `priprema`, `transkript`, `read_local_image`, `read_url_image`,
+  `generate_corrected_transcript`, `delete_mp3_files` — based faithfully on the
+  former reference copies.
+
+Other changes:
+
+- `Openai_Zapisnik.py` now imports everything from `app_utils`.
+- `Dunja_Zapisnik.py` was reduced to a thin reference that re-exports the
+  `asistenti` helpers from `app_utils` (no more ~300 lines of duplication).
+- `requirements.txt`: dropped the `myfunc` git line; added the now-direct deps
+  `streamlit-authenticator`, `PyYAML`, `Pillow`, `requests`, `python-docx`.
+- Added `test_app_utils.py` (a pytest contract test for the prompt keys,
+  placeholders and `work_vars` shape; requires the deps to be installed).
+
+### Pre-existing quirk left untouched
+
+The >275000-char `map_reduce` path builds its `PromptTemplate` via
+`mprompts["summary_begin"].format(text="text", opis="opis")`, which substitutes
+the placeholders before declaring them as `input_variables` — a pre-existing bug
+in the app logic, not in the vendored helpers, so it was left as-is.

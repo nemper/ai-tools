@@ -13,9 +13,16 @@ from langchain.schema import AIMessage
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain_openai.chat_models import ChatOpenAI
-from myfunc.asistenti import priprema
-from myfunc.mojafunkcija import initialize_session_state, positive_login, sacuvaj_dokument
-from myfunc.varvars_dicts import work_prompts, work_vars
+# Helpers formerly imported from the private `myfunc` package are now vendored
+# locally in app_utils.py (this tool is standalone — no external private dep).
+from app_utils import (
+    priprema,
+    initialize_session_state,
+    positive_login,
+    sacuvaj_dokument,
+    work_prompts,
+    work_vars,
+)
 
 mprompts = work_prompts()
 client = OpenAI()
