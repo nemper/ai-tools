@@ -24,3 +24,21 @@
 - Moved the original frozen dependency list to `requirements-lock.txt` and slimmed `requirements.txt` to direct dependencies.
 - Replaced authentication users and preauthorized emails with placeholder-only values.
 - Added `.env.example` with the expected environment variables.
+
+## Update — removed the private `myfunc` dependency
+
+The app imported `st_style`, `positive_login`, `init_cond_llm` and `show_logo`
+from the private `myfunc.mojafunkcija` package, which is no longer available.
+These are now re-implemented from scratch in a local, self-contained
+`app_utils.py`:
+
+- `st_style()` — hides Streamlit's default menu/footer/header chrome.
+- `init_cond_llm()` — sidebar model + temperature selectors, returns `(model, temp)`.
+- `show_logo()` — optional sidebar logo (env `APP_LOGO_URL`) with a text fallback.
+- `positive_login(main, " ")` — streamlit-authenticator login over `config.yaml`
+  (lazy import; only needed when `DEPLOYMENT_ENVIRONMENT=Streamlit`).
+
+`Koder.py` now imports from `app_utils`, and the `myfunc` git line was dropped
+from `requirements.txt` (the helpers' deps — `streamlit-authenticator`, `pyyaml`
+— were already present).
+

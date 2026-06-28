@@ -5,4 +5,4 @@ langchain-pinecone==0.0.3
 pinecone-client==3.0.2
 pyyaml==6.0.1
 streamlit-authenticator==0.2.3
-myfunc @ git+https://github.com/djordjethai/myfunc.git@550b25a6bcdd08224cbcd2aec4fafa1f9315b130
+# myfunc removed: its helpers are now vendored locally in app_utils.py

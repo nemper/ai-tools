@@ -1,7 +1,9 @@
 """Archived Streamlit RetrievalQA app backed by a Pinecone vector index.
 
-The app keeps its original UI flow and private ``myfunc`` helpers while using
-the Pinecone v3 client and the dedicated LangChain Pinecone integration.
+The app keeps its original UI flow while using the Pinecone v3 client and the
+dedicated LangChain Pinecone integration. The UI/login/model helpers that used
+to come from the private ``myfunc`` package are now implemented locally in
+``app_utils.py`` (no external private dependency).
 """
 
 from __future__ import annotations
@@ -15,7 +17,7 @@ from langchain_pinecone import PineconeVectorStore
 from pinecone import Pinecone
 import streamlit as st
 
-from myfunc.mojafunkcija import st_style, positive_login, init_cond_llm, show_logo
+from app_utils import st_style, positive_login, init_cond_llm, show_logo
 
 
 REQUIRED_ENV_VARS = ("OPENAI_API_KEY", "PINECONE_API_KEY", "PINECONE_API_ENV")
